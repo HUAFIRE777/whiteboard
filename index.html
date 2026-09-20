@@ -169,7 +169,8 @@
       <button class="tool-btn p-1.5 px-2 rounded-xl text-slate-300 hover:bg-slate-800 text-xs flex items-center gap-1 transition" data-tool="chalk" title="粉笔 (真实碎屑颗粒)">👨‍🏫 <span class="hidden sm:inline" data-i18n="chalk">粉笔</span></button>
       <button class="tool-btn p-1.5 px-2 rounded-xl text-slate-300 hover:bg-slate-800 text-xs flex items-center gap-1 transition" data-tool="spray" title="雾化喷枪">💨 <span class="hidden sm:inline" data-i18n="spray">喷枪</span></button>
       <button class="tool-btn p-1.5 px-2 rounded-xl text-slate-300 hover:bg-slate-800 text-xs flex items-center gap-1 transition" data-tool="laser" title="讲解激光笔 (1.2秒消散)">🔦 <span class="hidden sm:inline" data-i18n="laser">激光笔</span></button>
-      <button class="tool-btn p-1.5 px-2 rounded-xl text-slate-300 hover:bg-slate-800 text-xs flex items-center gap-1 transition" data-tool="eraser" title="板擦/橡皮">🧽 <span class="hidden sm:inline" data-i18n="eraser">橡皮</span></button>
+      <button class="tool-btn p-1.5 px-2 rounded-xl text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 text-xs flex items-center gap-1 transition font-medium" data-tool="eraser" title="⚡ 一笔整擦 (点中笔画/字立即全消，无碎屑残渣)">⚡ <span data-i18n="eraser">一笔整擦</span></button>
+      <button id="btnQuickClear" class="p-1.5 px-2 text-rose-300 hover:bg-rose-950/60 hover:text-rose-200 rounded-xl transition text-xs flex items-center gap-1 border border-rose-800/40" title="🗑️ 一键清屏 (清空所有字画)">🗑️ <span class="hidden sm:inline" data-i18n="clear_short">一键全擦</span></button>
     </div>
 
     <!-- 模式专属动态能力槽 -->
@@ -428,7 +429,7 @@
         title_graph: 'Graph Paper — 免费在线数学坐标方格纸 · 5mm网格/极坐标/3D等轴测',
         title_kids: 'KidsDraw — 免费儿童在线涂鸦画板与创意蜡笔画布 | 纯本地隐私安全',
         title_whiteboard: 'Whiteboard — 免费在线商务白板 · 点阵极简/便利贴/流程图绘制',
-        pencil: '铅笔', pen: '钢笔', brush: '毛笔', highlighter: '荧光', chalk: '粉笔', spray: '喷枪', laser: '激光笔', eraser: '橡皮',
+        pencil: '铅笔', pen: '钢笔', brush: '毛笔', highlighter: '荧光', chalk: '粉笔', spray: '喷枪', laser: '激光笔', eraser: '一笔整擦', clear_short: '一键全擦',
         size: '粗细', export: '导出', clear: '清空画布', undo: '撤销',
         nav_kids: '少儿画板', nav_graph: '坐标方格纸', nav_chalk: '教学黑板', nav_white: '在线白板',
         privacy: '隐私承诺', privacy_title: '隐私与数据安全说明', know: '我已知悉',
@@ -441,7 +442,7 @@
         title_graph: 'Free Online Graph Paper — 5mm Grid, Isometric 3D & Polar Coordinates | Graph Paper',
         title_kids: 'Free Online Kids Drawing Canvas — Fun Crayons, Stamps & Safe Doodle Board | KidsDraw',
         title_whiteboard: 'Free Online Whiteboard — Minimalist Dot Matrix & Sticky Notes Canvas | Whiteboard',
-        pencil: 'Pencil', pen: 'Pen', brush: 'Brush', highlighter: 'Highlight', chalk: 'Chalk', spray: 'Spray', laser: 'Laser', eraser: 'Eraser',
+        pencil: 'Pencil', pen: 'Pen', brush: 'Brush', highlighter: 'Highlight', chalk: 'Chalk', spray: 'Spray', laser: 'Laser', eraser: 'Stroke Erase', clear_short: 'Clear All',
         size: 'Size', export: 'Export', clear: 'Clear', undo: 'Undo',
         nav_kids: 'Kids Draw', nav_graph: 'Graph Paper', nav_chalk: 'Chalkboard', nav_white: 'Whiteboard',
         privacy: 'Privacy', privacy_title: 'Privacy & Security Guarantee', know: 'Got it',
@@ -454,7 +455,7 @@
         title_graph: '数学用方眼紙と座標軸 - Graph Paper | EazyOPC',
         title_kids: 'キッズお絵描きボード - Kids Draw | EazyOPC',
         title_whiteboard: 'ミニマルなドットホワイトボード - Whiteboard | EazyOPC',
-        pencil: '鉛筆', pen: '万年筆', brush: '筆', highlighter: '蛍光ペン', chalk: 'チョーク', spray: 'スプレー', laser: 'レーザー', eraser: '消しゴム',
+        pencil: '鉛筆', pen: '万年筆', brush: '筆', highlighter: '蛍光ペン', chalk: 'チョーク', spray: 'スプレー', laser: 'レーザー', eraser: '一筆消去', clear_short: '全消去',
         size: '太さ', export: '保存', clear: '消去', undo: '元に戻す',
         nav_kids: 'キッズ', nav_graph: '方眼紙', nav_chalk: '黒板', nav_white: 'ホワイトボード',
         privacy: 'プライバシー', privacy_title: 'プライバシー方針', know: '了解',
@@ -467,7 +468,7 @@
         title_graph: '수학 모눈종이와 좌표축 - Graph Paper | EazyOPC',
         title_kids: '키즈 드로잉 캔버스 - Kids Draw | EazyOPC',
         title_whiteboard: '미니멀 도트 화이트보드 - Whiteboard | EazyOPC',
-        pencil: '연필', pen: '만년필', brush: '붓', highlighter: '형광펜', chalk: '분필', spray: '스프레이', laser: '레이저', eraser: '지우개',
+        pencil: '연필', pen: '만년필', brush: '붓', highlighter: '형광펜', chalk: '분필', spray: '스프레이', laser: '레이저', eraser: '한획 지우개', clear_short: '전체 삭제',
         size: '굵기', export: '내보내기', clear: '지우기', undo: '실행 취소',
         nav_kids: '키즈 보드', nav_graph: '모눈종이', nav_chalk: '칠판', nav_white: '화이트보드',
         privacy: '개인정보 보호', privacy_title: '개인정보 정책', know: '확인',
@@ -480,7 +481,7 @@
         title_graph: 'Mathematisches Millimeterpapier - Graph Paper | EazyOPC',
         title_kids: 'Kreative Kinder-Zeichenfläche - Kids Draw | EazyOPC',
         title_whiteboard: 'Minimalistisches Punktraster-Whiteboard - Whiteboard | EazyOPC',
-        pencil: 'Bleistift', pen: 'Feder', brush: 'Pinsel', highlighter: 'Textmarker', chalk: 'Kreide', spray: 'Spray', laser: 'Laser', eraser: 'Radierer',
+        pencil: 'Bleistift', pen: 'Feder', brush: 'Pinsel', highlighter: 'Textmarker', chalk: 'Kreide', spray: 'Spray', laser: 'Laser', eraser: 'Strich-Radierer', clear_short: 'Alles Löschen',
         size: 'Stärke', export: 'Exportieren', clear: 'Löschen', undo: 'Rückgängig',
         nav_kids: 'Kinder', nav_graph: 'Millimeterpapier', nav_chalk: 'Tafel', nav_white: 'Whiteboard',
         privacy: 'Datenschutz', privacy_title: 'Datenschutzerklärung', know: 'Verstanden',
@@ -493,7 +494,7 @@
         title_graph: 'Papel milimetrado y coordenadas - Graph Paper | EazyOPC',
         title_kids: 'Pizarra de dibujo infantil - Kids Draw | EazyOPC',
         title_whiteboard: 'Pizarra blanca minimalista - Whiteboard | EazyOPC',
-        pencil: 'Lápiz', pen: 'Pluma', brush: 'Pincel', highlighter: 'Rotulador', chalk: 'Tiza', spray: 'Spray', laser: 'Láser', eraser: 'Borrador',
+        pencil: 'Lápiz', pen: 'Pluma', brush: 'Pincel', highlighter: 'Rotulador', chalk: 'Tiza', spray: 'Spray', laser: 'Láser', eraser: 'Borrado de Trazo', clear_short: 'Borrar Todo',
         size: 'Grosor', export: 'Exportar', clear: 'Limpiar', undo: 'Deshacer',
         nav_kids: 'Niños', nav_graph: 'Papel Milimetrado', nav_chalk: 'Pizarra', nav_white: 'Pizarra Blanca',
         privacy: 'Privacidad', privacy_title: 'Política de Privacidad', know: 'Entendido',
@@ -506,7 +507,7 @@
         title_graph: 'Papier millimétré mathématique - Graph Paper | EazyOPC',
         title_kids: 'Tableau de dessin pour enfants - Kids Draw | EazyOPC',
         title_whiteboard: 'Tableau blanc à matrice de points - Whiteboard | EazyOPC',
-        pencil: 'Crayon', pen: 'Stylo', brush: 'Pinceau', highlighter: 'Surligneur', chalk: 'Craie', spray: 'Aérosol', laser: 'Laser', eraser: 'Gomme',
+        pencil: 'Crayon', pen: 'Stylo', brush: 'Pinceau', highlighter: 'Surligneur', chalk: 'Craie', spray: 'Aérosol', laser: 'Laser', eraser: 'Gomme Trait', clear_short: 'Tout Effacer',
         size: 'Taille', export: 'Exporter', clear: 'Effacer', undo: 'Annuler',
         nav_kids: 'Enfants', nav_graph: 'Papier Millimétré', nav_chalk: 'Tableau Noir', nav_white: 'Tableau Blanc',
         privacy: 'Confidentialité', privacy_title: 'Politique de Confidentialité', know: 'Compris',
@@ -525,6 +526,7 @@
       brushSize: 5,
       isDrawing: false,
       history: [],
+      strokes: [],
       isPro: localStorage.getItem('eazyopc_pro_unlocked') === 'true',
       strokePoints: [],
       currentStamp: '⭐'
@@ -864,6 +866,88 @@
     }
 
     // 立即响应鼠标或触摸下笔
+        // --- 矢量笔画与「一笔整消/整字擦除」引擎 ---
+    let currentStroke = null;
+
+    function distToSegmentSquared(p, v, w) {
+      const l2 = (w.x - v.x) ** 2 + (w.y - v.y) ** 2;
+      if (l2 === 0) return (p.x - v.x) ** 2 + (p.y - v.y) ** 2;
+      let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+      t = Math.max(0, Math.min(1, t));
+      return (p.x - (v.x + t * (w.x - v.x))) ** 2 + (p.y - (v.y + t * (w.y - v.y))) ** 2;
+    }
+
+    function isStrokeNearPoint(stroke, px, py, radius) {
+      if (!stroke.points || stroke.points.length === 0) return false;
+      const r2 = radius * radius;
+      for (let i = 0; i < stroke.points.length; i++) {
+        const p1 = stroke.points[i];
+        const d2 = (p1.x - px) ** 2 + (p1.y - py) ** 2;
+        if (d2 <= r2) return true;
+        if (i > 0) {
+          const p0 = stroke.points[i - 1];
+          if (distToSegmentSquared({ x: px, y: py }, p0, p1) <= r2) return true;
+        }
+      }
+      return false;
+    }
+
+    function redrawAllStrokes() {
+      renderBackground();
+      for (const s of appState.strokes) {
+        if (!s.points || s.points.length === 0) continue;
+        ctx.save();
+        if (s.tool === 'highlighter') {
+          ctx.globalCompositeOperation = 'multiply';
+          ctx.strokeStyle = s.color;
+          ctx.globalAlpha = 0.35;
+          ctx.lineCap = 'square';
+        } else {
+          ctx.strokeStyle = s.color;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+        }
+
+        if (s.points.length < 3) {
+          ctx.beginPath();
+          ctx.arc(s.points[0].x, s.points[0].y, Math.max(2, s.size / 2), 0, Math.PI * 2);
+          ctx.fillStyle = s.color;
+          ctx.fill();
+        } else {
+          ctx.beginPath();
+          for (let i = 1; i < s.points.length; i++) {
+            const p1 = s.points[i - 1];
+            const p2 = s.points[i];
+            const mid = getMidPoint(p1, p2);
+            if (i === 1) ctx.moveTo(p1.x, p1.y);
+            ctx.quadraticCurveTo(p1.x, p1.y, mid.x, mid.y);
+          }
+          ctx.lineWidth = s.size;
+          ctx.stroke();
+
+          if (s.tool === 'chalk') {
+            for (let pt of s.points) {
+              drawParticles(pt.x, pt.y, s.size, s.color, false);
+            }
+          }
+        }
+        ctx.restore();
+      }
+    }
+
+    function eraseStrokesAt(x, y) {
+      if (!appState.strokes || appState.strokes.length === 0) return false;
+      const hitRadius = Math.max(24, appState.brushSize * 3);
+      const initialCount = appState.strokes.length;
+      appState.strokes = appState.strokes.filter(s => !isStrokeNearPoint(s, x, y, hitRadius));
+      if (appState.strokes.length < initialCount) {
+        redrawAllStrokes();
+        return true;
+      }
+      return false;
+    }
+
+
     canvas.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       isDrawing = true;
@@ -875,7 +959,22 @@
         createLaserBeam(e.clientX, e.clientY);
         return;
       }
+
+      if (appState.tool === 'eraser') {
+        saveHistory();
+        eraseStrokesAt(e.clientX, e.clientY);
+        return;
+      }
+
       saveHistory();
+      const dynamicWidth = computeDynamicWidth(pressure, appState.tool);
+      currentStroke = {
+        id: Date.now() + Math.random(),
+        tool: appState.tool,
+        color: appState.currentColor,
+        size: dynamicWidth,
+        points: [pt]
+      };
     });
 
     canvas.addEventListener('pointermove', (e) => {
@@ -887,9 +986,15 @@
         return;
       }
 
+      if (appState.tool === 'eraser') {
+        eraseStrokesAt(e.clientX, e.clientY);
+        return;
+      }
+
       const pressure = (e.pressure !== undefined && e.pressure > 0) ? e.pressure : 0.5;
       const currentPt = { x: e.clientX, y: e.clientY, pressure: pressure };
       strokePoints.push(currentPt);
+      if (currentStroke) currentStroke.points.push(currentPt);
 
       if (strokePoints.length < 3) {
         ctx.beginPath();
@@ -949,7 +1054,12 @@
     });
 
     window.addEventListener('pointerup', () => {
+      if (isDrawing && currentStroke && currentStroke.points && currentStroke.points.length > 0) {
+        if (!appState.strokes) appState.strokes = [];
+        appState.strokes.push(currentStroke);
+      }
       isDrawing = false;
+      currentStroke = null;
       strokePoints = [];
     });
 
@@ -1293,24 +1403,26 @@
       ctx.restore();
     }
 
-    // 9. 历史记录与撤销
+    // 9. 历史记录与撤销 (支持笔画对象同步恢复)
     function saveHistory() {
       if (appState.history.length > 25) appState.history.shift();
-      appState.history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
-    }
-
-    function restoreSnapshot() {
-      if (appState.history.length > 0) {
-        ctx.putImageData(appState.history[appState.history.length - 1], 0, 0);
-      }
+      appState.history.push({
+        img: ctx.getImageData(0, 0, canvas.width, canvas.height),
+        strokes: appState.strokes ? appState.strokes.slice() : []
+      });
     }
 
     document.getElementById('btnUndo').onclick = () => {
       if (appState.history.length > 1) {
         appState.history.pop();
-        ctx.putImageData(appState.history[appState.history.length - 1], 0, 0);
+        const prev = appState.history[appState.history.length - 1];
+        if (prev && prev.img) {
+          ctx.putImageData(prev.img, 0, 0);
+          appState.strokes = prev.strokes ? prev.strokes.slice() : [];
+        }
       } else if (appState.history.length === 1) {
         appState.history.pop();
+        appState.strokes = [];
         renderBackground();
       }
     };
@@ -1322,8 +1434,9 @@
     });
 
     document.getElementById('btnClear').onclick = () => {
-      if (confirm('确认清空当前画布上的所有绘画与内容吗？')) {
+      if (confirm('确认一键清屏（清除所有笔画与内容）吗？')) {
         saveHistory();
+        appState.strokes = [];
         renderBackground();
         stickyLayer.innerHTML = '';
       }
@@ -1423,6 +1536,15 @@
     };
 
         // 12. 工具栏与弹窗绑定
+    // 一键全屏清空
+    document.getElementById('btnQuickClear')?.addEventListener('click', () => {
+      if (confirm('确认一键清屏（清除所有笔画与内容）吗？')) {
+        saveHistory();
+        if (appState.strokes) appState.strokes = [];
+        renderBackground();
+        stickyLayer.innerHTML = '';
+      }
+    });
     document.getElementById('btnOpenEcosystem')?.addEventListener('click', () => document.getElementById('ecosystemModal').classList.remove('hidden'));
     document.getElementById('btnCloseEcosystem')?.addEventListener('click', () => document.getElementById('ecosystemModal').classList.add('hidden'));
     document.getElementById('ecosystemModal')?.addEventListener('click', (e) => {
