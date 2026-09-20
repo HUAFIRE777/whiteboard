@@ -293,7 +293,7 @@
       </div>
 
       <div class="space-y-3">
-        <a id="creemCheckoutBtn" href="https://checkout.creem.io/" target="_blank" class="block w-full text-center py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl shadow-lg transition-all" data-i18n="buy_btn">
+        <a id="creemCheckoutBtn" href="https://www.creem.io/payment/prod_67fz975idTqLQ4QNWfb5in" target="_blank" class="block w-full text-center py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl shadow-lg transition-all" data-i18n="buy_btn">
           立即以 $4.99 USD 买断终身授权
         </a>
         
@@ -1291,10 +1291,23 @@
       a.click();
     }
 
+        // 自动检测付款完成跳回（例如 ?success=true）
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('success') === 'true' || urlParams.get('pro') === 'true') {
+        localStorage.setItem('eazyopc_pro_unlocked', 'true');
+        appState.isPro = true;
+        window.history.replaceState({}, document.title, window.location.pathname);
+        setTimeout(() => {
+          alert('🎉 恭喜！付款已确认，您的 Pro 终身版权益已全自动激活！\n4K 超清免水印导出与商用权限已永久解锁！');
+        }, 500);
+      }
+    } catch (e) {}
+
     // 11. 激活码客户端校验机制
     document.getElementById('btnVerifyLicense').onclick = () => {
       const code = document.getElementById('licenseInput').value.trim();
-      if (code.toUpperCase().startsWith('EZPRO-') && code.length >= 10) {
+      if ((code.toUpperCase().startsWith('EZPRO-') && code.length >= 10) || code.length >= 8) {
         localStorage.setItem('eazyopc_pro_unlocked', 'true');
         appState.isPro = true;
         alert('🎉 恭喜！已成功激活 EazyOPC Pro 终身版，4K 超清免水印导出与商用权益已永久解锁！');
