@@ -125,20 +125,141 @@
     <div id="stickyLayer" class="absolute inset-0 pointer-events-none"></div>
   </main>
 
-  <!-- 底部全矩阵跨站内链导航 (EazyOPC 站群网络) -->
+    <!-- 底部全矩阵跨站内链导航 (EazyOPC 站群网络) -->
   <footer class="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 bg-slate-900/90 backdrop-blur-md border border-slate-800 px-4 py-1.5 rounded-full text-[11px] text-slate-400 max-w-[98vw] overflow-x-auto whitespace-nowrap shadow-2xl">
-    <a href="https://eazyopc.com" target="_blank" class="font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition">🏠 <span data-i18n="nav_main">EazyOPC 主站</span></a>
+    <button id="btnOpenEcosystem" class="font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition">🚀 <span data-i18n="nav_more_tools">全部工具生态</span></button>
     <span class="text-slate-700">|</span>
-    <a href="https://videotools.eazyopc.com" target="_blank" class="hover:text-indigo-400 transition flex items-center gap-1">🎬 <span data-i18n="nav_video">视频工具</span></a>
+    <a href="https://eazyopc.com" target="_blank" class="hover:text-indigo-300 flex items-center gap-1 transition">🏠 <span data-i18n="nav_main">主站</span></a>
+    <a href="https://videotools.eazyopc.com" target="_blank" class="hover:text-indigo-400 transition flex items-center gap-1">🎬 <span data-i18n="nav_video">视频</span></a>
+    <a href="https://kidsdraw.eazyopc.com" class="hover:text-indigo-400 transition flex items-center gap-1">👶 <span data-i18n="nav_kids">画板</span></a>
+    <a href="https://graph.eazyopc.com" class="hover:text-indigo-400 transition flex items-center gap-1">📐 <span data-i18n="nav_graph">坐标纸</span></a>
+    <a href="https://chalkboard.eazyopc.com" class="hover:text-indigo-400 transition flex items-center gap-1">👨‍🏫 <span data-i18n="nav_chalk">黑板</span></a>
+    <a href="https://whiteboard.eazyopc.com" class="hover:text-indigo-400 transition flex items-center gap-1">💼 <span data-i18n="nav_white">白板</span></a>
     <span class="text-slate-700">|</span>
-    <a href="https://kidsdraw.eazyopc.com" class="hover:text-indigo-400 transition flex items-center gap-1">👶 <span data-i18n="nav_kids">少儿画板</span></a>
-    <a href="https://graph.eazyopc.com" class="hover:text-indigo-400 transition flex items-center gap-1">📐 <span data-i18n="nav_graph">坐标方格纸</span></a>
-    <a href="https://chalkboard.eazyopc.com" class="hover:text-indigo-400 transition flex items-center gap-1">👨‍🏫 <span data-i18n="nav_chalk">教学黑板</span></a>
-    <a href="https://whiteboard.eazyopc.com" class="hover:text-indigo-400 transition flex items-center gap-1">💼 <span data-i18n="nav_white">在线白板</span></a>
-    <span class="text-slate-700">|</span>
-    <button id="btnOpenPrivacy" class="hover:underline text-slate-300 transition" data-i18n="privacy">隐私承诺</button>
-    <button id="btnOpenProModal" class="ml-1 px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 font-medium transition">⭐ Pro 终身版</button>
+    <button id="btnOpenPrivacy" class="hover:underline text-slate-300 transition" data-i18n="privacy">隐私</button>
+    <button id="btnOpenProModal" class="ml-1 px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 font-medium transition">⭐ Pro</button>
   </footer>
+
+  
+  <!-- 站群生态全景弹窗 (预留未来更多工具接入) -->
+  <div id="ecosystemModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="bg-slate-800 border border-slate-700 w-full max-w-xl rounded-3xl p-6 shadow-2xl text-white space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-700">
+        <div>
+          <h3 class="text-base font-bold flex items-center gap-2">🌐 <span>EazyOPC 免费实用工具矩阵</span></h3>
+          <p class="text-xs text-slate-400 mt-0.5">100% 浏览器本地计算 · 绝不上传数据 · 持续上线新工具</p>
+        </div>
+        <button id="btnCloseEcosystem" class="text-slate-400 hover:text-white text-lg px-2">✕</button>
+      </div>
+
+      <!-- 分类1: 视频工具 -->
+      <div>
+        <div class="text-xs font-bold text-slate-300 mb-2 flex items-center gap-1.5">🎬 视频与自媒体工具</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <a href="https://videotools.eazyopc.com" target="_blank" class="p-2.5 rounded-xl bg-slate-900/80 hover:bg-indigo-950/40 border border-slate-700/60 hover:border-indigo-500/50 transition flex items-center justify-between group">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">🎬</span>
+              <div>
+                <div class="text-xs font-semibold text-white group-hover:text-indigo-400 transition">VideoTools</div>
+                <div class="text-[10px] text-slate-400">视频码率/体积/安全区计算</div>
+              </div>
+            </div>
+            <span class="text-[9px] px-1.5 py-0.5 bg-red-500/20 text-red-300 rounded font-medium">HOT</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 分类2: 创意与绘图画板 -->
+      <div>
+        <div class="text-xs font-bold text-slate-300 mb-2 flex items-center gap-1.5">🎨 创意与绘图画板</div>
+        <div class="grid grid-cols-2 gap-2">
+          <a href="https://kidsdraw.eazyopc.com" class="p-2.5 rounded-xl bg-slate-900/80 hover:bg-indigo-950/40 border border-slate-700/60 hover:border-indigo-500/50 transition flex items-center justify-between group">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">👶</span>
+              <div>
+                <div class="text-xs font-semibold text-white group-hover:text-indigo-400 transition">KidsDraw</div>
+                <div class="text-[10px] text-slate-400">少儿蜡笔涂鸦画板</div>
+              </div>
+            </div>
+            <span class="text-[9px] px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-medium">FREE</span>
+          </a>
+          <a href="https://graph.eazyopc.com" class="p-2.5 rounded-xl bg-slate-900/80 hover:bg-indigo-950/40 border border-slate-700/60 hover:border-indigo-500/50 transition flex items-center justify-between group">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">📐</span>
+              <div>
+                <div class="text-xs font-semibold text-white group-hover:text-indigo-400 transition">Graph Paper</div>
+                <div class="text-[10px] text-slate-400">5mm网格/极坐标/3D</div>
+              </div>
+            </div>
+            <span class="text-[9px] px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-medium">FREE</span>
+          </a>
+          <a href="https://chalkboard.eazyopc.com" class="p-2.5 rounded-xl bg-slate-900/80 hover:bg-indigo-950/40 border border-slate-700/60 hover:border-indigo-500/50 transition flex items-center justify-between group">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">👨‍🏫</span>
+              <div>
+                <div class="text-xs font-semibold text-white group-hover:text-indigo-400 transition">Chalkboard</div>
+                <div class="text-[10px] text-slate-400">经典黑板/粉笔颗粒</div>
+              </div>
+            </div>
+            <span class="text-[9px] px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-medium">FREE</span>
+          </a>
+          <a href="https://whiteboard.eazyopc.com" class="p-2.5 rounded-xl bg-slate-900/80 hover:bg-indigo-950/40 border border-slate-700/60 hover:border-indigo-500/50 transition flex items-center justify-between group">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">💼</span>
+              <div>
+                <div class="text-xs font-semibold text-white group-hover:text-indigo-400 transition">Whiteboard</div>
+                <div class="text-[10px] text-slate-400">点阵白板/思维便利贴</div>
+              </div>
+            </div>
+            <span class="text-[9px] px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-medium">FREE</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 分类3: 预留未来扩展分类 -->
+      <div>
+        <div class="text-xs font-bold text-slate-300 mb-2 flex items-center gap-1.5">🚀 更多实用工具（持续研发上线中）</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div class="p-2.5 rounded-xl bg-slate-900/40 border border-slate-800 text-slate-400 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-lg opacity-60">📄</span>
+              <div>
+                <div class="text-xs font-medium text-slate-300">PDF & 文档</div>
+                <div class="text-[10px] text-slate-500">隐私合并/拆分</div>
+              </div>
+            </div>
+            <span class="text-[9px] px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded">即将推出</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-900/40 border border-slate-800 text-slate-400 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-lg opacity-60">🖼️</span>
+              <div>
+                <div class="text-xs font-medium text-slate-300">图片无损压缩</div>
+                <div class="text-[10px] text-slate-500">WebP转换/裁切</div>
+              </div>
+            </div>
+            <span class="text-[9px] px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded">即将推出</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-900/40 border border-slate-800 text-slate-400 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-lg opacity-60">⚡</span>
+              <div>
+                <div class="text-xs font-medium text-slate-300">开发与文本</div>
+                <div class="text-[10px] text-slate-500">JSON/正则/编码</div>
+              </div>
+            </div>
+            <span class="text-[9px] px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded">即将推出</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-2 border-t border-slate-700/60 flex items-center justify-between text-[11px] text-slate-400">
+        <span>🏠 EazyOPC Creator Studio</span>
+        <a href="https://eazyopc.com" target="_blank" class="text-indigo-400 hover:underline">访问官方主站 →</a>
+      </div>
+    </div>
+  </div>
+
 
   <!-- 隐私政策弹窗 -->
   <div id="privacyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -197,7 +318,7 @@
     // --- 7 国语言多语言字典库 (i18n) ---
     const TRANSLATIONS = {
       zh: {
-        nav_main: 'EazyOPC 主站', nav_video: '视频工具', 
+        nav_more_tools: '全部工具生态', nav_main: 'EazyOPC 主站', nav_video: '视频工具', 
         title_chalkboard: '复古墨绿教学黑板 - Chalkboard | EazyOPC',
         title_graph: '数学毫米方格与坐标纸 - Graph Paper | EazyOPC',
         title_kids: '少儿创意涂鸦画板 - Kids Draw | EazyOPC',
@@ -210,7 +331,7 @@
         buy_btn: '立即以 $4.99 USD 买断终身授权', has_license: '已有授权码？', activate: '激活', continue_free: '暂不解锁，继续免费普通导出'
       },
       en: {
-        nav_main: 'EazyOPC Home', nav_video: 'VideoTools', 
+        nav_more_tools: 'All Free Tools', nav_main: 'EazyOPC Home', nav_video: 'VideoTools', 
         title_chalkboard: 'Classic Green Chalkboard - Chalkboard | EazyOPC',
         title_graph: 'Math 5mm Grid & Graph Paper - Graph Paper | EazyOPC',
         title_kids: 'Kids Creative Drawing Canvas - Kids Draw | EazyOPC',
@@ -223,7 +344,7 @@
         buy_btn: 'Buy Lifetime License for $4.99 USD', has_license: 'Have a license key?', activate: 'Activate', continue_free: 'Export standard free version'
       },
       ja: {
-        nav_main: 'EazyOPC ホーム', nav_video: '動画ツール', 
+        nav_more_tools: '全ツール一覧', nav_main: 'EazyOPC ホーム', nav_video: '動画ツール', 
         title_chalkboard: 'レトロな緑の黒板 - Chalkboard | EazyOPC',
         title_graph: '数学用方眼紙と座標軸 - Graph Paper | EazyOPC',
         title_kids: 'キッズお絵描きボード - Kids Draw | EazyOPC',
@@ -249,7 +370,7 @@
         buy_btn: '$4.99 USD로 평생 라이선스 구매', has_license: '인증 코드가 있으신가요?', activate: '활성화', continue_free: '무료 버전으로 내보내기'
       },
       de: {
-        nav_main: 'EazyOPC Start', nav_video: 'Video-Tools', 
+        nav_more_tools: 'Alle Tools', nav_main: 'EazyOPC Start', nav_video: 'Video-Tools', 
         title_chalkboard: 'Klassische grüne Tafel - Chalkboard | EazyOPC',
         title_graph: 'Mathematisches Millimeterpapier - Graph Paper | EazyOPC',
         title_kids: 'Kreative Kinder-Zeichenfläche - Kids Draw | EazyOPC',
@@ -262,7 +383,7 @@
         buy_btn: 'Lebenslange Lizenz für $4.99 USD kaufen', has_license: 'Haben Sie einen Lizenzschlüssel?', activate: 'Aktivieren', continue_free: 'Kostenlose Version exportieren'
       },
       es: {
-        nav_main: 'EazyOPC Inicio', nav_video: 'Herramientas Video', 
+        nav_more_tools: 'Todas las Herramientas', nav_main: 'EazyOPC Inicio', nav_video: 'Herramientas Video', 
         title_chalkboard: 'Pizarra verde clásica - Chalkboard | EazyOPC',
         title_graph: 'Papel milimetrado y coordenadas - Graph Paper | EazyOPC',
         title_kids: 'Pizarra de dibujo infantil - Kids Draw | EazyOPC',
@@ -275,7 +396,7 @@
         buy_btn: 'Comprar licencia vitalicia por $4.99 USD', has_license: '¿Tienes una clave?', activate: 'Activar', continue_free: 'Exportar versión gratuita'
       },
       fr: {
-        nav_main: 'EazyOPC Accueil', nav_video: 'Outils Vidéo', 
+        nav_more_tools: 'Tous les Outils', nav_main: 'EazyOPC Accueil', nav_video: 'Outils Vidéo', 
         title_chalkboard: 'Tableau noir rétro - Chalkboard | EazyOPC',
         title_graph: 'Papier millimétré mathématique - Graph Paper | EazyOPC',
         title_kids: 'Tableau de dessin pour enfants - Kids Draw | EazyOPC',
@@ -1183,7 +1304,12 @@
       }
     };
 
-    // 12. 工具栏与弹窗绑定
+        // 12. 工具栏与弹窗绑定
+    document.getElementById('btnOpenEcosystem')?.addEventListener('click', () => document.getElementById('ecosystemModal').classList.remove('hidden'));
+    document.getElementById('btnCloseEcosystem')?.addEventListener('click', () => document.getElementById('ecosystemModal').classList.add('hidden'));
+    document.getElementById('ecosystemModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'ecosystemModal') document.getElementById('ecosystemModal').classList.add('hidden');
+    });
     document.getElementById('btnOpenPrivacy').onclick = () => document.getElementById('privacyModal').classList.remove('hidden');
     document.getElementById('btnClosePrivacy').onclick = () => document.getElementById('privacyModal').classList.add('hidden');
     document.getElementById('btnConfirmPrivacy').onclick = () => document.getElementById('privacyModal').classList.add('hidden');
