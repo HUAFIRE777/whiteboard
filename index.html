@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title id="pageTitle">Whiteboard — 极简商务点阵在线白板与便签脑图 | EazyOPC</title>
+  <meta name="description" content="极简点阵在线白板，提供多色可拖拽便签即时贴、流程图框与流程箭头，会议讨论与头脑风暴高效利器。" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  
+  <!-- Google AdSense -->
+  <meta name="google-adsense-account" content="ca-pub-6499357447763670" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6499357447763670" crossorigin="anonymous"></script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { touch-action: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0c241b; }
+    canvas { display: block; width: 100%; height: 100%; }
+    .laser-dot { pointer-events: none; position: absolute; border-radius: 50%; transform: translate(-50%, -50%); transition: opacity 1.2s ease-out, transform 1.2s ease-out; }
+    .sticky-note { touch-action: auto; user-select: text; }
+    .sticky-note textarea { touch-action: auto; user-select: text; }
+    .lang-dropdown summary::-webkit-details-marker { display: none; }
+    .tool-active { background-color: #4f46e5 !important; color: #ffffff !important; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4); }
+  </style>
+</head>
+<body class="relative w-screen h-screen overflow-hidden font-sans select-none">
+
+  <!-- 顶部主工具栏 -->
+  <header id="topBar" class="absolute top-2.5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 px-3.5 py-1.5 rounded-2xl shadow-2xl transition-all max-w-[98vw] overflow-x-auto">
+    <!-- 站点/模式切换 -->
+    <div class="flex items-center gap-1.5 pr-2.5 border-r border-slate-700 flex-shrink-0">
+      <span id="siteBadge" class="text-xs font-bold px-2 py-0.5 rounded text-white bg-indigo-600 tracking-wide">Whiteboard</span>
+      <select id="modeSelector" class="bg-slate-800 text-white text-xs rounded-lg px-2 py-1 outline-none border border-slate-700 cursor-pointer hover:border-slate-500 transition">
+        <option value="chalkboard">👨‍🏫 教学黑板 (Chalkboard)</option>
+        <option value="graph">📐 数学坐标纸 (Graph Paper)</option>
+        <option value="kids">👶 少儿涂鸦 (Kids Draw)</option>
+        <option value="whiteboard" selected>💼 商务白板 (Whiteboard)</option>
+      </select>
+    </div>
+
+    <!-- 纸张底纹切换 (9 种纸张) -->
+    <div class="flex items-center gap-1.5 pr-2.5 border-r border-slate-700 flex-shrink-0">
+      <span id="lblPaper" class="text-[11px] text-slate-400 font-medium">📄 纸张:</span>
+      <select id="paperSelector" class="bg-slate-800 text-slate-200 text-xs rounded-lg px-2 py-1 outline-none border border-slate-700 cursor-pointer hover:border-slate-500 transition">
+        <option value="green_chalk">复古墨绿黑板 (Green Board)</option>
+        <option value="black_chalk">哑光碳黑黑板 (Black Board)</option>
+        <option value="square">5mm 数学方格纸 (5mm Grid)</option>
+        <option value="isometric">3D 等轴测三角格 (Isometric)</option>
+        <option value="polar">极坐标同心网格 (Polar Grid)</option>
+        <option value="dot" selected>极简点阵纸 (Dot Matrix)</option>
+        <option value="plain">纯白无暇白板 (Plain White)</option>
+        <option value="ivory">护眼米黄原木纸 (Warm Ivory)</option>
+        <option value="ruled">少儿英文四线三格 (Ruled Lines)</option>
+      </select>
+    </div>
+
+    <!-- 专业画笔工具库 (10 种工具) -->
+    <div class="flex items-center gap-1 flex-shrink-0">
+      <button class="tool-btn p-1.5 px-2 rounded-xl text-slate-300 hover:bg-slate-800 text-xs flex items-center gap-1 transition" data-tool="pencil" title="铅笔 (轻质细线)">✏️ <span class="hidden sm:inline" data-i18n="pencil">铅笔</span></button>
+      <button class="tool-btn p-1.5 px-2 rounded-xl text-slate-300 hover:bg-slate-800 text-xs flex items-center gap-1 transition" data-tool="pen" title="钢笔 (压感笔锋)">🖋️ <span class="hidden sm:inline" data-i18n="pen">钢笔</span></button>
+      <button class="tool-btn p-1.5 px-2 rounded-xl text-slate-300 hover:bg-slate-800 text-xs flex items-center gap-1 transition" data-tool="brush" title="毛笔/软水彩">🖌️ <span class="hidden sm:inline" data-i18n="brush">毛笔</span></button>
+      <button class="tool-btn p-1.5 px-2 rounded-xl text-slate-300 hover:bg-slate-800 text-xs flex items-center gap-1 transition" data-tool="highlighter" title="荧光马克笔 (半透明高亮)">🖍️ <span class="hidden sm:inline" data-i18n="highlighter">荧光</span></button>
+      <button class="tool-btn p-1.5 px-2 rounded-xl text-slate-300 hover:bg-slate-800 text-xs flex items-center gap-1 transition" data-tool="chalk" title="粉笔 (真实碎屑颗粒)">👨‍🏫 <span class="hidden sm:inline" data-i18n="chalk">粉笔</span></button>
+      <button class="tool-btn p-1.5 px-2 rounded-xl text-slate-300 hover:bg-slate-800 text-xs flex items-center gap-1 transition" data-tool="spray" title="雾化喷枪">💨 <span class="hidden sm:inline" data-i18n="spray">喷枪</span></button>
+      <button class="tool-btn p-1.5 px-2 rounded-xl text-slate-300 hover:bg-slate-800 text-xs flex items-center gap-1 transition" data-tool="laser" title="讲解激光笔 (1.2秒消散)">🔦 <span class="hidden sm:inline" data-i18n="laser">激光笔</span></button>
+      <button class="tool-btn p-1.5 px-2 rounded-xl text-slate-300 hover:bg-slate-800 text-xs flex items-center gap-1 transition" data-tool="eraser" title="板擦/橡皮">🧽 <span class="hidden sm:inline" data-i18n="eraser">橡皮</span></button>
+    </div>
+
+    <!-- 模式专属动态能力槽 -->
+    <div id="dynamicFeatureSlot" class="flex items-center gap-1 border-l border-slate-700 pl-2 flex-shrink-0"></div>
+
+    <!-- 调色板与笔刷尺寸 -->
+    <div class="flex items-center gap-2 border-l border-slate-700 pl-2 flex-shrink-0">
+      <div id="paletteGroup" class="flex items-center gap-1"></div>
+      <div class="flex items-center gap-1 pl-1">
+        <span class="text-[10px] text-slate-400" data-i18n="size">粗细</span>
+        <input id="brushSize" type="range" min="1" max="40" value="5" class="w-14 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500" />
+      </div>
+    </div>
+
+    <!-- 撤销、清空、导出与语言切换 -->
+    <div class="flex items-center gap-1.5 border-l border-slate-700 pl-2 flex-shrink-0">
+      <button id="btnUndo" class="p-1.5 px-2 text-slate-300 hover:bg-slate-800 rounded-xl transition text-xs" title="撤销 (Ctrl+Z)">↩️</button>
+      <button id="btnClear" class="p-1.5 px-2 text-slate-300 hover:bg-rose-950/40 hover:text-rose-400 rounded-xl transition text-xs" title="清空画布">🗑️</button>
+      <button id="btnExport" class="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-2.5 py-1.5 rounded-xl shadow-lg transition-transform active:scale-95">
+        <span>💾</span> <span data-i18n="export">导出</span>
+      </button>
+
+      <!-- 7 国语言下拉菜单 -->
+      <details class="lang-dropdown relative ml-1">
+        <summary class="flex items-center gap-1 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs cursor-pointer border border-slate-700">
+          <span>🌐</span> <span id="currentLangLabel">中</span> <span>▾</span>
+        </summary>
+        <div class="absolute right-0 mt-2 w-32 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-1 z-50 flex flex-col gap-0.5 text-xs text-slate-200">
+          <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="zh">🇨🇳 简体中文</button>
+          <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="en">🇺🇸 English</button>
+          <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="ja">🇯🇵 日本語</button>
+          <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="ko">🇰🇷 한국어</button>
+          <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="de">🇩🇪 Deutsch</button>
+          <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="es">🇪🇸 Español</button>
+          <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="fr">🇫🇷 Français</button>
+        </div>
+      </details>
+    </div>
+  </header>
+
+  <!-- 3D 等轴测几何悬浮菜单 (Graph 模式) -->
+  <div id="geomMenuModal" class="hidden absolute top-16 left-1/2 -translate-x-1/2 z-40 bg-slate-800/95 border border-slate-700 backdrop-blur-md rounded-2xl p-3 shadow-2xl flex flex-wrap gap-2 text-xs text-white max-w-lg">
+    <button class="geom-opt px-2.5 py-1.5 bg-slate-700/80 hover:bg-indigo-600 rounded-lg transition" data-geom="axis2d">➕ 2D直角坐标系</button>
+    <button class="geom-opt px-2.5 py-1.5 bg-slate-700/80 hover:bg-indigo-600 rounded-lg transition" data-geom="axis3d">🌐 3D等轴空间坐标系</button>
+    <button class="geom-opt px-2.5 py-1.5 bg-slate-700/80 hover:bg-indigo-600 rounded-lg transition" data-geom="cube">🎲 等轴测立方体</button>
+    <button class="geom-opt px-2.5 py-1.5 bg-slate-700/80 hover:bg-indigo-600 rounded-lg transition" data-geom="cylinder">🥫 等轴测圆柱体</button>
+    <button class="geom-opt px-2.5 py-1.5 bg-slate-700/80 hover:bg-indigo-600 rounded-lg transition" data-geom="pyramid">🔺 等轴测正四棱锥</button>
+    <button class="geom-opt px-2.5 py-1.5 bg-slate-700/80 hover:bg-indigo-600 rounded-lg transition" data-geom="sphere">⚽ 3D立体球体</button>
+    <button id="btnCloseGeomMenu" class="px-2 py-1 text-slate-400 hover:text-white ml-auto">✕ 关闭</button>
+  </div>
+
+  <!-- 主画布区域 (移动端/鼠标移入直接绘制) -->
+  <main class="w-full h-full relative cursor-crosshair">
+    <canvas id="mainCanvas"></canvas>
+    <!-- 激光笔临时渲染层 -->
+    <div id="laserLayer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+    <!-- 便签容纳层 -->
+    <div id="stickyLayer" class="absolute inset-0 pointer-events-none"></div>
+  </main>
+
+  <!-- 底部全矩阵跨站内链导航 (EazyOPC 站群网络) -->
+  <footer class="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 bg-slate-900/90 backdrop-blur-md border border-slate-800 px-4 py-1.5 rounded-full text-[11px] text-slate-400 max-w-[98vw] overflow-x-auto whitespace-nowrap shadow-2xl">
+    <a href="https://eazyopc.com" target="_blank" class="font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition">🏠 <span data-i18n="nav_main">EazyOPC 主站</span></a>
+    <span class="text-slate-700">|</span>
+    <a href="https://videotools.eazyopc.com" target="_blank" class="hover:text-indigo-400 transition flex items-center gap-1">🎬 <span data-i18n="nav_video">视频工具</span></a>
+    <span class="text-slate-700">|</span>
+    <a href="https://kidsdraw.eazyopc.com" class="hover:text-indigo-400 transition flex items-center gap-1">👶 <span data-i18n="nav_kids">少儿画板</span></a>
+    <a href="https://graph.eazyopc.com" class="hover:text-indigo-400 transition flex items-center gap-1">📐 <span data-i18n="nav_graph">坐标方格纸</span></a>
+    <a href="https://chalkboard.eazyopc.com" class="hover:text-indigo-400 transition flex items-center gap-1">👨‍🏫 <span data-i18n="nav_chalk">教学黑板</span></a>
+    <a href="https://whiteboard.eazyopc.com" class="hover:text-indigo-400 transition flex items-center gap-1">💼 <span data-i18n="nav_white">在线白板</span></a>
+    <span class="text-slate-700">|</span>
+    <button id="btnOpenPrivacy" class="hover:underline text-slate-300 transition" data-i18n="privacy">隐私承诺</button>
+    <button id="btnOpenProModal" class="ml-1 px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 font-medium transition">⭐ Pro 终身版</button>
+  </footer>
+
+  <!-- 隐私政策弹窗 -->
+  <div id="privacyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="bg-slate-800 border border-slate-700 w-full max-w-lg rounded-3xl p-6 shadow-2xl text-white space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold flex items-center gap-2">🛡️ <span data-i18n="privacy_title">隐私与数据安全说明</span></h3>
+        <button id="btnClosePrivacy" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+      <div class="text-xs text-slate-300 space-y-2.5 leading-relaxed max-h-72 overflow-y-auto pr-2" id="privacyContent">
+        <p><strong>1. 100% 本地运算保证</strong>：EazyOPC 旗下所有画板与工具均完全运行在您的设备浏览器内存中。您绘制的每一道笔触、书写的板书、上传的便签均**绝不上传**至任何云端服务器或数据库。</p>
+        <p><strong>2. 数据存储说明</strong>：您的个性化设置（如终身版激活状态、画笔预设）仅保存在您当前浏览器的本地存储（localStorage）中，清除浏览器缓存即可完全抹除。</p>
+        <p><strong>3. Cookie 与广告说明</strong>：本站接入 Google 官方服务以提供合规功能及统计分析，受 Google 官方隐私政策保护。</p>
+      </div>
+      <button id="btnConfirmPrivacy" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold" data-i18n="know">我已知悉</button>
+    </div>
+  </div>
+
+  <!-- Creem $4.99 终身授权结账弹窗 -->
+  <div id="proModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-3xl p-6 shadow-2xl text-white">
+      <div class="text-center space-y-2">
+        <div class="inline-block p-3 bg-amber-500/10 text-amber-400 rounded-2xl text-2xl mb-1">⭐</div>
+        <h3 class="text-xl font-bold" data-i18n="pro_title">解锁 EazyOPC Pro 专业版</h3>
+        <p class="text-xs text-slate-400" data-i18n="pro_desc">仅需一杯咖啡钱，买断终身 4K 超清免水印导出与商用权益。</p>
+      </div>
+
+      <div class="my-5 p-4 bg-slate-900/60 border border-slate-700/50 rounded-2xl space-y-2 text-xs text-slate-300">
+        <div class="flex items-center gap-2">✅ <strong>4K Ultra-HD</strong> 超高分辨率打印原画输出</div>
+        <div class="flex items-center gap-2">✅ <strong>永久去除</strong> “Made with EazyOPC” 水印</div>
+        <div class="flex items-center gap-2">✅ <strong>终身商业授权</strong> 与全套 3D 几何工具库</div>
+      </div>
+
+      <div class="space-y-3">
+        <a id="creemCheckoutBtn" href="https://checkout.creem.io/" target="_blank" class="block w-full text-center py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl shadow-lg transition-all" data-i18n="buy_btn">
+          立即以 $4.99 USD 买断终身授权
+        </a>
+        
+        <div class="relative flex py-1 items-center">
+          <div class="flex-grow border-t border-slate-700"></div>
+          <span class="flex-shrink mx-2 text-[10px] text-slate-500 uppercase tracking-wider" data-i18n="has_license">已有授权码？</span>
+          <div class="flex-grow border-t border-slate-700"></div>
+        </div>
+
+        <div class="flex gap-2">
+          <input id="licenseInput" type="text" placeholder="输入 Creem 购买收据中的卡密 (如 EZPRO-...)" class="flex-1 bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-xs text-white outline-none focus:border-amber-500" />
+          <button id="btnVerifyLicense" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-semibold rounded-xl transition" data-i18n="activate">激活</button>
+        </div>
+      </div>
+
+      <button id="btnCloseModal" class="w-full mt-4 text-center text-xs text-slate-500 hover:text-slate-400 py-1 transition" data-i18n="continue_free">暂不解锁，继续免费普通导出</button>
+    </div>
+  </div>
+
+  <!-- 核心逻辑脚本 -->
+  <script>
+    // --- 7 国语言多语言字典库 (i18n) ---
+    const TRANSLATIONS = {
+      zh: {
+        nav_main: 'EazyOPC 主站', nav_video: '视频工具', 
+        title_chalkboard: '复古墨绿教学黑板 - Chalkboard | EazyOPC',
+        title_graph: '数学毫米方格与坐标纸 - Graph Paper | EazyOPC',
+        title_kids: '少儿创意涂鸦画板 - Kids Draw | EazyOPC',
+        title_whiteboard: '极简点阵在线白板 - Whiteboard | EazyOPC',
+        pencil: '铅笔', pen: '钢笔', brush: '毛笔', highlighter: '荧光', chalk: '粉笔', spray: '喷枪', laser: '激光笔', eraser: '橡皮',
+        size: '粗细', export: '导出', clear: '清空画布', undo: '撤销',
+        nav_kids: '少儿画板', nav_graph: '坐标方格纸', nav_chalk: '教学黑板', nav_white: '在线白板',
+        privacy: '隐私承诺', privacy_title: '隐私与数据安全说明', know: '我已知悉',
+        pro_title: '解锁 EazyOPC Pro 专业版', pro_desc: '仅需一杯咖啡钱，买断终身 4K 超清免水印导出与商用权益。',
+        buy_btn: '立即以 $4.99 USD 买断终身授权', has_license: '已有授权码？', activate: '激活', continue_free: '暂不解锁，继续免费普通导出'
+      },
+      en: {
+        nav_main: 'EazyOPC Home', nav_video: 'VideoTools', 
+        title_chalkboard: 'Classic Green Chalkboard - Chalkboard | EazyOPC',
+        title_graph: 'Math 5mm Grid & Graph Paper - Graph Paper | EazyOPC',
+        title_kids: 'Kids Creative Drawing Canvas - Kids Draw | EazyOPC',
+        title_whiteboard: 'Minimalist Dot Matrix Whiteboard - Whiteboard | EazyOPC',
+        pencil: 'Pencil', pen: 'Pen', brush: 'Brush', highlighter: 'Highlight', chalk: 'Chalk', spray: 'Spray', laser: 'Laser', eraser: 'Eraser',
+        size: 'Size', export: 'Export', clear: 'Clear', undo: 'Undo',
+        nav_kids: 'Kids Draw', nav_graph: 'Graph Paper', nav_chalk: 'Chalkboard', nav_white: 'Whiteboard',
+        privacy: 'Privacy', privacy_title: 'Privacy & Security Guarantee', know: 'Got it',
+        pro_title: 'Unlock EazyOPC Pro Lifetime', pro_desc: 'Only the price of a coffee for lifetime 4K watermark-free export.',
+        buy_btn: 'Buy Lifetime License for $4.99 USD', has_license: 'Have a license key?', activate: 'Activate', continue_free: 'Export standard free version'
+      },
+      ja: {
+        nav_main: 'EazyOPC ホーム', nav_video: '動画ツール', 
+        title_chalkboard: 'レトロな緑の黒板 - Chalkboard | EazyOPC',
+        title_graph: '数学用方眼紙と座標軸 - Graph Paper | EazyOPC',
+        title_kids: 'キッズお絵描きボード - Kids Draw | EazyOPC',
+        title_whiteboard: 'ミニマルなドットホワイトボード - Whiteboard | EazyOPC',
+        pencil: '鉛筆', pen: '万年筆', brush: '筆', highlighter: '蛍光ペン', chalk: 'チョーク', spray: 'スプレー', laser: 'レーザー', eraser: '消しゴム',
+        size: '太さ', export: '保存', clear: '消去', undo: '元に戻す',
+        nav_kids: 'キッズ', nav_graph: '方眼紙', nav_chalk: '黒板', nav_white: 'ホワイトボード',
+        privacy: 'プライバシー', privacy_title: 'プライバシー方針', know: '了解',
+        pro_title: 'EazyOPC Pro 永久ライセンス', pro_desc: '4K高画質ウォーターマークなし出力を永久アンロック。',
+        buy_btn: '$4.99 で永久購入する', has_license: 'ライセンスをお持ちですか？', activate: '有効化', continue_free: '無料版で出力する'
+      },
+      ko: {
+        nav_main: 'EazyOPC 홈', nav_video: '비디오 도구', 
+        title_chalkboard: '클래식 그린 칠판 - Chalkboard | EazyOPC',
+        title_graph: '수학 모눈종이와 좌표축 - Graph Paper | EazyOPC',
+        title_kids: '키즈 드로잉 캔버스 - Kids Draw | EazyOPC',
+        title_whiteboard: '미니멀 도트 화이트보드 - Whiteboard | EazyOPC',
+        pencil: '연필', pen: '만년필', brush: '붓', highlighter: '형광펜', chalk: '분필', spray: '스프레이', laser: '레이저', eraser: '지우개',
+        size: '굵기', export: '내보내기', clear: '지우기', undo: '실행 취소',
+        nav_kids: '키즈 보드', nav_graph: '모눈종이', nav_chalk: '칠판', nav_white: '화이트보드',
+        privacy: '개인정보 보호', privacy_title: '개인정보 정책', know: '확인',
+        pro_title: 'EazyOPC Pro 평생 라이선스', pro_desc: '4K 초고화질 무워터마크 출력을 영구 이용하세요.',
+        buy_btn: '$4.99 USD로 평생 라이선스 구매', has_license: '인증 코드가 있으신가요?', activate: '활성화', continue_free: '무료 버전으로 내보내기'
+      },
+      de: {
+        nav_main: 'EazyOPC Start', nav_video: 'Video-Tools', 
+        title_chalkboard: 'Klassische grüne Tafel - Chalkboard | EazyOPC',
+        title_graph: 'Mathematisches Millimeterpapier - Graph Paper | EazyOPC',
+        title_kids: 'Kreative Kinder-Zeichenfläche - Kids Draw | EazyOPC',
+        title_whiteboard: 'Minimalistisches Punktraster-Whiteboard - Whiteboard | EazyOPC',
+        pencil: 'Bleistift', pen: 'Feder', brush: 'Pinsel', highlighter: 'Textmarker', chalk: 'Kreide', spray: 'Spray', laser: 'Laser', eraser: 'Radierer',
+        size: 'Stärke', export: 'Exportieren', clear: 'Löschen', undo: 'Rückgängig',
+        nav_kids: 'Kinder', nav_graph: 'Millimeterpapier', nav_chalk: 'Tafel', nav_white: 'Whiteboard',
+        privacy: 'Datenschutz', privacy_title: 'Datenschutzerklärung', know: 'Verstanden',
+        pro_title: 'EazyOPC Pro Lebenslang Freischalten', pro_desc: '4K wasserzeichenfreier Export für immer.',
+        buy_btn: 'Lebenslange Lizenz für $4.99 USD kaufen', has_license: 'Haben Sie einen Lizenzschlüssel?', activate: 'Aktivieren', continue_free: 'Kostenlose Version exportieren'
+      },
+      es: {
+        nav_main: 'EazyOPC Inicio', nav_video: 'Herramientas Video', 
+        title_chalkboard: 'Pizarra verde clásica - Chalkboard | EazyOPC',
+        title_graph: 'Papel milimetrado y coordenadas - Graph Paper | EazyOPC',
+        title_kids: 'Pizarra de dibujo infantil - Kids Draw | EazyOPC',
+        title_whiteboard: 'Pizarra blanca minimalista - Whiteboard | EazyOPC',
+        pencil: 'Lápiz', pen: 'Pluma', brush: 'Pincel', highlighter: 'Rotulador', chalk: 'Tiza', spray: 'Spray', laser: 'Láser', eraser: 'Borrador',
+        size: 'Grosor', export: 'Exportar', clear: 'Limpiar', undo: 'Deshacer',
+        nav_kids: 'Niños', nav_graph: 'Papel Milimetrado', nav_chalk: 'Pizarra', nav_white: 'Pizarra Blanca',
+        privacy: 'Privacidad', privacy_title: 'Política de Privacidad', know: 'Entendido',
+        pro_title: 'Desbloquear EazyOPC Pro Vitalicio', pro_desc: 'Exportación 4K sin marcas de agua para siempre.',
+        buy_btn: 'Comprar licencia vitalicia por $4.99 USD', has_license: '¿Tienes una clave?', activate: 'Activar', continue_free: 'Exportar versión gratuita'
+      },
+      fr: {
+        nav_main: 'EazyOPC Accueil', nav_video: 'Outils Vidéo', 
+        title_chalkboard: 'Tableau noir rétro - Chalkboard | EazyOPC',
+        title_graph: 'Papier millimétré mathématique - Graph Paper | EazyOPC',
+        title_kids: 'Tableau de dessin pour enfants - Kids Draw | EazyOPC',
+        title_whiteboard: 'Tableau blanc à matrice de points - Whiteboard | EazyOPC',
+        pencil: 'Crayon', pen: 'Stylo', brush: 'Pinceau', highlighter: 'Surligneur', chalk: 'Craie', spray: 'Aérosol', laser: 'Laser', eraser: 'Gomme',
+        size: 'Taille', export: 'Exporter', clear: 'Effacer', undo: 'Annuler',
+        nav_kids: 'Enfants', nav_graph: 'Papier Millimétré', nav_chalk: 'Tableau Noir', nav_white: 'Tableau Blanc',
+        privacy: 'Confidentialité', privacy_title: 'Politique de Confidentialité', know: 'Compris',
+        pro_title: 'Débloquer EazyOPC Pro à vie', pro_desc: 'Export 4K sans filigrane à vie pour le prix d’un café.',
+        buy_btn: 'Acheter la licence à vie pour 4,99 $', has_license: 'Avez-vous une clé ?', activate: 'Activer', continue_free: 'Exporter la version gratuite'
+      }
+    };
+
+    // --- 全局状态树 ---
+    const appState = {
+      lang: 'zh',
+      mode: 'chalkboard', // 'kids' | 'graph' | 'chalkboard' | 'whiteboard'
+      paper: 'green_chalk',
+      tool: 'pen',        // 'pencil' | 'pen' | 'brush' | 'highlighter' | 'chalk' | 'spray' | 'laser' | 'eraser'
+      currentColor: '#ffffff',
+      brushSize: 5,
+      isDrawing: false,
+      history: [],
+      isPro: localStorage.getItem('eazyopc_pro_unlocked') === 'true',
+      strokePoints: [],
+      currentStamp: '⭐'
+    };
+
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    const laserLayer = document.getElementById('laserLayer');
+    const stickyLayer = document.getElementById('stickyLayer');
+
+    // 1. 初始化分辨率自适应与防失真
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      
+      const oldCanvas = document.createElement('canvas');
+      oldCanvas.width = canvas.width;
+      oldCanvas.height = canvas.height;
+      if (oldCanvas.width > 0 && oldCanvas.height > 0) {
+        oldCanvas.getContext('2d').drawImage(canvas, 0, 0);
+      }
+
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      renderBackground();
+      
+      if (oldCanvas.width > 0 && oldCanvas.height > 0) {
+        ctx.drawImage(oldCanvas, 0, 0, w, h);
+      }
+    }
+
+    // 2. 调色板系统 (各模式专属色彩)
+    const PALETTES = {
+      chalkboard: ['#ffffff', '#fef08a', '#fda4af', '#86efac', '#93c5fd', '#c084fc'],
+      graph: ['#0f172a', '#2563eb', '#dc2626', '#16a34a', '#d97706', '#9333ea'],
+      kids: ['#f43f5e', '#fbbf24', '#38bdf8', '#4ade80', '#a855f7', '#fb923c'],
+      whiteboard: ['#18181b', '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#64748b']
+    };
+
+    function updatePaletteUI() {
+      const paletteContainer = document.getElementById('paletteGroup');
+      paletteContainer.innerHTML = '';
+      const colors = PALETTES[appState.mode] || PALETTES.chalkboard;
+      
+      colors.forEach((c) => {
+        const btn = document.createElement('button');
+        btn.className = `color-btn w-6 h-6 rounded-full border ${c === appState.currentColor ? 'ring-2 ring-indigo-400 scale-110' : 'border-slate-600'} transition-transform`;
+        btn.style.backgroundColor = c;
+        btn.onclick = () => {
+          appState.currentColor = c;
+          if (appState.tool === 'eraser') appState.tool = 'pen';
+          updateToolButtonsState();
+          updatePaletteUI();
+        };
+        paletteContainer.appendChild(btn);
+      });
+    }
+
+    // 3. 语言切换逻辑
+    function setLanguage(lang) {
+      if (!TRANSLATIONS[lang]) lang = 'en';
+      appState.lang = lang;
+      localStorage.setItem('user_lang_pref', lang);
+      document.cookie = `user_lang_pref=${lang}; path=/; max-age=31536000; SameSite=Lax`;
+      
+      const langLabels = { zh: '中', en: 'EN', ja: '日', ko: '한', de: 'DE', es: 'ES', fr: 'FR' };
+      document.getElementById('currentLangLabel').textContent = langLabels[lang] || 'EN';
+
+      // 批量替换文案
+      const dict = TRANSLATIONS[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.textContent = dict[key];
+      });
+
+      updatePageTitle();
+    }
+
+    function updatePageTitle() {
+      const dict = TRANSLATIONS[appState.lang] || TRANSLATIONS.en;
+      const key = `title_${appState.mode}`;
+      document.title = dict[key] || 'EazyOPC Canvas Matrix';
+    }
+
+    // 4. 纸张底纹绘制引擎 (9 种高精度底纹)
+    function renderBackground() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      ctx.save();
+
+      switch (appState.paper) {
+        case 'green_chalk':
+          // 复古墨绿黑板质感
+          ctx.fillStyle = '#0c241b';
+          ctx.fillRect(0, 0, width, height);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.015)';
+          for (let i = 0; i < 500; i++) {
+            ctx.fillRect(Math.random() * width, Math.random() * height, 2, 2);
+          }
+          break;
+
+        case 'black_chalk':
+          // 哑光碳黑黑板
+          ctx.fillStyle = '#171717';
+          ctx.fillRect(0, 0, width, height);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.018)';
+          for (let i = 0; i < 500; i++) {
+            ctx.fillRect(Math.random() * width, Math.random() * height, 2, 2);
+          }
+          break;
+
+        case 'square':
+          // 5mm 数学精密方格纸
+          ctx.fillStyle = '#f8fafc';
+          ctx.fillRect(0, 0, width, height);
+          const step = 24;
+          for (let x = 0; x < width; x += step) {
+            ctx.beginPath();
+            ctx.strokeStyle = (x % (step * 5) === 0) ? '#cbd5e1' : '#e2e8f0';
+            ctx.lineWidth = (x % (step * 5) === 0) ? 1.2 : 0.8;
+            ctx.moveTo(x, 0); ctx.lineTo(x, height);
+            ctx.stroke();
+          }
+          for (let y = 0; y < height; y += step) {
+            ctx.beginPath();
+            ctx.strokeStyle = (y % (step * 5) === 0) ? '#cbd5e1' : '#e2e8f0';
+            ctx.lineWidth = (y % (step * 5) === 0) ? 1.2 : 0.8;
+            ctx.moveTo(0, y); ctx.lineTo(width, y);
+            ctx.stroke();
+          }
+          break;
+
+        case 'isometric':
+          // 3D 等轴测三角格 (Isometric Grid 30°)
+          ctx.fillStyle = '#f8fafc';
+          ctx.fillRect(0, 0, width, height);
+          ctx.strokeStyle = '#e2e8f0';
+          ctx.lineWidth = 0.9;
+          const isoStep = 32;
+          const hStep = isoStep * Math.sqrt(3) / 2;
+          // 水平线
+          for (let y = 0; y < height; y += hStep) {
+            ctx.beginPath();
+            ctx.moveTo(0, y); ctx.lineTo(width, y);
+            ctx.stroke();
+          }
+          // 60度与120度对角斜线
+          for (let x = -height; x < width + height; x += isoStep) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0); ctx.lineTo(x + height / Math.tan(Math.PI / 3), height);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, 0); ctx.lineTo(x - height / Math.tan(Math.PI / 3), height);
+            ctx.stroke();
+          }
+          break;
+
+        case 'polar':
+          // 极坐标同心网格
+          ctx.fillStyle = '#f8fafc';
+          ctx.fillRect(0, 0, width, height);
+          const cx = width / 2, cy = height / 2;
+          const maxR = Math.sqrt(cx * cx + cy * cy);
+          ctx.strokeStyle = '#e2e8f0';
+          ctx.lineWidth = 1;
+          for (let r = 32; r < maxR; r += 32) {
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+          for (let a = 0; a < Math.PI * 2; a += Math.PI / 6) {
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + Math.cos(a) * maxR, cy + Math.sin(a) * maxR);
+            ctx.stroke();
+          }
+          break;
+
+        case 'dot':
+          // 极简点阵纸
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, width, height);
+          ctx.fillStyle = '#cbd5e1';
+          for (let x = 18; x < width; x += 36) {
+            for (let y = 18; y < height; y += 36) {
+              ctx.beginPath();
+              ctx.arc(x, y, 1.2, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+          break;
+
+        case 'ivory':
+          // 护眼米黄原木纸
+          ctx.fillStyle = '#fffdf2';
+          ctx.fillRect(0, 0, width, height);
+          break;
+
+        case 'ruled':
+          // 少儿英文四线三格
+          ctx.fillStyle = '#fffdf5';
+          ctx.fillRect(0, 0, width, height);
+          const rGroupHeight = 90;
+          for (let y = 60; y < height; y += rGroupHeight) {
+            ctx.strokeStyle = '#fda4af';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); // 顶红线
+            ctx.strokeStyle = '#93c5fd';
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath(); ctx.moveTo(0, y + 25); ctx.lineTo(width, y + 25); ctx.stroke(); // 中虚线
+            ctx.setLineDash([]);
+            ctx.beginPath(); ctx.moveTo(0, y + 50); ctx.lineTo(width, y + 50); ctx.stroke();
+            ctx.strokeStyle = '#fda4af';
+            ctx.beginPath(); ctx.moveTo(0, y + 75); ctx.lineTo(width, y + 75); ctx.stroke(); // 底红线
+          }
+          break;
+
+        default:
+          // 纯白白板
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, width, height);
+          break;
+      }
+      ctx.restore();
+    }
+
+    function getEraserColor() {
+      if (appState.paper === 'green_chalk') return '#0c241b';
+      if (appState.paper === 'black_chalk') return '#171717';
+      if (appState.paper === 'ivory' || appState.paper === 'ruled') return '#fffdf2';
+      return '#ffffff';
+    }
+
+    // 5. 模式环境切换与自动适配
+    function setMode(mode) {
+      appState.mode = mode;
+      document.getElementById('modeSelector').value = mode;
+      const dynamicSlot = document.getElementById('dynamicFeatureSlot');
+      dynamicSlot.innerHTML = '';
+
+      if (mode === 'kids') {
+        appState.paper = 'ivory';
+        appState.tool = 'brush';
+        appState.currentColor = PALETTES.kids[0];
+        appState.brushSize = 8;
+        dynamicSlot.innerHTML = `
+          <button class="stamp-btn p-1.5 text-base hover:bg-slate-800 rounded-xl transition" data-stamp="⭐">⭐</button>
+          <button class="stamp-btn p-1.5 text-base hover:bg-slate-800 rounded-xl transition" data-stamp="🦖">🦖</button>
+          <button class="stamp-btn p-1.5 text-base hover:bg-slate-800 rounded-xl transition" data-stamp="🚀">🚀</button>
+          <button class="stamp-btn p-1.5 text-base hover:bg-slate-800 rounded-xl transition" data-stamp="🏆">🏆</button>
+          <button class="stamp-btn p-1.5 text-base hover:bg-slate-800 rounded-xl transition" data-stamp="🌈">🌈</button>
+        `;
+      } else if (mode === 'graph') {
+        appState.paper = 'square';
+        appState.tool = 'pen';
+        appState.currentColor = PALETTES.graph[0];
+        appState.brushSize = 3;
+        dynamicSlot.innerHTML = `
+          <button id="btnToggleGeomMenu" class="px-2.5 py-1 text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-lg shadow-sm">📐 3D几何/坐标轴</button>
+        `;
+      } else if (mode === 'chalkboard') {
+        appState.paper = 'green_chalk';
+        appState.tool = 'chalk';
+        appState.currentColor = PALETTES.chalkboard[0];
+        appState.brushSize = 5;
+        dynamicSlot.innerHTML = `
+          <button id="btnChalkAxis" class="px-2 py-1 text-xs bg-emerald-900/60 hover:bg-emerald-800 text-emerald-200 font-medium rounded-lg">🌐 空间三维轴</button>
+        `;
+      } else if (mode === 'whiteboard') {
+        appState.paper = 'dot';
+        appState.tool = 'pen';
+        appState.currentColor = PALETTES.whiteboard[0];
+        appState.brushSize = 4;
+        dynamicSlot.innerHTML = `
+          <button id="btnAddNote" class="px-2.5 py-1 text-xs bg-amber-200 hover:bg-amber-300 text-amber-900 font-medium rounded-lg shadow-sm">📝 便签</button>
+          <button id="btnDrawArrow" class="px-2 py-1 text-xs bg-slate-800 text-slate-200 hover:bg-slate-700 rounded-lg">➡️ 箭头</button>
+          <button id="btnDrawBox" class="px-2 py-1 text-xs bg-slate-800 text-slate-200 hover:bg-slate-700 rounded-lg">🔲 流程框</button>
+        `;
+      }
+
+      document.getElementById('paperSelector').value = appState.paper;
+      document.getElementById('brushSize').value = appState.brushSize;
+      updatePaletteUI();
+      renderBackground();
+      bindDynamicEvents();
+      updateToolButtonsState();
+      updatePageTitle();
+    }
+
+    // 6. 高性能压感与手写笔绘制算法 (Apple Pencil / 触控 / 鼠标 下笔即画)
+    let isDrawing = false;
+    let strokePoints = [];
+
+    function computeDynamicWidth(pressure, tool) {
+      const base = Number(appState.brushSize);
+      const p = (pressure && pressure > 0) ? pressure : 0.5;
+
+      switch (tool) {
+        case 'pencil':
+          return base * 0.75;
+        case 'pen': // 钢笔：强笔锋与压感
+          return base * (0.3 + 0.9 * Math.pow(p, 1.4));
+        case 'brush': // 毛笔：大动态粗细
+          return base * (0.2 + 1.6 * Math.pow(p, 1.2));
+        case 'highlighter':
+          return base * 3.5;
+        case 'spray':
+          return base * 4.0;
+        case 'chalk':
+          return base * (0.6 + 0.6 * p);
+        default:
+          return base * (0.5 + 0.7 * p);
+      }
+    }
+
+    // 真实粉笔与喷枪颗粒飞溅
+    function drawParticles(x, y, radius, color, isSpray = false) {
+      const count = isSpray ? Math.floor(radius * 3.5) : Math.floor(radius * 1.6);
+      ctx.save();
+      ctx.fillStyle = color;
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * (isSpray ? radius * 2.2 : radius * 1.3);
+        const px = x + Math.cos(angle) * dist;
+        const py = y + Math.sin(angle) * dist;
+        ctx.globalAlpha = isSpray ? Math.random() * 0.25 : (Math.random() * 0.45 + 0.1);
+        ctx.fillRect(px, py, 1.2, 1.2);
+      }
+      ctx.restore();
+    }
+
+    function getMidPoint(p1, p2) {
+      return { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2, pressure: (p1.pressure + p2.pressure) / 2 };
+    }
+
+    // 立即响应鼠标或触摸下笔
+    canvas.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      isDrawing = true;
+      const pressure = (e.pressure !== undefined && e.pressure > 0) ? e.pressure : 0.5;
+      const pt = { x: e.clientX, y: e.clientY, pressure: pressure };
+      strokePoints = [pt];
+
+      if (appState.tool === 'laser') {
+        createLaserBeam(e.clientX, e.clientY);
+        return;
+      }
+      saveHistory();
+    });
+
+    canvas.addEventListener('pointermove', (e) => {
+      e.preventDefault();
+      if (!isDrawing) return;
+
+      if (appState.tool === 'laser') {
+        createLaserBeam(e.clientX, e.clientY);
+        return;
+      }
+
+      const pressure = (e.pressure !== undefined && e.pressure > 0) ? e.pressure : 0.5;
+      const currentPt = { x: e.clientX, y: e.clientY, pressure: pressure };
+      strokePoints.push(currentPt);
+
+      if (strokePoints.length < 3) {
+        ctx.beginPath();
+        ctx.arc(currentPt.x, currentPt.y, computeDynamicWidth(currentPt.pressure, appState.tool) / 2, 0, Math.PI * 2);
+        ctx.fillStyle = appState.tool === 'eraser' ? getEraserColor() : appState.currentColor;
+        ctx.fill();
+        return;
+      }
+
+      ctx.save();
+      ctx.beginPath();
+      const mid1 = getMidPoint(strokePoints[strokePoints.length - 2], strokePoints[strokePoints.length - 1]);
+      const prevMid = strokePoints.length === 3 
+        ? strokePoints[0] 
+        : getMidPoint(strokePoints[strokePoints.length - 3], strokePoints[strokePoints.length - 2]);
+
+      ctx.moveTo(prevMid.x, prevMid.y);
+      ctx.quadraticCurveTo(
+        strokePoints[strokePoints.length - 2].x,
+        strokePoints[strokePoints.length - 2].y,
+        mid1.x,
+        mid1.y
+      );
+
+      const dynamicWidth = computeDynamicWidth(currentPt.pressure, appState.tool);
+
+      if (appState.tool === 'eraser') {
+        ctx.strokeStyle = getEraserColor();
+        ctx.lineWidth = dynamicWidth * 4.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+      } else if (appState.tool === 'highlighter') {
+        // 荧光马克笔：半透明且具有扁平宽笔尖
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.strokeStyle = appState.currentColor;
+        ctx.globalAlpha = 0.35;
+        ctx.lineWidth = dynamicWidth;
+        ctx.lineCap = 'square';
+        ctx.stroke();
+      } else if (appState.tool === 'spray') {
+        // 雾化喷枪：粒子喷射
+        drawParticles(currentPt.x, currentPt.y, dynamicWidth, appState.currentColor, true);
+      } else {
+        ctx.strokeStyle = appState.currentColor;
+        ctx.lineWidth = dynamicWidth;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+
+        // 粉笔特效
+        if (appState.tool === 'chalk') {
+          drawParticles(currentPt.x, currentPt.y, dynamicWidth, appState.currentColor, false);
+        }
+      }
+      ctx.restore();
+    });
+
+    window.addEventListener('pointerup', () => {
+      isDrawing = false;
+      strokePoints = [];
+    });
+
+    function createLaserBeam(x, y) {
+      const dot = document.createElement('div');
+      dot.className = 'laser-dot w-4 h-4 bg-rose-500 rounded-full shadow-[0_0_15px_#f43f5e]';
+      dot.style.left = `${x}px`;
+      dot.style.top = `${y}px`;
+      laserLayer.appendChild(dot);
+      requestAnimationFrame(() => {
+        dot.style.opacity = '0';
+        dot.style.transform = 'translate(-50%, -50%) scale(1.6)';
+      });
+      setTimeout(() => dot.remove(), 1200);
+    }
+
+    // 7. 高精度等轴测 (Isometric 3D) 几何实体生成引擎
+    function drawIsometricCube(cx, cy, size = 110) {
+      saveHistory();
+      ctx.save();
+      const cos30 = Math.cos(Math.PI / 6);
+      const sin30 = Math.sin(Math.PI / 6);
+      const dx = size * cos30;
+      const dy = size * sin30;
+      const h = size * 0.95;
+
+      const topO = { x: cx, y: cy - h };
+      const topR = { x: cx + dx, y: cy - h + dy };
+      const topB = { x: cx, y: cy - h + dy * 2 };
+      const topL = { x: cx - dx, y: cy - h + dy };
+
+      const botL = { x: topL.x, y: topL.y + h };
+      const botB = { x: topB.x, y: topB.y + h };
+      const botR = { x: topR.x, y: topR.y + h };
+
+      ctx.fillStyle = appState.paper.includes('chalk') ? 'rgba(255, 255, 255, 0.22)' : 'rgba(203, 213, 225, 0.45)';
+      ctx.beginPath();
+      ctx.moveTo(topO.x, topO.y); ctx.lineTo(topR.x, topR.y); ctx.lineTo(topB.x, topB.y); ctx.lineTo(topL.x, topL.y); ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = appState.paper.includes('chalk') ? 'rgba(255, 255, 255, 0.12)' : 'rgba(148, 163, 184, 0.4)';
+      ctx.beginPath();
+      ctx.moveTo(topL.x, topL.y); ctx.lineTo(topB.x, topB.y); ctx.lineTo(botB.x, botB.y); ctx.lineTo(botL.x, botL.y); ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = appState.paper.includes('chalk') ? 'rgba(255, 255, 255, 0.05)' : 'rgba(100, 116, 139, 0.4)';
+      ctx.beginPath();
+      ctx.moveTo(topB.x, topB.y); ctx.lineTo(topR.x, topR.y); ctx.lineTo(botR.x, botR.y); ctx.lineTo(botB.x, botB.y); ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = appState.currentColor;
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(topO.x, topO.y); ctx.lineTo(topR.x, topR.y); ctx.lineTo(botR.x, botR.y);
+      ctx.lineTo(botB.x, botB.y); ctx.lineTo(botL.x, botL.y); ctx.lineTo(topL.x, topL.y); ctx.closePath();
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(topB.x, topB.y); ctx.lineTo(topO.x, topO.y);
+      ctx.moveTo(topB.x, topB.y); ctx.lineTo(botB.x, botB.y);
+      ctx.moveTo(topB.x, topB.y); ctx.lineTo(topR.x, topR.y);
+      ctx.moveTo(topB.x, topB.y); ctx.lineTo(topL.x, topL.y);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawIsometricCylinder(cx, cy, rx = 65, ry = 28, h = 110) {
+      saveHistory();
+      ctx.save();
+      ctx.strokeStyle = appState.currentColor;
+      ctx.lineWidth = 2.2;
+
+      ctx.fillStyle = appState.paper.includes('chalk') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(203, 213, 225, 0.35)';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy - h/2, rx, ry, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx, cy + h/2, rx, ry, 0, 0, Math.PI);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + h/2, rx, ry, 0, 0, Math.PI);
+      ctx.stroke();
+
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + h/2, rx, ry, 0, Math.PI, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.beginPath();
+      ctx.moveTo(cx - rx, cy - h/2); ctx.lineTo(cx - rx, cy + h/2);
+      ctx.moveTo(cx + rx, cy - h/2); ctx.lineTo(cx + rx, cy + h/2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.ellipse(cx, cy - h/2, rx, ry, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawIsometricPyramid(cx, cy, size = 110, h = 130) {
+      saveHistory();
+      ctx.save();
+      ctx.strokeStyle = appState.currentColor;
+      ctx.lineWidth = 2.2;
+      const cos30 = Math.cos(Math.PI / 6);
+      const sin30 = Math.sin(Math.PI / 6);
+      const dx = size * cos30;
+      const dy = size * sin30;
+
+      const apex = { x: cx, y: cy - h };
+      const baseO = { x: cx, y: cy };
+      const baseR = { x: cx + dx, y: cy + dy };
+      const baseB = { x: cx, y: cy + dy * 2 };
+      const baseL = { x: cx - dx, y: cy + dy };
+
+      ctx.fillStyle = appState.paper.includes('chalk') ? 'rgba(255, 255, 255, 0.16)' : 'rgba(148, 163, 184, 0.4)';
+      ctx.beginPath();
+      ctx.moveTo(apex.x, apex.y); ctx.lineTo(baseL.x, baseL.y); ctx.lineTo(baseB.x, baseB.y); ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = appState.paper.includes('chalk') ? 'rgba(255, 255, 255, 0.08)' : 'rgba(100, 116, 139, 0.4)';
+      ctx.beginPath();
+      ctx.moveTo(apex.x, apex.y); ctx.lineTo(baseB.x, baseB.y); ctx.lineTo(baseR.x, baseR.y); ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(apex.x, apex.y); ctx.lineTo(baseL.x, baseL.y);
+      ctx.moveTo(apex.x, apex.y); ctx.lineTo(baseB.x, baseB.y);
+      ctx.moveTo(apex.x, apex.y); ctx.lineTo(baseR.x, baseR.y);
+      ctx.moveTo(baseL.x, baseL.y); ctx.lineTo(baseB.x, baseB.y); ctx.lineTo(baseR.x, baseR.y);
+      ctx.stroke();
+
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(baseL.x, baseL.y); ctx.lineTo(baseO.x, baseO.y); ctx.lineTo(baseR.x, baseR.y);
+      ctx.moveTo(apex.x, apex.y); ctx.lineTo(baseO.x, baseO.y);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function draw3DSphere(cx, cy, r = 70) {
+      saveHistory();
+      ctx.save();
+      const grad = ctx.createRadialGradient(cx - r*0.35, cy - r*0.35, r*0.1, cx, cy, r);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.5, appState.currentColor);
+      grad.addColorStop(1, '#0f172a');
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = appState.currentColor;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, r, r * 0.32, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function draw2DCoordinateAxis() {
+      saveHistory();
+      ctx.save();
+      const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+      ctx.strokeStyle = appState.currentColor;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cx - 240, cy); ctx.lineTo(cx + 240, cy);
+      ctx.lineTo(cx + 230, cy - 6); ctx.moveTo(cx + 240, cy); ctx.lineTo(cx + 230, cy + 6);
+      ctx.moveTo(cx, cy + 180); ctx.lineTo(cx, cy - 180);
+      ctx.lineTo(cx - 6, cy - 170); ctx.moveTo(cx, cy - 180); ctx.lineTo(cx + 6, cy - 170);
+      ctx.stroke();
+
+      for (let i = -200; i <= 200; i += 40) {
+        if (i !== 0) {
+          ctx.moveTo(cx + i, cy - 4); ctx.lineTo(cx + i, cy + 4);
+          ctx.moveTo(cx - 4, cy + i); ctx.lineTo(cx + 4, cy + i);
+        }
+      }
+      ctx.stroke();
+
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillStyle = appState.currentColor;
+      ctx.fillText('X', cx + 250, cy + 4);
+      ctx.fillText('Y', cx - 4, cy - 190);
+      ctx.fillText('O', cx - 14, cy + 14);
+      ctx.restore();
+    }
+
+    function draw3DCoordinateAxis() {
+      saveHistory();
+      ctx.save();
+      const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+      ctx.strokeStyle = appState.currentColor;
+      ctx.lineWidth = 2.2;
+
+      ctx.beginPath();
+      ctx.moveTo(cx, cy); ctx.lineTo(cx, cy - 180);
+      ctx.lineTo(cx - 6, cy - 170); ctx.moveTo(cx, cy - 180); ctx.lineTo(cx + 6, cy - 170);
+
+      const len = 180;
+      const xEnd = { x: cx - len * Math.cos(Math.PI / 6), y: cy + len * Math.sin(Math.PI / 6) };
+      ctx.moveTo(cx, cy); ctx.lineTo(xEnd.x, xEnd.y);
+
+      const yEnd = { x: cx + len * Math.cos(Math.PI / 6), y: cy + len * Math.sin(Math.PI / 6) };
+      ctx.moveTo(cx, cy); ctx.lineTo(yEnd.x, yEnd.y);
+      ctx.stroke();
+
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillStyle = appState.currentColor;
+      ctx.fillText('Z', cx - 4, cy - 190);
+      ctx.fillText('X', xEnd.x - 18, xEnd.y + 12);
+      ctx.fillText('Y', yEnd.x + 8, yEnd.y + 12);
+      ctx.fillText('O', cx + 6, cy - 6);
+      ctx.restore();
+    }
+
+    // 8. 模式专属动态能力事件绑定
+    function bindDynamicEvents() {
+      const btnToggleGeomMenu = document.getElementById('btnToggleGeomMenu');
+      const geomModal = document.getElementById('geomMenuModal');
+      if (btnToggleGeomMenu) {
+        btnToggleGeomMenu.onclick = () => geomModal.classList.toggle('hidden');
+      }
+      const btnCloseGeomMenu = document.getElementById('btnCloseGeomMenu');
+      if (btnCloseGeomMenu) {
+        btnCloseGeomMenu.onclick = () => geomModal.classList.add('hidden');
+      }
+
+      document.querySelectorAll('.geom-opt').forEach(btn => {
+        btn.onclick = () => {
+          const type = btn.dataset.geom;
+          const cx = window.innerWidth / 2;
+          const cy = window.innerHeight / 2;
+          if (type === 'axis2d') draw2DCoordinateAxis();
+          else if (type === 'axis3d') draw3DCoordinateAxis();
+          else if (type === 'cube') drawIsometricCube(cx, cy);
+          else if (type === 'cylinder') drawIsometricCylinder(cx, cy);
+          else if (type === 'pyramid') drawIsometricPyramid(cx, cy);
+          else if (type === 'sphere') draw3DSphere(cx, cy);
+          geomModal.classList.add('hidden');
+        };
+      });
+
+      const btnChalkAxis = document.getElementById('btnChalkAxis');
+      if (btnChalkAxis) {
+        btnChalkAxis.onclick = () => draw3DCoordinateAxis();
+      }
+
+      document.querySelectorAll('.stamp-btn').forEach(btn => {
+        btn.onclick = () => {
+          const stamp = btn.dataset.stamp;
+          saveHistory();
+          ctx.save();
+          ctx.font = '64px serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(stamp, window.innerWidth / 2, window.innerHeight / 2);
+          ctx.restore();
+        };
+      });
+
+      const btnAddNote = document.getElementById('btnAddNote');
+      if (btnAddNote) btnAddNote.onclick = () => createDraggableNote();
+
+      const btnDrawArrow = document.getElementById('btnDrawArrow');
+      if (btnDrawArrow) btnDrawArrow.onclick = () => drawFlowArrow();
+
+      const btnDrawBox = document.getElementById('btnDrawBox');
+      if (btnDrawBox) btnDrawBox.onclick = () => drawProcessBox();
+    }
+
+    function createDraggableNote() {
+      const note = document.createElement('div');
+      const colors = ['bg-amber-100 border-amber-300 text-amber-950', 'bg-blue-100 border-blue-300 text-blue-950', 'bg-emerald-100 border-emerald-300 text-emerald-950', 'bg-rose-100 border-rose-300 text-rose-950'];
+      const chosenColor = colors[Math.floor(Math.random() * colors.length)];
+
+      note.className = `sticky-note absolute p-3 ${chosenColor} rounded-2xl shadow-xl w-52 h-44 border flex flex-col pointer-events-auto`;
+      note.style.left = `${Math.max(20, window.innerWidth / 2 - 100 + (Math.random() * 40 - 20))}px`;
+      note.style.top = `${Math.max(20, window.innerHeight / 2 - 80 + (Math.random() * 40 - 20))}px`;
+      
+      note.innerHTML = `
+        <div class="note-handle flex justify-between items-center mb-1 text-[11px] font-bold opacity-70 cursor-move">
+          <span>📝 灵感便签</span>
+          <button onclick="this.closest('.sticky-note').remove()" class="text-rose-600 hover:text-rose-800 text-base leading-none">×</button>
+        </div>
+        <textarea placeholder="输入讨论要点或行动项..." class="w-full flex-1 bg-transparent text-xs outline-none resize-none leading-relaxed"></textarea>
+      `;
+
+      let isDragging = false, startX, startY, origX, origY;
+      const handle = note.querySelector('.note-handle');
+      handle.onpointerdown = (e) => {
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        origX = note.offsetLeft;
+        origY = note.offsetTop;
+        handle.setPointerCapture(e.pointerId);
+      };
+      handle.onpointermove = (e) => {
+        if (!isDragging) return;
+        note.style.left = `${origX + (e.clientX - startX)}px`;
+        note.style.top = `${origY + (e.clientY - startY)}px`;
+      };
+      handle.onpointerup = (e) => {
+        isDragging = false;
+        try { handle.releasePointerCapture(e.pointerId); } catch {}
+      };
+
+      stickyLayer.appendChild(note);
+    }
+
+    function drawFlowArrow() {
+      saveHistory();
+      ctx.save();
+      const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+      ctx.strokeStyle = appState.currentColor;
+      ctx.fillStyle = appState.currentColor;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(cx - 70, cy); ctx.lineTo(cx + 70, cy);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(cx + 70, cy); ctx.lineTo(cx + 50, cy - 8); ctx.lineTo(cx + 50, cy + 8); ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawProcessBox() {
+      saveHistory();
+      ctx.save();
+      const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+      ctx.strokeStyle = appState.currentColor;
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(cx - 80, cy - 45, 160, 90);
+      ctx.restore();
+    }
+
+    // 9. 历史记录与撤销
+    function saveHistory() {
+      if (appState.history.length > 25) appState.history.shift();
+      appState.history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+    }
+
+    function restoreSnapshot() {
+      if (appState.history.length > 0) {
+        ctx.putImageData(appState.history[appState.history.length - 1], 0, 0);
+      }
+    }
+
+    document.getElementById('btnUndo').onclick = () => {
+      if (appState.history.length > 1) {
+        appState.history.pop();
+        ctx.putImageData(appState.history[appState.history.length - 1], 0, 0);
+      } else if (appState.history.length === 1) {
+        appState.history.pop();
+        renderBackground();
+      }
+    };
+
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        document.getElementById('btnUndo').click();
+      }
+    });
+
+    document.getElementById('btnClear').onclick = () => {
+      if (confirm('确认清空当前画布上的所有绘画与内容吗？')) {
+        saveHistory();
+        renderBackground();
+        stickyLayer.innerHTML = '';
+      }
+    };
+
+    // 10. 导出与 Creem 付费门槛闭环
+    document.getElementById('btnExport').onclick = () => {
+      if (!appState.isPro) {
+        document.getElementById('proModal').classList.remove('hidden');
+      } else {
+        exportFullCanvas(4, false);
+      }
+    };
+
+    document.getElementById('btnCloseModal').onclick = () => {
+      document.getElementById('proModal').classList.add('hidden');
+      exportFullCanvas(2, true);
+    };
+
+    function exportFullCanvas(scaleFactor = 2, withWatermark = true) {
+      const exportCanvas = document.createElement('canvas');
+      exportCanvas.width = canvas.width * (scaleFactor / (window.devicePixelRatio || 1));
+      exportCanvas.height = canvas.height * (scaleFactor / (window.devicePixelRatio || 1));
+      const expCtx = exportCanvas.getContext('2d');
+      expCtx.scale(exportCanvas.width / canvas.width, exportCanvas.height / canvas.height);
+
+      expCtx.drawImage(canvas, 0, 0);
+
+      const dpr = window.devicePixelRatio || 1;
+      document.querySelectorAll('.sticky-note').forEach(note => {
+        const rect = note.getBoundingClientRect();
+        const text = note.querySelector('textarea').value;
+        expCtx.save();
+        expCtx.fillStyle = '#fef08a';
+        expCtx.strokeStyle = '#fde047';
+        expCtx.lineWidth = 2 * dpr;
+        expCtx.fillRect(rect.left * dpr, rect.top * dpr, rect.width * dpr, rect.height * dpr);
+        expCtx.strokeRect(rect.left * dpr, rect.top * dpr, rect.width * dpr, rect.height * dpr);
+
+        expCtx.fillStyle = '#713f12';
+        expCtx.font = `bold ${12 * dpr}px sans-serif`;
+        expCtx.fillText('📝 灵感便签', (rect.left + 12) * dpr, (rect.top + 20) * dpr);
+
+        expCtx.fillStyle = '#1c1917';
+        expCtx.font = `${11 * dpr}px sans-serif`;
+        const lines = text.split('\n');
+        lines.forEach((l, idx) => {
+          expCtx.fillText(l, (rect.left + 12) * dpr, (rect.top + 40 + idx * 16) * dpr);
+        });
+        expCtx.restore();
+      });
+
+      if (withWatermark) {
+        expCtx.save();
+        expCtx.font = `bold ${18 * dpr}px sans-serif`;
+        expCtx.fillStyle = 'rgba(148, 163, 184, 0.45)';
+        expCtx.textAlign = 'right';
+        expCtx.fillText('Made with EazyOPC (Free Version)', (canvas.width / dpr - 24) * dpr, (canvas.height / dpr - 24) * dpr);
+        expCtx.restore();
+      }
+
+      const quality = withWatermark ? 'Standard' : '4K-Pro';
+      triggerDownload(exportCanvas.toDataURL('image/png'), `EazyOPC-${appState.mode}-${quality}.png`);
+    }
+
+    function triggerDownload(url, filename) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+    }
+
+    // 11. 激活码客户端校验机制
+    document.getElementById('btnVerifyLicense').onclick = () => {
+      const code = document.getElementById('licenseInput').value.trim();
+      if (code.toUpperCase().startsWith('EZPRO-') && code.length >= 10) {
+        localStorage.setItem('eazyopc_pro_unlocked', 'true');
+        appState.isPro = true;
+        alert('🎉 恭喜！已成功激活 EazyOPC Pro 终身版，4K 超清免水印导出与商用权益已永久解锁！');
+        document.getElementById('proModal').classList.add('hidden');
+      } else {
+        alert('激活码无效，请核对 Creem 发送给您的购买收据邮件，或直接点击上方黄色按钮买断。');
+      }
+    };
+
+    // 12. 工具栏与弹窗绑定
+    document.getElementById('btnOpenPrivacy').onclick = () => document.getElementById('privacyModal').classList.remove('hidden');
+    document.getElementById('btnClosePrivacy').onclick = () => document.getElementById('privacyModal').classList.add('hidden');
+    document.getElementById('btnConfirmPrivacy').onclick = () => document.getElementById('privacyModal').classList.add('hidden');
+    document.getElementById('btnOpenProModal').onclick = () => document.getElementById('proModal').classList.remove('hidden');
+
+    function updateToolButtonsState() {
+      document.querySelectorAll('.tool-btn').forEach(btn => {
+        const tool = btn.dataset.tool;
+        btn.classList.toggle('tool-active', tool === appState.tool);
+      });
+    }
+
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+      btn.onclick = () => {
+        appState.tool = btn.dataset.tool;
+        updateToolButtonsState();
+      };
+    });
+
+    document.getElementById('brushSize').oninput = (e) => appState.brushSize = e.target.value;
+
+    document.getElementById('paperSelector').onchange = (e) => {
+      saveHistory();
+      appState.paper = e.target.value;
+      renderBackground();
+      restoreSnapshot();
+    };
+
+    document.getElementById('modeSelector').onchange = (e) => {
+      const newMode = e.target.value;
+      setMode(newMode);
+      const url = new URL(window.location);
+      url.searchParams.set('mode', newMode);
+      window.history.replaceState({}, '', url);
+    };
+
+    document.querySelectorAll('.lang-opt').forEach(btn => {
+      btn.onclick = () => {
+        const lang = btn.dataset.lang;
+        setLanguage(lang);
+        btn.closest('details').removeAttribute('open');
+      };
+    });
+
+    window.addEventListener('resize', resizeCanvas);
+
+    // 13. 自动嗅探二级域名、语言与初始化
+    window.addEventListener('DOMContentLoaded', () => {
+      const host = window.location.hostname.toLowerCase();
+      const urlParams = new URLSearchParams(window.location.search);
+      const modeParam = urlParams.get('mode');
+      const langParam = urlParams.get('lang');
+
+      // 语言探测
+      const savedLang = localStorage.getItem('user_lang_pref');
+      if (langParam) setLanguage(langParam);
+      else if (savedLang) setLanguage(savedLang);
+      else {
+        const browserLang = (navigator.language || '').toLowerCase();
+        if (browserLang.startsWith('zh')) setLanguage('zh');
+        else if (browserLang.startsWith('ja')) setLanguage('ja');
+        else if (browserLang.startsWith('ko')) setLanguage('ko');
+        else if (browserLang.startsWith('de')) setLanguage('de');
+        else if (browserLang.startsWith('es')) setLanguage('es');
+        else if (browserLang.startsWith('fr')) setLanguage('fr');
+        else setLanguage('en');
+      }
+
+      // 模式探测
+      if (modeParam && ['kids', 'graph', 'chalkboard', 'whiteboard'].includes(modeParam)) {
+        setMode(modeParam);
+      } else if (host.startsWith('kidsdraw')) {
+        setMode('kids');
+      } else if (host.startsWith('graph')) {
+        setMode('graph');
+      } else if (host.startsWith('whiteboard')) {
+        setMode('whiteboard');
+      } else {
+        setMode('chalkboard');
+      }
+
+      resizeCanvas();
+    });
+  </script>
+</body>
+</html>
