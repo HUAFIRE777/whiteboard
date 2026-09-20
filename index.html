@@ -117,6 +117,7 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6499357447763670" crossorigin="anonymous"></script>
 
   <!-- Tailwind CSS CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     * { touch-action: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
@@ -185,31 +186,31 @@
       </div>
     </div>
 
-    <!-- 撤销、清空、导出与语言切换 -->
-    <div class="flex items-center gap-1.5 border-l border-slate-700 pl-2 flex-shrink-0">
-      <button id="btnUndo" class="p-1.5 px-2 text-slate-300 hover:bg-slate-800 rounded-xl transition text-xs" title="撤销 (Ctrl+Z)">↩️</button>
-      <button id="btnClear" class="p-1.5 px-2 text-slate-300 hover:bg-rose-950/40 hover:text-rose-400 rounded-xl transition text-xs" title="清空画布">🗑️</button>
-      <button id="btnExport" class="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-2.5 py-1.5 rounded-xl shadow-lg transition-transform active:scale-95">
-        <span>💾</span> <span data-i18n="export">导出</span>
-      </button>
+    </header>
 
-      <!-- 7 国语言下拉菜单 -->
-      <details class="lang-dropdown relative ml-1">
-        <summary class="flex items-center gap-1 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs cursor-pointer border border-slate-700">
-          <span>🌐</span> <span id="currentLangLabel">中</span> <span>▾</span>
-        </summary>
-        <div class="absolute right-0 mt-2 w-32 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-1 z-50 flex flex-col gap-0.5 text-xs text-slate-200">
-          <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="zh">🇨🇳 简体中文</button>
-          <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="en">🇺🇸 English</button>
-          <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="ja">🇯🇵 日本語</button>
-          <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="ko">🇰🇷 한국어</button>
-          <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="de">🇩🇪 Deutsch</button>
-          <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="es">🇪🇸 Español</button>
-          <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="fr">🇫🇷 Français</button>
-        </div>
-      </details>
-    </div>
-  </header>
+  <!-- 右上角常驻操作面板 (撤销、导出与语言切换，永远置顶不被遮挡) -->
+  <div id="rightActionDock" class="absolute top-2.5 right-3 z-30 flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 px-2.5 py-1.5 rounded-2xl shadow-2xl">
+    <button id="btnUndo" class="p-1.5 px-2 text-slate-300 hover:bg-slate-800 rounded-xl transition text-xs" title="撤销 (Ctrl+Z)">↩️</button>
+    <button id="btnExport" class="flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-lg transition-transform active:scale-95">
+      <span>💾</span> <span data-i18n="export">导出</span>
+    </button>
+
+    <!-- 7 国语言下拉菜单 -->
+    <details class="lang-dropdown relative ml-1">
+      <summary class="flex items-center gap-1 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs cursor-pointer border border-slate-700">
+        <span>🌐</span> <span id="currentLangLabel">中</span> <span>▾</span>
+      </summary>
+      <div class="absolute right-0 mt-2 w-32 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-1 z-50 flex flex-col gap-0.5 text-xs text-slate-200">
+        <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="zh">🇨🇳 简体中文</button>
+        <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="en">🇺🇸 English</button>
+        <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="ja">🇯🇵 日本語</button>
+        <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="ko">🇰🇷 한국어</button>
+        <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="de">🇩🇪 Deutsch</button>
+        <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="es">🇪🇸 Español</button>
+        <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-lg transition" data-lang="fr">🇫🇷 Français</button>
+      </div>
+    </details>
+  </div>
 
   <!-- 3D 等轴测几何悬浮菜单 (Graph 模式) -->
   <div id="geomMenuModal" class="hidden absolute top-16 left-1/2 -translate-x-1/2 z-40 bg-slate-800/95 border border-slate-700 backdrop-blur-md rounded-2xl p-3 shadow-2xl flex flex-wrap gap-2 text-xs text-white max-w-lg">
@@ -366,6 +367,76 @@
     </div>
   </div>
 
+
+    <!-- 专业导出中心弹窗 (支持 1080P免费 / 4K Pro / PDF 矢量导出) -->
+  <div id="exportModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-3xl p-6 shadow-2xl text-white space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg">💾</div>
+          <div>
+            <h3 class="text-base font-bold">导出作品 · Export Center</h3>
+            <p class="text-[11px] text-slate-400">选择文件格式与输出画质</p>
+          </div>
+        </div>
+        <button id="btnCloseExportModal" class="text-slate-400 hover:text-white text-lg px-2">✕</button>
+      </div>
+
+      <div class="space-y-2.5">
+        <!-- 选项 1: 免费 1080P PNG -->
+        <label class="export-card flex items-center justify-between p-3.5 rounded-2xl bg-slate-800/90 border-2 border-emerald-500 cursor-pointer transition">
+          <div class="flex items-center gap-3">
+            <input type="radio" name="exportFormat" value="png_free" checked class="w-4 h-4 accent-emerald-500" />
+            <div>
+              <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                <span>🖼️ 1080P 标准高清 PNG</span>
+                <span class="text-[9px] px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-semibold">免费 Free</span>
+              </div>
+              <p class="text-[10px] text-slate-400 mt-0.5">带 EazyOPC 极简水印，日常记录与社交分享首选</p>
+            </div>
+          </div>
+          <span class="text-xs font-bold text-emerald-400">$0 免费</span>
+        </label>
+
+        <!-- 选项 2: 4K Ultra-HD 超清原画 (Pro) -->
+        <label class="export-card flex items-center justify-between p-3.5 rounded-2xl bg-slate-800/90 border-2 border-slate-700/60 cursor-pointer transition">
+          <div class="flex items-center gap-3">
+            <input type="radio" name="exportFormat" value="png_4k" class="w-4 h-4 accent-amber-500" />
+            <div>
+              <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                <span>✨ 4K Ultra-HD 超清原画</span>
+                <span class="text-[9px] px-1.5 py-0.5 bg-amber-500/20 text-amber-300 rounded font-semibold">⭐ Pro 终身</span>
+              </div>
+              <p class="text-[10px] text-slate-400 mt-0.5">3840×2160 印刷级超清分辨率，永久纯净无水印</p>
+            </div>
+          </div>
+          <span class="text-xs font-bold text-amber-400">$4.99 买断</span>
+        </label>
+
+        <!-- 选项 3: PDF 矢量打印文档 (Pro 会员专享) -->
+        <label class="export-card flex items-center justify-between p-3.5 rounded-2xl bg-slate-800/90 border-2 border-slate-700/60 cursor-pointer transition">
+          <div class="flex items-center gap-3">
+            <input type="radio" name="exportFormat" value="pdf_pro" class="w-4 h-4 accent-amber-500" />
+            <div>
+              <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                <span>📄 PDF 矢量打印文档</span>
+                <span class="text-[9px] px-1.5 py-0.5 bg-amber-500/20 text-amber-300 rounded font-semibold">⭐ Pro 专享</span>
+              </div>
+              <p class="text-[10px] text-slate-400 mt-0.5">A4 矢量无损高清，学校作业、教案与工程图纸首选</p>
+            </div>
+          </div>
+          <span class="text-xs font-bold text-amber-400">$4.99 买断</span>
+        </label>
+      </div>
+
+      <!-- 操作执行按钮 -->
+      <div class="pt-2">
+        <button id="btnExecuteExport" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition-all text-xs flex items-center justify-center gap-2">
+          <span>⬇️</span> <span id="lblExecuteExport">免费导出 1080P (带水印)</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- 隐私政策弹窗 -->
   <div id="privacyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -1433,7 +1504,7 @@
       }
     });
 
-    document.getElementById('btnClear').onclick = () => {
+    const btnClr = document.getElementById('btnClear') || document.getElementById('btnQuickClear'); if (btnClr) btnClr.onclick = () => {
       if (confirm('确认一键清屏（清除所有笔画与内容）吗？')) {
         saveHistory();
         appState.strokes = [];
@@ -1442,64 +1513,115 @@
       }
     };
 
-    // 10. 导出与 Creem 付费门槛闭环
+        // 10. 现代化导出中心逻辑 (支持 1080P免费 / 4K Pro / PDF 矢量导出)
+    const exportModal = document.getElementById('exportModal');
+    const btnCloseExportModal = document.getElementById('btnCloseExportModal');
+    const btnExecuteExport = document.getElementById('btnExecuteExport');
+    const lblExecuteExport = document.getElementById('lblExecuteExport');
+
     document.getElementById('btnExport').onclick = () => {
-      if (!appState.isPro) {
-        document.getElementById('proModal').classList.remove('hidden');
-      } else {
-        exportFullCanvas(4, false);
-      }
+      updateExportModalUI();
+      exportModal.classList.remove('hidden');
     };
 
-    document.getElementById('btnCloseModal').onclick = () => {
-      document.getElementById('proModal').classList.add('hidden');
-      exportFullCanvas(2, true);
+    btnCloseExportModal.onclick = () => {
+      exportModal.classList.add('hidden');
     };
 
-    function exportFullCanvas(scaleFactor = 2, withWatermark = true) {
-      const exportCanvas = document.createElement('canvas');
-      exportCanvas.width = canvas.width * (scaleFactor / (window.devicePixelRatio || 1));
-      exportCanvas.height = canvas.height * (scaleFactor / (window.devicePixelRatio || 1));
-      const expCtx = exportCanvas.getContext('2d');
-      expCtx.scale(exportCanvas.width / canvas.width, exportCanvas.height / canvas.height);
+    exportModal.onclick = (e) => {
+      if (e.target === exportModal) exportModal.classList.add('hidden');
+    };
 
-      expCtx.drawImage(canvas, 0, 0);
+    function getSelectedExportFormat() {
+      const checked = document.querySelector('input[name="exportFormat"]:checked');
+      return checked ? checked.value : 'png_free';
+    }
 
-      const dpr = window.devicePixelRatio || 1;
-      document.querySelectorAll('.sticky-note').forEach(note => {
-        const rect = note.getBoundingClientRect();
-        const text = note.querySelector('textarea').value;
-        expCtx.save();
-        expCtx.fillStyle = '#fef08a';
-        expCtx.strokeStyle = '#fde047';
-        expCtx.lineWidth = 2 * dpr;
-        expCtx.fillRect(rect.left * dpr, rect.top * dpr, rect.width * dpr, rect.height * dpr);
-        expCtx.strokeRect(rect.left * dpr, rect.top * dpr, rect.width * dpr, rect.height * dpr);
-
-        expCtx.fillStyle = '#713f12';
-        expCtx.font = `bold ${12 * dpr}px sans-serif`;
-        expCtx.fillText('📝 灵感便签', (rect.left + 12) * dpr, (rect.top + 20) * dpr);
-
-        expCtx.fillStyle = '#1c1917';
-        expCtx.font = `${11 * dpr}px sans-serif`;
-        const lines = text.split('\n');
-        lines.forEach((l, idx) => {
-          expCtx.fillText(l, (rect.left + 12) * dpr, (rect.top + 40 + idx * 16) * dpr);
-        });
-        expCtx.restore();
+    function updateExportModalUI() {
+      const fmt = getSelectedExportFormat();
+      document.querySelectorAll('.export-card').forEach(card => {
+        const input = card.querySelector('input');
+        if (input.checked) {
+          card.classList.remove('border-slate-700/60');
+          card.classList.add(input.value === 'png_free' ? 'border-emerald-500' : 'border-amber-500');
+        } else {
+          card.classList.remove('border-emerald-500', 'border-amber-500');
+          card.classList.add('border-slate-700/60');
+        }
       });
 
-      if (withWatermark) {
-        expCtx.save();
-        expCtx.font = `bold ${18 * dpr}px sans-serif`;
-        expCtx.fillStyle = 'rgba(148, 163, 184, 0.45)';
-        expCtx.textAlign = 'right';
-        expCtx.fillText('Made with EazyOPC (Free Version)', (canvas.width / dpr - 24) * dpr, (canvas.height / dpr - 24) * dpr);
-        expCtx.restore();
+      if (fmt === 'png_free') {
+        btnExecuteExport.className = 'w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition-all text-xs flex items-center justify-center gap-2';
+        lblExecuteExport.innerText = '免费导出 1080P (带水印)';
+      } else if (fmt === 'png_4k') {
+        if (appState.isPro) {
+          btnExecuteExport.className = 'w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl shadow-lg transition-all text-xs flex items-center justify-center gap-2';
+          lblExecuteExport.innerText = '立即导出 4K 超清原画 (无水印)';
+        } else {
+          btnExecuteExport.className = 'w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl shadow-lg transition-all text-xs flex items-center justify-center gap-2';
+          lblExecuteExport.innerText = '⭐ 解锁 4K 无水印原画 ($4.99 一次性买断)';
+        }
+      } else if (fmt === 'pdf_pro') {
+        if (appState.isPro) {
+          btnExecuteExport.className = 'w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg transition-all text-xs flex items-center justify-center gap-2';
+          lblExecuteExport.innerText = '立即导出 PDF 矢量文档';
+        } else {
+          btnExecuteExport.className = 'w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl shadow-lg transition-all text-xs flex items-center justify-center gap-2';
+          lblExecuteExport.innerText = '⭐ 解锁 PDF 矢量导出 ($4.99 一次性买断)';
+        }
       }
+    }
 
-      const quality = withWatermark ? 'Standard' : '4K-Pro';
-      triggerDownload(exportCanvas.toDataURL('image/png'), `EazyOPC-${appState.mode}-${quality}.png`);
+    document.querySelectorAll('input[name="exportFormat"]').forEach(radio => {
+      radio.onchange = updateExportModalUI;
+    });
+
+    btnExecuteExport.onclick = () => {
+      const fmt = getSelectedExportFormat();
+      if (fmt === 'png_free') {
+        exportModal.classList.add('hidden');
+        exportFullCanvas(2, true);
+      } else if (fmt === 'png_4k') {
+        if (appState.isPro) {
+          exportModal.classList.add('hidden');
+          exportFullCanvas(4, false);
+        } else {
+          document.getElementById('proModal').classList.remove('hidden');
+        }
+      } else if (fmt === 'pdf_pro') {
+        if (appState.isPro) {
+          exportModal.classList.add('hidden');
+          exportToPDF();
+        } else {
+          document.getElementById('proModal').classList.remove('hidden');
+        }
+      }
+    };
+
+    function exportToPDF() {
+      if (!window.jspdf) {
+        alert('PDF 组件加载中，请稍后再试');
+        return;
+      }
+      const { jsPDF } = window.jspdf;
+      const isLandscape = canvas.width >= canvas.height;
+      const pdf = new jsPDF({
+        orientation: isLandscape ? 'l' : 'p',
+        unit: 'pt',
+        format: 'a4'
+      });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      const exportCanvas = document.createElement('canvas');
+      exportCanvas.width = canvas.width;
+      exportCanvas.height = canvas.height;
+      const expCtx = exportCanvas.getContext('2d');
+      expCtx.drawImage(canvas, 0, 0);
+
+      const imgData = exportCanvas.toDataURL('image/jpeg', 0.95);
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`EazyOPC-${appState.mode}-${Date.now()}.pdf`);
     }
 
     function triggerDownload(url, filename) {
