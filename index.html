@@ -866,13 +866,54 @@
       color: #ffffff !important;
       box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
     }
+    body.theme-light #brushStudioFlyout,
     body.theme-light #zoomDock,
     body.theme-light #pageManagerDock,
     body.theme-light #paletteFlyout {
       background: #ffffff !important;
       border-color: #cbd5e1 !important;
       color: #0f172a !important;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12) !important;
+    }
+    body.theme-light #brushStudioFlyout span,
+    body.theme-light #brushStudioFlyout div {
+      color: #0f172a !important;
+    }
+    body.theme-light #brushStudioFlyout .brush-card {
+      background: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    body.theme-light #brushStudioFlyout .brush-card:hover {
+      background: #eef2ff !important;
+      border-color: #6366f1 !important;
+    }
+    body.theme-light #brushStudioFlyout .brush-card.active {
+      background: #e0e7ff !important;
+      border-color: #4f46e5 !important;
+    }
+    body.theme-light #brushStudioFlyout .brush-card div:last-child {
+      color: #475569 !important;
+    }
+    body.theme-light #paletteFlyout span,
+    body.theme-light #paletteFlyout div {
+      color: #0f172a !important;
+    }
+    body.theme-light #paletteFlyout .bg-slate-950\/80 {
+      background: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    body.theme-light #paletteFlyout input[type="number"] {
+      background: #ffffff !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+    #canvasSelectionMarquee {
+      position: absolute;
+      border: 1.5px dashed #4f46e5;
+      background-color: rgba(79, 70, 229, 0.12);
+      pointer-events: none;
+      z-index: 45;
+      display: none;
     }
     body.theme-light #zoomDock button,
     body.theme-light #pageManagerDock button {
@@ -1482,13 +1523,28 @@
         </button>
       </div>
     </div>
-        <div id="paletteFlyout" class="hidden absolute left-16 sm:left-20 top-16 sm:top-20 z-40 bg-slate-900/95 border border-slate-700 backdrop-blur-md rounded-2xl p-3 shadow-2xl space-y-3 w-64 text-white">
+        <div id="paletteFlyout" class="hidden absolute left-14 sm:left-18 z-40 bg-slate-900/95 border border-slate-700 backdrop-blur-md rounded-2xl p-3 shadow-2xl space-y-3 w-64 text-white transition-all">
       <!-- 调色板标题与当前色预览 -->
       <div class="flex items-center justify-between pb-1.5 border-b border-slate-800">
-        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider" data-i18n="palette_title">画笔色彩与 RGB 取色</span>
+        <span class="text-xs text-slate-300 font-bold flex items-center gap-1.5">
+          <span>🎨</span> <span>画笔色彩与粗细</span>
+        </span>
         <div class="flex items-center gap-1.5">
           <span id="rgbHexDisplay" class="font-mono text-xs text-indigo-300 font-bold">#18181B</span>
           <span id="rgbPreviewSwatch" class="w-4 h-4 rounded-full border border-white/60 bg-[#18181b] shadow-sm"></span>
+        </div>
+      </div>
+
+      <!-- 🌟 专业 Photoshop / Procreate 级 HSV 色盘与饱和度方块 (圆盘拖拽拾色) -->
+      <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800/80 space-y-2 flex flex-col items-center">
+        <div class="flex items-center justify-between w-full text-[10px] font-mono text-slate-400">
+          <span class="text-indigo-400 font-bold flex items-center gap-1">
+            <span>🎯</span> <span>PS 级色相环圆盘</span>
+          </span>
+          <span class="text-[9px] text-slate-400">拖拽圆环与方块拾色</span>
+        </div>
+        <div class="relative w-[180px] h-[180px] flex items-center justify-center select-none touch-none">
+          <canvas id="hsvWheelCanvas" width="180" height="180" class="cursor-crosshair rounded-full shadow-lg block"></canvas>
         </div>
       </div>
 
@@ -1538,24 +1594,18 @@
         <input id="brushSizeInput" type="range" min="1" max="40" value="4" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500" />
       </div>
 
+      <!-- 快捷笔刷尺寸选择按钮组 -->
+      <div class="flex items-center justify-between gap-1 pt-0.5">
+        <button type="button" class="btn-quick-size px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 font-mono flex-1 text-center border border-slate-700/60 transition" data-sz="2">细 2px</button>
+        <button type="button" class="btn-quick-size px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 font-mono flex-1 text-center border border-slate-700/60 transition" data-sz="4">标 4px</button>
+        <button type="button" class="btn-quick-size px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 font-mono flex-1 text-center border border-slate-700/60 transition" data-sz="8">粗 8px</button>
+        <button type="button" class="btn-quick-size px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 font-mono flex-1 text-center border border-slate-700/60 transition" data-sz="16">特粗 16px</button>
+      </div>
+
       <div class="pt-1">
         <button id="btnSmartInvert" class="w-full py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] rounded-xl border border-slate-700 flex items-center justify-center gap-1.5 transition" title="智能反转笔划色彩，自动适配黑白底色">
           <span>🌓</span> <span data-i18n="smart_invert">智能对比度修复 (反色)</span>
         </button>
-      </div>
-    </div>
-      <div>
-        <div class="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">
-          <span data-i18n="size">粗细</span>
-          <span id="brushSizeVal" class="text-white">4px</span>
-        </div>
-        <input id="brushSizeInput" type="range" min="1" max="40" value="4" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500" />
-      
-      <div class="pt-2 border-t border-slate-700/80 flex items-center justify-between">
-        <button id="btnSmartInvert" class="w-full py-1 px-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] rounded-lg border border-slate-600/80 flex items-center justify-center gap-1.5 transition" title="智能反转笔划色彩，自动适配黑白底色">
-          <span>🌓</span> <span>智能对比度修复 (反色)</span>
-        </button>
-      </div>
       </div>
     </div>
 
@@ -1575,20 +1625,39 @@
       <button id="btnNextPage" class="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition" title="下一页 (▶)">▶</button>
       <span class="text-slate-700">|</span>
       <button id="btnAddPage" class="flex items-center gap-1.5 px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow transition active:scale-95" title="新建空白白板页 (+)"><svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span data-i18n="add_page" class="text-white font-bold">加页</span></button>
+      <button id="btnToggleDualView" class="flex items-center gap-1 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold shadow transition active:scale-95" title="双板并排独立书写模式 (支持同时独立书写左侧与右侧画板)"><span>📖</span><span id="lblDualView">双板并排</span></button>
       <button id="btnDeletePage" class="p-1 hover:bg-rose-900/40 text-slate-400 hover:text-rose-400 rounded-lg text-xs transition" title="删除当前页面">🗑️</button>
     </div>
 
-    <!-- 真实物理纸张容器 (带高阶阴影与标准长宽比，彻底告别模糊) -->
-    <div id="canvasCard" class="relative rounded-2xl shadow-2xl ring-1 ring-slate-800 overflow-hidden flex items-center justify-center transition-transform bg-white origin-center">
-      <!-- 视频图层渲染容器 (置于主画布下方，支持在演示视频上方直接批注涂鸦) -->
-      <div id="videoLayerContainer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
-      <canvas id="mainCanvas"></canvas>
-      <!-- 激光笔动画层 -->
-      <div id="laserLayer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
-      <!-- 便签与打字层 -->
-      <div id="stickyLayer" class="absolute inset-0 pointer-events-none"></div>
-      <!-- 套索拖动选区层 -->
-      <div id="selectionOverlay" class="absolute inset-0 pointer-events-none"></div>
+    <!-- 真实物理纸张容器 (支持双板并排独立书写) -->
+    <div id="artboardStage" class="relative flex items-center justify-center gap-6 transition-transform origin-center">
+      <!-- 📄 左侧交互画板 (可直接双板书写绘制) -->
+      <div id="referenceCanvasCard" class="hidden relative rounded-2xl shadow-2xl ring-1 ring-slate-800 overflow-hidden flex flex-col items-center justify-center transition-transform bg-white origin-center">
+        <!-- 顶部左侧画板控制坞 -->
+        <div class="flex items-center justify-between w-full px-3 py-1.5 bg-slate-900 border-b border-slate-800 text-xs text-slate-300 select-none">
+          <div class="flex items-center gap-2">
+            <span class="text-indigo-400 font-bold flex items-center gap-1"><span>📄</span> <span id="lblLeftBoardTitle">左侧画板 (可直接编辑)</span></span>
+            <select id="refPageSelect" class="bg-slate-800 text-white text-[10px] rounded px-1.5 py-0.5 border border-slate-700 outline-none cursor-pointer" title="切换左侧画板页面"></select>
+          </div>
+          <button id="btnCloseDualView" class="text-slate-400 hover:text-white text-xs px-1 hover:bg-slate-800 rounded" title="退出双板模式">✕</button>
+        </div>
+        <div class="relative flex items-center justify-center flex-1 bg-white overflow-hidden">
+          <canvas id="referenceCanvas" class="cursor-crosshair touch-none"></canvas>
+        </div>
+      </div>
+
+      <!-- ✏️ 当前主绘制画板 (Active Drawing Canvas) -->
+      <div id="canvasCard" class="relative rounded-2xl shadow-2xl ring-1 ring-slate-800 overflow-hidden flex items-center justify-center transition-transform bg-white origin-center">
+        <!-- 视频图层渲染容器 (置于主画布下方，支持在演示视频上方直接批注涂鸦) -->
+        <div id="videoLayerContainer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+        <canvas id="mainCanvas"></canvas>
+        <!-- 激光笔动画层 -->
+        <div id="laserLayer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+        <!-- 便签与打字层 -->
+        <div id="stickyLayer" class="absolute inset-0 pointer-events-none"></div>
+        <!-- 套索拖动选区层 -->
+        <div id="selectionOverlay" class="absolute inset-0 pointer-events-none"></div>
+      </div>
     </div>
   </main>
 
@@ -3088,6 +3157,7 @@
       isPanning: false,
       panStart: { x: 0, y: 0 }
     };
+    window.appState = appState;
 
     const canvas = document.getElementById('mainCanvas');
     const ctx = canvas.getContext('2d');
@@ -3247,8 +3317,12 @@
     function resizeCanvas() {
       dpr = Math.min(window.devicePixelRatio || 1, 3);
       const containerRect = workbenchWrapper.getBoundingClientRect();
-      const maxW = Math.max(300, containerRect.width - (document.body.classList.contains('is-fullscreen') ? 0 : 32));
-      const maxH = Math.max(300, containerRect.height - (document.body.classList.contains('is-fullscreen') ? 0 : 32));
+      let maxW = Math.max(300, containerRect.width - (document.body.classList.contains('is-fullscreen') ? 0 : 32));
+      let maxH = Math.max(300, containerRect.height - (document.body.classList.contains('is-fullscreen') ? 0 : 32));
+
+      if (appState.isDualSpread) {
+        maxW = Math.max(300, (maxW - 36) * 0.48);
+      }
 
       let targetRatio = null;
       if (appState.ratio === 'a4_p') targetRatio = 210 / 297;
@@ -3289,9 +3363,21 @@
       canvas.style.width = `${cssWidth}px`;
       canvas.style.height = `${cssHeight}px`;
 
+      const refCard = document.getElementById('referenceCanvasCard');
+      const refCanvas = document.getElementById('referenceCanvas');
+      if (refCard && refCanvas) {
+        refCard.style.width = `${cssWidth}px`;
+        refCard.style.height = `${cssHeight + 36}px`;
+        refCanvas.width = Math.round(cssWidth * dpr);
+        refCanvas.height = Math.round(cssHeight * dpr);
+        refCanvas.style.width = `${cssWidth}px`;
+        refCanvas.style.height = `${cssHeight}px`;
+      }
+
       applyZoomAndPan();
       redrawAllStrokes();
       updateSelectionBoxUI();
+      if (appState.isDualSpread) renderReferenceBoard();
     }
 
     function renderBackgroundOnContext(targetCtx, w, h, scaleFactor = 1, transparent = false) {
@@ -3517,12 +3603,23 @@
           targetCtx.beginPath();
           targetCtx.arc(s.points[0].x, s.points[0].y, Math.max(1.5, targetCtx.lineWidth / 2), 0, Math.PI * 2);
           targetCtx.fill();
+        } else if (s.points.length === 2) {
+          targetCtx.beginPath();
+          targetCtx.moveTo(s.points[0].x, s.points[0].y);
+          targetCtx.lineTo(s.points[1].x, s.points[1].y);
+          targetCtx.stroke();
         } else {
           targetCtx.beginPath();
           targetCtx.moveTo(s.points[0].x, s.points[0].y);
-          for (let i = 1; i < s.points.length; i++) {
-            targetCtx.lineTo(s.points[i].x, s.points[i].y);
+          for (let i = 1; i < s.points.length - 1; i++) {
+            const p1 = s.points[i];
+            const p2 = s.points[i + 1];
+            const midX = (p1.x + p2.x) / 2;
+            const midY = (p1.y + p2.y) / 2;
+            targetCtx.quadraticCurveTo(p1.x, p1.y, midX, midY);
           }
+          const last = s.points[s.points.length - 1];
+          targetCtx.lineTo(last.x, last.y);
           targetCtx.stroke();
         }
 
@@ -4261,14 +4358,284 @@
     }
 
     // ✏️ 沉浸式行内富文本编辑器 (支持 9 款开源商用字体、实时字号/变色/粗体/多行编辑)
+    function renderReferenceBoard() {
+      const refCard = document.getElementById('referenceCanvasCard');
+      const refCanvas = document.getElementById('referenceCanvas');
+      if (!refCard || !refCanvas) return;
+
+      if (!appState.isDualSpread) {
+        refCard.classList.add('hidden');
+        refCard.style.display = 'none';
+        return;
+      }
+      refCard.classList.remove('hidden');
+      refCard.style.display = 'flex';
+
+      const refSelect = document.getElementById('refPageSelect');
+      if (refSelect) {
+        refSelect.innerHTML = '';
+        appState.pages.forEach((p, idx) => {
+          const opt = document.createElement('option');
+          opt.value = idx;
+          opt.innerText = `第 ${idx + 1} 页${idx === appState.currentPageIndex ? ' (当前)' : ''}`;
+          if (idx === appState.referencePageIndex) opt.selected = true;
+          refSelect.appendChild(opt);
+        });
+      }
+
+      let refIdx = appState.referencePageIndex;
+      if (refIdx >= appState.pages.length) refIdx = appState.pages.length - 1;
+      if (refIdx === appState.currentPageIndex) {
+        refIdx = appState.currentPageIndex > 0 ? appState.currentPageIndex - 1 : (appState.pages.length > 1 ? 1 : 0);
+      }
+      appState.referencePageIndex = refIdx;
+      if (refSelect) refSelect.value = refIdx;
+
+      const p = appState.pages[refIdx];
+      if (!p) return;
+
+      const refCtx = refCanvas.getContext('2d');
+      renderBackgroundOnContext(refCtx, cssWidth, cssHeight, dpr, false);
+
+      refCtx.save();
+      refCtx.setTransform(1, 0, 0, 1, 0, 0);
+      refCtx.scale(dpr, dpr);
+
+      // 渲染对照页图片
+      for (const im of (p.images || [])) {
+        if (im.img && im.img.complete) {
+          refCtx.save();
+          const cx = im.x + im.width / 2;
+          const cy = im.y + im.height / 2;
+          refCtx.translate(cx, cy);
+          if (im.rotation) refCtx.rotate(im.rotation);
+          refCtx.drawImage(im.img, -im.width / 2, -im.height / 2, im.width, im.height);
+          refCtx.restore();
+        }
+      }
+
+      // 渲染对照页笔触
+      for (const s of (p.strokes || [])) {
+        if (!s.points || s.points.length === 0) continue;
+        refCtx.save();
+        refCtx.strokeStyle = s.color || '#18181b';
+        refCtx.fillStyle = s.color || '#18181b';
+        refCtx.lineCap = 'round';
+        refCtx.lineJoin = 'round';
+        refCtx.lineWidth = Math.max(1, s.size || 3);
+        if (s.tool === 'highlighter') {
+          refCtx.globalCompositeOperation = 'multiply';
+          refCtx.globalAlpha = 0.35;
+          refCtx.lineWidth = (s.size || 3) * 3.6;
+        }
+
+        if (s.points.length === 1) {
+          refCtx.beginPath();
+          refCtx.arc(s.points[0].x, s.points[0].y, Math.max(1.5, (s.size || 3) / 2), 0, Math.PI * 2);
+          refCtx.fill();
+        } else if (s.points.length === 2) {
+          refCtx.beginPath();
+          refCtx.moveTo(s.points[0].x, s.points[0].y);
+          refCtx.lineTo(s.points[1].x, s.points[1].y);
+          refCtx.stroke();
+        } else {
+          refCtx.beginPath();
+          refCtx.moveTo(s.points[0].x, s.points[0].y);
+          for (let i = 1; i < s.points.length - 1; i++) {
+            const p1 = s.points[i];
+            const p2 = s.points[i + 1];
+            refCtx.quadraticCurveTo(p1.x, p1.y, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+          }
+          refCtx.lineTo(s.points[s.points.length - 1].x, s.points[s.points.length - 1].y);
+          refCtx.stroke();
+        }
+        refCtx.restore();
+      }
+
+      // 渲染对照页文本
+      for (const t of (p.texts || [])) {
+        if (!t.text) continue;
+        refCtx.save();
+        refCtx.font = `${t.bold ? 'bold' : 'normal'} ${t.size || 24}px ${t.fontFamily || "'Noto Sans SC', sans-serif"}`;
+        refCtx.fillStyle = t.color || '#18181b';
+        refCtx.textBaseline = 'top';
+        const lines = String(t.text).split('\n');
+        const lineHeight = (t.size || 24) * 1.35;
+        lines.forEach((line, idx) => {
+          refCtx.fillText(line, t.x, t.y + idx * lineHeight);
+        });
+        refCtx.restore();
+      }
+
+      refCtx.restore();
+    }
+
+    function getRefCanvasCoordinates(e) {
+      const refCanvas = document.getElementById('referenceCanvas');
+      if (!refCanvas) return { x: 0, y: 0 };
+      const rect = refCanvas.getBoundingClientRect();
+      const scaleX = cssWidth / (rect.width || 1);
+      const scaleY = cssHeight / (rect.height || 1);
+      return {
+        x: Math.max(0, Math.min(cssWidth, (e.clientX - rect.left) * scaleX)),
+        y: Math.max(0, Math.min(cssHeight, (e.clientY - rect.top) * scaleY))
+      };
+    }
+
+    let isRefDrawing = false;
+    let currentRefStroke = null;
+
+    function setupWritableDualBoard() {
+      const refCanvas = document.getElementById('referenceCanvas');
+      if (!refCanvas || refCanvas._bound) return;
+      refCanvas._bound = true;
+
+      refCanvas.addEventListener('pointerdown', (e) => {
+        closeAllFlyouts();
+        e.preventDefault();
+        const pos = getRefCanvasCoordinates(e);
+        const refIdx = appState.referencePageIndex !== undefined ? appState.referencePageIndex : (appState.currentPageIndex > 0 ? appState.currentPageIndex - 1 : 0);
+        const p = appState.pages[refIdx];
+        if (!p) return;
+        if (!p.strokes) p.strokes = [];
+        if (!p.history) p.history = [];
+        p.history.push(JSON.parse(JSON.stringify(p.strokes)));
+        if (p.history.length > 30) p.history.shift();
+
+        isRefDrawing = true;
+        currentRefStroke = {
+          id: Date.now() + Math.random(),
+          tool: appState.tool,
+          color: appState.currentColor,
+          size: Number(appState.brushSize) || 3,
+          points: [pos]
+        };
+        p.strokes.push(currentRefStroke);
+
+        const refCtx = refCanvas.getContext('2d');
+        refCtx.save();
+        refCtx.setTransform(1, 0, 0, 1, 0, 0);
+        refCtx.scale(dpr, dpr);
+        refCtx.fillStyle = currentRefStroke.color;
+        refCtx.beginPath();
+        refCtx.arc(pos.x, pos.y, Math.max(1, currentRefStroke.size / 2), 0, Math.PI * 2);
+        refCtx.fill();
+        refCtx.restore();
+      });
+
+      refCanvas.addEventListener('pointermove', (e) => {
+        if (!isRefDrawing || !currentRefStroke) return;
+        e.preventDefault();
+        const pos = getRefCanvasCoordinates(e);
+        const pts = currentRefStroke.points;
+        if (pts.length > 0) {
+          const last = pts[pts.length - 1];
+          if (Math.hypot(pos.x - last.x, pos.y - last.y) < 2) return;
+        }
+        pos.time = performance.now();
+        pts.push(pos);
+
+        const refCtx = refCanvas.getContext('2d');
+        refCtx.save();
+        refCtx.setTransform(1, 0, 0, 1, 0, 0);
+        refCtx.scale(dpr, dpr);
+        refCtx.strokeStyle = currentRefStroke.color;
+        refCtx.lineCap = 'round';
+        refCtx.lineJoin = 'round';
+        refCtx.lineWidth = currentRefStroke.size;
+
+        if (pts.length >= 3) {
+          const p0 = pts[pts.length - 3], pA = pts[pts.length - 2], pB = pts[pts.length - 1];
+          refCtx.beginPath();
+          refCtx.moveTo((p0.x + pA.x)/2, (p0.y + pA.y)/2);
+          refCtx.quadraticCurveTo(pA.x, pA.y, (pA.x + pB.x)/2, (pA.y + pB.y)/2);
+          refCtx.stroke();
+        } else if (pts.length === 2) {
+          refCtx.beginPath();
+          refCtx.moveTo(pts[0].x, pts[0].y);
+          refCtx.lineTo(pts[1].x, pts[1].y);
+          refCtx.stroke();
+        }
+        refCtx.restore();
+      });
+
+      const onRefUp = () => {
+        if (isRefDrawing) {
+          isRefDrawing = false;
+          currentRefStroke = null;
+          renderReferenceBoard();
+        }
+      };
+      refCanvas.addEventListener('pointerup', onRefUp);
+      refCanvas.addEventListener('pointerleave', onRefUp);
+    }
+
+    function toggleDualSpreadView() {
+      if (appState.pages.length <= 1 && !appState.isDualSpread) {
+        addNewPage();
+      }
+      appState.isDualSpread = !appState.isDualSpread;
+      const btn = document.getElementById('btnToggleDualView');
+      const lbl = document.getElementById('lblDualView');
+      if (btn && lbl) {
+        if (appState.isDualSpread) {
+          btn.className = 'flex items-center gap-1 px-2.5 py-1 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg transition active:scale-95';
+          lbl.innerText = '单板模式';
+        } else {
+          btn.className = 'flex items-center gap-1 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold shadow transition active:scale-95';
+          lbl.innerText = '双板并排';
+        }
+      }
+      resizeCanvas();
+    }
+
+    function closeAllFlyouts(exceptId = null) {
+      const flyoutIds = ['paletteFlyout', 'brushStudioFlyout', 'langMenu', 'moreToolsDrawer'];
+      for (const id of flyoutIds) {
+        if (id !== exceptId) {
+          const el = document.getElementById(id);
+          if (el) el.classList.add('hidden');
+        }
+      }
+    }
+
+    function getNormalizedRect(p1, p2) {
+      const x = Math.min(p1.x, p2.x);
+      const y = Math.min(p1.y, p2.y);
+      const width = Math.abs(p2.x - p1.x);
+      const height = Math.abs(p2.y - p1.y);
+      return { x, y, width, height };
+    }
+
+    function renderMarqueeBoxUI(p1, p2) {
+      const rect = getNormalizedRect(p1, p2);
+      let marqueeEl = document.getElementById('canvasMarqueeBox');
+      if (!marqueeEl) {
+        marqueeEl = document.createElement('div');
+        marqueeEl.id = 'canvasMarqueeBox';
+        marqueeEl.className = 'absolute pointer-events-none border border-dashed border-indigo-500 bg-indigo-500/15 z-40 rounded';
+        canvasCard.appendChild(marqueeEl);
+      }
+      marqueeEl.style.left = `${rect.x}px`;
+      marqueeEl.style.top = `${rect.y}px`;
+      marqueeEl.style.width = `${rect.width}px`;
+      marqueeEl.style.height = `${rect.height}px`;
+    }
+
+    function clearMarqueeBoxUI() {
+      const marqueeEl = document.getElementById('canvasMarqueeBox');
+      if (marqueeEl) marqueeEl.remove();
+    }
+
+    // ✏️ 沉浸式行内富文本编辑器 (支持 9 款开源商用字体、实时字号/变色/粗体/多行编辑)
     function openRichTextEditor(targetText, posX, posY) {
-      const existing = document.getElementById('richTextEditorFloating');
+      const existing = document.getElementById('inlineCanvasTextWrapper');
       if (existing) existing.remove();
 
       let currentX = targetText ? targetText.x : (posX || 120);
       let currentY = targetText ? targetText.y : (posY || 120);
       let currentVal = targetText ? targetText.text : '';
-      let currentFont = (targetText && targetText.fontFamily) ? targetText.fontFamily : "'ZCOOL KuaiLe', cursive, sans-serif";
+      let currentFont = (targetText && targetText.fontFamily) ? targetText.fontFamily : "'Noto Sans SC', sans-serif";
       let currentSize = targetText ? (Number(targetText.size) || 24) : Math.max(18, (Number(appState.brushSize) || 4) * 4);
       let currentColor = targetText ? (targetText.color || '#18181b') : (appState.currentColor || '#18181b');
       let isBold = targetText ? !!targetText.bold : false;
@@ -4278,144 +4645,96 @@
         redrawAllStrokes();
       }
 
-      const editor = document.createElement('div');
-      editor.id = 'richTextEditorFloating';
-      editor.className = 'absolute z-50 bg-slate-900/95 border border-indigo-500 rounded-2xl shadow-2xl p-3 backdrop-blur-md flex flex-col gap-2.5 w-84 max-w-[92vw] text-white select-none transition-all';
-      
-      const clampX = Math.max(10, Math.min(cssWidth - 340, currentX));
-      const clampY = Math.max(10, Math.min(cssHeight - 240, currentY - 70));
-      editor.style.left = `${clampX}px`;
-      editor.style.top = `${clampY}px`;
+      const wrapper = document.createElement('div');
+      wrapper.id = 'inlineCanvasTextWrapper';
+      wrapper.className = 'absolute z-50 flex flex-col items-start gap-1 select-none pointer-events-auto';
+      wrapper.style.left = `${currentX}px`;
+      wrapper.style.top = `${Math.max(10, currentY - 48)}px`;
 
-      editor.innerHTML = `
-        <div class="flex items-center justify-between pb-1.5 border-b border-slate-700/80 text-xs">
-          <span class="font-bold text-indigo-400 flex items-center gap-1.5">
-            <span>🔤</span> <span>${targetText ? '编辑台词与文本' : '新建台词文本'}</span>
-          </span>
-          <div class="flex items-center gap-1">
-            <button type="button" class="btn-text-size-down px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 font-bold text-xs" title="缩小字号">A−</button>
-            <span class="text-size-display font-mono text-xs text-indigo-300 w-9 text-center font-bold">${currentSize}px</span>
-            <button type="button" class="btn-text-size-up px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 font-bold text-xs" title="放大字号">A+</button>
-            <button type="button" class="btn-text-bold px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 font-bold text-xs ${isBold ? 'text-indigo-400 border border-indigo-500' : 'text-slate-400'}" title="加粗">B</button>
-          </div>
-        </div>
-
-        <!-- 字体选择器 (9 款开源商用字体) -->
-        <div class="flex items-center gap-1.5">
-          <span class="text-[11px] text-slate-400 font-medium shrink-0">开源字体:</span>
-          <select class="font-select flex-1 bg-slate-800 text-white text-xs px-2 py-1.5 rounded-xl border border-slate-700 outline-none cursor-pointer">
-            <option value="'ZCOOL KuaiLe', cursive, sans-serif">🎈 站酷快乐体 (可爱/漫画)</option>
-            <option value="'Ma Shan Zheng', cursive">🖌️ 马善政毛笔楷书 (国风书法)</option>
-            <option value="'Long Cang', cursive">🌊 龙苍行书体 (洒脱行书)</option>
-            <option value="'Noto Sans SC', sans-serif">📐 思源黑体 (现代硬朗黑体)</option>
-            <option value="'Noto Serif SC', serif">📖 思源宋体 (典雅经典宋体)</option>
-            <option value="'Bangers', cursive">💥 Bangers (美漫英雄特效 POW!)</option>
-            <option value="'Comic Neue', cursive, sans-serif">💬 Comic Neue (欧美连环画)</option>
-            <option value="'Caveat', cursive">✍️ Caveat (随性英文手写)</option>
-            <option value="'Orbitron', sans-serif">🛸 Orbitron (机甲科幻未来)</option>
-            <option value="system-ui, -apple-system, sans-serif">💻 系统黑体 (System UI)</option>
+      wrapper.innerHTML = `
+        <div class="inline-text-toolbar flex items-center gap-1.5 px-2 py-1 bg-slate-900/95 border border-indigo-500/80 rounded-xl shadow-xl text-white text-xs backdrop-blur-md">
+          <select class="inline-font-select bg-slate-800 text-white text-[11px] px-1.5 py-0.5 rounded border border-slate-700 outline-none cursor-pointer">
+            <option value="'Noto Sans SC', sans-serif">📐 思源黑体 (标准黑体)</option>
+            <option value="'Noto Serif SC', serif">📖 思源宋体 (典雅经典)</option>
+            <option value="'ZCOOL KuaiLe', cursive, sans-serif">🎈 站酷快乐体 (卡通可爱)</option>
+            <option value="'Ma Shan Zheng', cursive">🖌️ 马善政楷书 (国风书法)</option>
+            <option value="'Comic Neue', cursive, sans-serif">💬 Comic Neue (欧美漫画)</option>
+            <option value="'Bangers', cursive">💥 Bangers (英雄特效)</option>
+            <option value="system-ui, -apple-system, sans-serif">💻 系统黑体 (System)</option>
           </select>
+          <button type="button" class="btn-sz-minus px-1.5 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-[11px] font-bold" title="字号缩小">A−</button>
+          <span class="inline-sz-val font-mono text-[11px] text-indigo-300 w-8 text-center font-bold">${currentSize}px</span>
+          <button type="button" class="btn-sz-plus px-1.5 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-[11px] font-bold" title="字号放大">A+</button>
+          <button type="button" class="btn-bold-toggle px-2 py-0.5 rounded text-[11px] font-bold ${isBold ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}" title="加粗">B</button>
+          <input type="color" class="inline-color-input w-5 h-5 rounded cursor-pointer border-0 bg-transparent" value="${currentColor.startsWith('#') && currentColor.length === 7 ? currentColor : '#18181b'}" title="文字色彩" />
+          <button type="button" class="btn-inline-done px-2.5 py-0.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[11px] font-bold shadow transition">完成 ✔</button>
         </div>
-
-        <!-- 调色与取色条 -->
-        <div class="flex items-center gap-1.5">
-          <span class="text-[11px] text-slate-400 font-medium shrink-0">文字色彩:</span>
-          <div class="color-swatches-row flex items-center gap-1.5 flex-1 overflow-x-auto py-0.5">
-            ${['#ffffff', '#0f172a', '#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899'].map(c => `
-              <button type="button" class="text-color-dot w-4 h-4 rounded-full border ${c === currentColor ? 'border-indigo-400 scale-110' : 'border-slate-600'} transition-transform shrink-0" style="background:${c}" data-c="${c}"></button>
-            `).join('')}
-          </div>
-          <label class="shrink-0 cursor-pointer p-0.5 rounded hover:bg-slate-800" title="更多色彩">
-            <input type="color" class="text-color-input sr-only" value="${currentColor.startsWith('#') && currentColor.length === 7 ? currentColor : '#18181b'}" />
-            <span class="text-xs">🎨</span>
-          </label>
-        </div>
-
-        <!-- 多行文本域 -->
-        <textarea class="text-edit-area w-full bg-slate-950/90 text-white p-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 outline-none resize-y min-h-[76px] text-sm leading-relaxed" placeholder="输入台词或文本... (Shift+Enter 换行)">${currentVal}</textarea>
-
-        <!-- 底部控制栏 -->
-        <div class="flex items-center justify-between pt-1 border-t border-slate-800 text-xs">
-          <span class="text-[10px] text-slate-500">Shift+Enter换行 · 点击完成保存</span>
-          <div class="flex items-center gap-2">
-            <button type="button" class="btn-cancel-edit px-2.5 py-1 text-slate-400 hover:text-white rounded-xl transition">取消</button>
-            <button type="button" class="btn-save-text px-3.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow transition">完成 ✔</button>
-          </div>
-        </div>
+        <textarea id="inlineCanvasTextArea" class="bg-white/90 dark:bg-slate-900/90 border-2 border-dashed border-indigo-500 rounded-lg p-2 outline-none resize-none overflow-hidden shadow-2xl transition" placeholder="在此直接打字..." style="font-size:${currentSize}px; font-family:${currentFont}; color:${currentColor}; font-weight:${isBold ? 'bold' : 'normal'}; line-height:1.25; min-width:160px; min-height:${currentSize * 1.5}px;">${currentVal}</textarea>
       `;
 
-      stickyLayer.appendChild(editor);
+      canvasCard.appendChild(wrapper);
 
-      const fontSelect = editor.querySelector('.font-select');
+      const textarea = wrapper.querySelector('#inlineCanvasTextArea');
+      const fontSelect = wrapper.querySelector('.inline-font-select');
+      const szMinus = wrapper.querySelector('.btn-sz-minus');
+      const szPlus = wrapper.querySelector('.btn-sz-plus');
+      const szVal = wrapper.querySelector('.inline-sz-val');
+      const btnBold = wrapper.querySelector('.btn-bold-toggle');
+      const colorInput = wrapper.querySelector('.inline-color-input');
+      const btnDone = wrapper.querySelector('.btn-inline-done');
+
       fontSelect.value = currentFont;
-      const textarea = editor.querySelector('.text-edit-area');
-      const sizeDisplay = editor.querySelector('.text-size-display');
-      const boldBtn = editor.querySelector('.btn-text-bold');
-      const colorInput = editor.querySelector('.text-color-input');
 
-      const updateTextareaPreview = () => {
+      const autoResize = () => {
+        textarea.style.height = 'auto';
+        textarea.style.height = `${Math.max(currentSize * 1.5, textarea.scrollHeight)}px`;
+        textarea.style.width = 'auto';
+        textarea.style.width = `${Math.max(160, textarea.scrollWidth + 24)}px`;
+      };
+
+      textarea.addEventListener('input', autoResize);
+      autoResize();
+      setTimeout(() => {
+        textarea.focus();
+        if (currentVal) textarea.select();
+      }, 30);
+
+      fontSelect.onchange = () => {
+        currentFont = fontSelect.value;
         textarea.style.fontFamily = currentFont;
-        textarea.style.fontSize = `${Math.min(28, Math.max(14, currentSize))}px`;
-        textarea.style.color = currentColor;
-        textarea.style.fontWeight = isBold ? 'bold' : 'normal';
-      };
-      updateTextareaPreview();
-
-      fontSelect.onchange = (e) => {
-        currentFont = e.target.value;
-        updateTextareaPreview();
+        autoResize();
       };
 
-      editor.querySelector('.btn-text-size-down').onclick = (e) => {
+      szMinus.onclick = (e) => {
         e.stopPropagation();
         currentSize = Math.max(12, currentSize - 2);
-        sizeDisplay.innerText = `${currentSize}px`;
-        updateTextareaPreview();
+        szVal.innerText = `${currentSize}px`;
+        textarea.style.fontSize = `${currentSize}px`;
+        autoResize();
       };
 
-      editor.querySelector('.btn-text-size-up').onclick = (e) => {
+      szPlus.onclick = (e) => {
         e.stopPropagation();
         currentSize = Math.min(120, currentSize + 2);
-        sizeDisplay.innerText = `${currentSize}px`;
-        updateTextareaPreview();
+        szVal.innerText = `${currentSize}px`;
+        textarea.style.fontSize = `${currentSize}px`;
+        autoResize();
       };
 
-      boldBtn.onclick = (e) => {
+      btnBold.onclick = (e) => {
         e.stopPropagation();
         isBold = !isBold;
-        boldBtn.classList.toggle('text-indigo-400', isBold);
-        boldBtn.classList.toggle('border', isBold);
-        boldBtn.classList.toggle('border-indigo-500', isBold);
-        updateTextareaPreview();
+        btnBold.className = `btn-bold-toggle px-2 py-0.5 rounded text-[11px] font-bold ${isBold ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`;
+        textarea.style.fontWeight = isBold ? 'bold' : 'normal';
+        autoResize();
       };
-
-      editor.querySelectorAll('.text-color-dot').forEach(btn => {
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          currentColor = btn.dataset.c;
-          colorInput.value = currentColor;
-          editor.querySelectorAll('.text-color-dot').forEach(d => d.classList.toggle('border-indigo-400', d.dataset.c === currentColor));
-          updateTextareaPreview();
-        };
-      });
 
       colorInput.oninput = (e) => {
         currentColor = e.target.value;
-        updateTextareaPreview();
+        textarea.style.color = currentColor;
       };
 
-      const closeEditor = () => {
-        if (targetText) delete targetText._editing;
-        editor.remove();
-        redrawAllStrokes();
-      };
-
-      editor.querySelector('.btn-cancel-edit').onclick = (e) => {
-        e.stopPropagation();
-        closeEditor();
-      };
-
-      const saveTextAction = () => {
+      function commitAndClose() {
         const val = textarea.value.trim();
         saveHistory();
         if (targetText) {
@@ -4431,42 +4750,37 @@
             appState.texts = appState.texts.filter(t => t !== targetText);
             clearSelection();
           }
-        } else {
-          if (val) {
-            const newT = {
-              id: Date.now() + Math.random(),
-              text: val,
-              x: currentX,
-              y: currentY,
-              size: currentSize,
-              color: currentColor,
-              fontFamily: currentFont,
-              bold: isBold,
-              rotation: 0
-            };
-            appState.texts.push(newT);
-            appState.selectedTexts = [newT];
-            appState.selectedStrokes = [];
-            appState.selectedImages = [];
-          }
+        } else if (val) {
+          const newT = {
+            id: Date.now() + Math.random(),
+            text: val,
+            x: currentX,
+            y: currentY,
+            size: currentSize,
+            fontFamily: currentFont,
+            color: currentColor,
+            bold: isBold,
+            rotation: 0
+          };
+          appState.texts.push(newT);
+          appState.selectedTexts = [newT];
+          appState.selectedStrokes = [];
+          appState.selectedImages = [];
         }
-        editor.remove();
+        wrapper.remove();
         redrawAllStrokes();
         updateSelectionBoxUI();
-      };
+      }
 
-      editor.querySelector('.btn-save-text').onclick = (e) => {
+      btnDone.onclick = (e) => {
         e.stopPropagation();
-        saveTextAction();
+        commitAndClose();
       };
 
       textarea.onkeydown = (e) => {
-        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        if ((e.key === 'Enter' && (e.ctrlKey || e.metaKey)) || e.key === 'Escape') {
           e.preventDefault();
-          saveTextAction();
-        } else if (e.key === 'Escape') {
-          e.preventDefault();
-          closeEditor();
+          commitAndClose();
         }
       };
 
@@ -4504,7 +4818,7 @@
       return dots;
     }
 
-    function renderLiveStrokeSegment(s, p1, p2) {
+    function renderLiveStrokeSegment(s, p1, p2, pPrev = null) {
       ctx.save();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
@@ -4629,10 +4943,21 @@
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.lineWidth = Math.max(1, s.size * dynamicTaper);
-        ctx.beginPath();
-        ctx.moveTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.stroke();
+        if (pPrev) {
+          const mid1X = (pPrev.x + p1.x) / 2;
+          const mid1Y = (pPrev.y + p1.y) / 2;
+          const mid2X = (p1.x + p2.x) / 2;
+          const mid2Y = (p1.y + p2.y) / 2;
+          ctx.beginPath();
+          ctx.moveTo(mid1X, mid1Y);
+          ctx.quadraticCurveTo(p1.x, p1.y, mid2X, mid2Y);
+          ctx.stroke();
+        } else {
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.stroke();
+        }
       }
 
       ctx.restore();
@@ -4648,6 +4973,7 @@
       }
 
       e.preventDefault();
+      closeAllFlyouts();
       const pos = getCanvasCoordinates(e);
 
       if (appState.tool === 'text') {
@@ -4751,6 +5077,9 @@
         }
 
         clearSelection();
+        appState.isMarqueeSelecting = true;
+        appState.marqueeStart = pos;
+        appState.marqueeCurrent = pos;
         return;
       }
 
@@ -4924,6 +5253,11 @@
 
         for (const ce of events) {
           const cPos = getCanvasCoordinates(ce);
+          const pts = currentStroke.points;
+          if (pts.length > 0) {
+            const last = pts[pts.length - 1];
+            if (Math.hypot(cPos.x - last.x, cPos.y - last.y) < 2.0) continue;
+          }
           cPos.time = performance.now();
           cPos.pressure = (ce.pressure !== undefined && ce.pressure > 0) ? ce.pressure : 0.5;
           if (currentStroke.tool === 'spray') {
@@ -4931,9 +5265,9 @@
           }
           currentStroke.points.push(cPos);
 
-          const pts = currentStroke.points;
           if (pts.length >= 2) {
-            renderLiveStrokeSegment(currentStroke, pts[pts.length - 2], pts[pts.length - 1]);
+            const pPrev = pts.length >= 3 ? pts[pts.length - 3] : null;
+            renderLiveStrokeSegment(currentStroke, pts[pts.length - 2], pts[pts.length - 1], pPrev);
           }
         }
 
@@ -4947,8 +5281,16 @@
       }
     });
 
-        // 🌟 全局 Window 层级平移拖拽系统：彻底解决选框覆盖 Canvas 导致鼠标拖不动的 Bug
+    // 🌟 全局 Window 层级平移拖拽与拉框多选系统：彻底解决选框覆盖 Canvas 导致鼠标拖不动的 Bug
     window.addEventListener('pointermove', (e) => {
+      if (appState.isMarqueeSelecting) {
+        e.preventDefault();
+        const pos = getCanvasCoordinates(e);
+        appState.marqueeCurrent = pos;
+        renderMarqueeBoxUI(appState.marqueeStart, appState.marqueeCurrent);
+        return;
+      }
+
       if (appState.isDraggingSelection) {
         e.preventDefault();
         const pos = getCanvasCoordinates(e);
@@ -4984,6 +5326,28 @@
       if (appState.isPanning) {
         appState.isPanning = false;
         if (appState.tool === 'hand') canvasCard.style.cursor = 'grab';
+        return;
+      }
+      if (appState.isMarqueeSelecting) {
+        appState.isMarqueeSelecting = false;
+        clearMarqueeBoxUI();
+        if (appState.marqueeStart && appState.marqueeCurrent) {
+          const rect = getNormalizedRect(appState.marqueeStart, appState.marqueeCurrent);
+          if (rect.width > 6 && rect.height > 6) {
+            appState.selectedStrokes = appState.strokes.filter(s =>
+              s.points && s.points.some(pt => pt.x >= rect.x && pt.x <= rect.x + rect.width && pt.y >= rect.y && pt.y <= rect.y + rect.height)
+            );
+            appState.selectedTexts = appState.texts.filter(t => {
+              const tb = getTextBounds(t);
+              return !(tb.x + tb.width < rect.x || tb.x > rect.x + rect.width || tb.y + tb.height < rect.y || tb.y > rect.y + rect.height);
+            });
+            appState.selectedImages = appState.images.filter(im =>
+              !(im.x + im.width < rect.x || im.x > rect.x + rect.width || im.y + im.height < rect.y || im.y > rect.y + rect.height)
+            );
+            redrawAllStrokes();
+            updateSelectionBoxUI();
+          }
+        }
         return;
       }
       if (appState.isDraggingSelection) {
@@ -5072,36 +5436,52 @@
 
     const btnInsertImage = document.getElementById('btnInsertImage');
     const imageFileInput = document.getElementById('imageFileInput');
-    btnInsertImage.onclick = () => imageFileInput.click();
-    imageFileInput.onchange = (e) => {
-      if (e.target.files && e.target.files[0]) {
-        const reader = new FileReader();
-        reader.onload = (ev) => addImageToCanvas(ev.target.result);
-        reader.readAsDataURL(e.target.files[0]);
-      }
-    };
+    if (btnInsertImage && imageFileInput) {
+      btnInsertImage.onclick = () => imageFileInput.click();
+    }
+    if (imageFileInput) {
+      imageFileInput.onchange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+          const reader = new FileReader();
+          reader.onload = (ev) => addImageToCanvas(ev.target.result);
+          reader.readAsDataURL(e.target.files[0]);
+        }
+      };
+    }
 
     // 缩放导航坞 (Pan & Zoom)
-    document.getElementById('btnZoomIn').onclick = () => {
-      appState.zoom = Math.min(2.5, appState.zoom + 0.15);
-      applyZoomAndPan();
-    };
-    document.getElementById('btnZoomOut').onclick = () => {
-      appState.zoom = Math.max(0.4, appState.zoom - 0.15);
-      applyZoomAndPan();
-    };
-    document.getElementById('btnZoomReset').onclick = () => {
-      appState.zoom = 1.0;
-      appState.panX = 0;
-      appState.panY = 0;
-      applyZoomAndPan();
-    };
-    document.getElementById('btnZoomFit').onclick = () => {
-      appState.zoom = 1.0;
-      appState.panX = 0;
-      appState.panY = 0;
-      resizeCanvas();
-    };
+    const btnZoomIn = document.getElementById('btnZoomIn');
+    if (btnZoomIn) {
+      btnZoomIn.onclick = () => {
+        appState.zoom = Math.min(2.5, appState.zoom + 0.15);
+        applyZoomAndPan();
+      };
+    }
+    const btnZoomOut = document.getElementById('btnZoomOut');
+    if (btnZoomOut) {
+      btnZoomOut.onclick = () => {
+        appState.zoom = Math.max(0.4, appState.zoom - 0.15);
+        applyZoomAndPan();
+      };
+    }
+    const btnZoomReset = document.getElementById('btnZoomReset');
+    if (btnZoomReset) {
+      btnZoomReset.onclick = () => {
+        appState.zoom = 1.0;
+        appState.panX = 0;
+        appState.panY = 0;
+        applyZoomAndPan();
+      };
+    }
+    const btnZoomFit = document.getElementById('btnZoomFit');
+    if (btnZoomFit) {
+      btnZoomFit.onclick = () => {
+        appState.zoom = 1.0;
+        appState.panX = 0;
+        appState.panY = 0;
+        resizeCanvas();
+      };
+    }
 
     workbenchWrapper.addEventListener('wheel', (e) => {
       if (e.ctrlKey || e.metaKey) {
@@ -5538,64 +5918,327 @@
       a.remove();
     }
 
-    // 调色板与全光谱自定义色盘
+    // 🎨 HSV 色相环与饱和度/亮度拾色器系统
+    let hsvState = { h: 0, s: 0, v: 0.1 };
+    let isDraggingHue = false;
+    let isDraggingSV = false;
+
+    function hexToRgb(hex) {
+      hex = hex.replace('#', '');
+      if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+      const num = parseInt(hex, 16);
+      return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+    }
+
+    function rgbToHex(r, g, b) {
+      return '#' + [r, g, b].map(x => {
+        const h = Math.max(0, Math.min(255, Math.round(x))).toString(16);
+        return h.length === 1 ? '0' + h : h;
+      }).join('');
+    }
+
+    function rgbToHsv(r, g, b) {
+      r /= 255; g /= 255; b /= 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h = 0, s = 0, v = max;
+      const d = max - min;
+      s = max === 0 ? 0 : d / max;
+      if (max !== min) {
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+      return { h: h * 360, s, v };
+    }
+
+    function hsvToRgb(h, s, v) {
+      let r = 0, g = 0, b = 0;
+      const i = Math.floor((h / 60) % 6);
+      const f = h / 60 - Math.floor(h / 60);
+      const p = v * (1 - s);
+      const q = v * (1 - f * s);
+      const t = v * (1 - (1 - f) * s);
+      switch (i) {
+        case 0: r = v; g = t; b = p; break;
+        case 1: r = q; g = v; b = p; break;
+        case 2: r = p; g = v; b = t; break;
+        case 3: r = p; g = q; b = v; break;
+        case 4: r = t; g = p; b = v; break;
+        case 5: r = v; g = p; b = q; break;
+      }
+      return {
+        r: Math.round(r * 255),
+        g: Math.round(g * 255),
+        b: Math.round(b * 255)
+      };
+    }
+
+    function renderHsvWheel() {
+      const wheelCanvas = document.getElementById('hsvWheelCanvas');
+      if (!wheelCanvas) return;
+      const wCtx = wheelCanvas.getContext('2d');
+      const w = 180, h = 180;
+      const cx = w / 2, cy = h / 2;
+      const rOut = 84, rIn = 66;
+
+      wCtx.clearRect(0, 0, w, h);
+
+      // 1. 绘制 360° 外色相圆环
+      for (let angle = 0; angle < 360; angle += 1) {
+        const rad1 = ((angle - 1) * Math.PI) / 180;
+        const rad2 = ((angle + 1.5) * Math.PI) / 180;
+        wCtx.beginPath();
+        wCtx.arc(cx, cy, rOut, rad1, rad2);
+        wCtx.arc(cx, cy, rIn, rad2, rad1, true);
+        wCtx.closePath();
+        wCtx.fillStyle = `hsl(${angle}, 100%, 50%)`;
+        wCtx.fill();
+      }
+
+      // 2. 绘制色相环上的当前角度手柄
+      const hueRad = (hsvState.h * Math.PI) / 180;
+      const midR = (rOut + rIn) / 2;
+      const hx = cx + Math.cos(hueRad) * midR;
+      const hy = cy + Math.sin(hueRad) * midR;
+      wCtx.beginPath();
+      wCtx.arc(hx, hy, 6.5, 0, Math.PI * 2);
+      wCtx.fillStyle = `hsl(${hsvState.h}, 100%, 50%)`;
+      wCtx.fill();
+      wCtx.lineWidth = 2.5;
+      wCtx.strokeStyle = '#ffffff';
+      wCtx.stroke();
+      wCtx.lineWidth = 1;
+      wCtx.strokeStyle = 'rgba(0,0,0,0.4)';
+      wCtx.stroke();
+
+      // 3. 绘制内切饱和度/亮度 (SV) 正方形
+      const boxSize = 72;
+      const bx = cx - boxSize / 2;
+      const by = cy - boxSize / 2;
+
+      const gradH = wCtx.createLinearGradient(bx, by, bx + boxSize, by);
+      gradH.addColorStop(0, '#ffffff');
+      gradH.addColorStop(1, `hsl(${hsvState.h}, 100%, 50%)`);
+      wCtx.fillStyle = gradH;
+      wCtx.fillRect(bx, by, boxSize, boxSize);
+
+      const gradV = wCtx.createLinearGradient(bx, by, bx, by + boxSize);
+      gradV.addColorStop(0, 'rgba(0,0,0,0)');
+      gradV.addColorStop(1, '#000000');
+      wCtx.fillStyle = gradV;
+      wCtx.fillRect(bx, by, boxSize, boxSize);
+
+      wCtx.lineWidth = 1.5;
+      wCtx.strokeStyle = 'rgba(255,255,255,0.4)';
+      wCtx.strokeRect(bx, by, boxSize, boxSize);
+
+      // 4. 绘制 SV 内部当前取色圆环游标
+      const sx = bx + hsvState.s * boxSize;
+      const sy = by + (1 - hsvState.v) * boxSize;
+      wCtx.beginPath();
+      wCtx.arc(sx, sy, 5.5, 0, Math.PI * 2);
+      wCtx.lineWidth = 2;
+      wCtx.strokeStyle = hsvState.v > 0.4 ? '#000000' : '#ffffff';
+      wCtx.stroke();
+      wCtx.beginPath();
+      wCtx.arc(sx, sy, 4, 0, Math.PI * 2);
+      wCtx.lineWidth = 1.5;
+      wCtx.strokeStyle = hsvState.v > 0.4 ? '#ffffff' : '#000000';
+      wCtx.stroke();
+    }
+
+    function initHsvColorWheel() {
+      const wheelCanvas = document.getElementById('hsvWheelCanvas');
+      if (!wheelCanvas) return;
+
+      function handleWheelPointer(e) {
+        const rect = wheelCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const cx = 90, cy = 90;
+        const dx = x - cx, dy = y - cy;
+        const dist = Math.hypot(dx, dy);
+
+        if (isDraggingHue || (!isDraggingSV && dist >= 58)) {
+          isDraggingHue = true;
+          let deg = (Math.atan2(dy, dx) * 180) / Math.PI;
+          if (deg < 0) deg += 360;
+          hsvState.h = deg;
+        } else {
+          isDraggingSV = true;
+          const boxSize = 72;
+          const bx = cx - boxSize / 2;
+          const by = cy - boxSize / 2;
+          hsvState.s = Math.max(0, Math.min(1, (x - bx) / boxSize));
+          hsvState.v = Math.max(0, Math.min(1, 1 - (y - by) / boxSize));
+        }
+
+        const rgb = hsvToRgb(hsvState.h, hsvState.s, hsvState.v);
+        const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+        syncColorUI(hex, false, true);
+        renderHsvWheel();
+      }
+
+      wheelCanvas.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        wheelCanvas.setPointerCapture(e.pointerId);
+        const rect = wheelCanvas.getBoundingClientRect();
+        const dist = Math.hypot(e.clientX - rect.left - 90, e.clientY - rect.top - 90);
+        if (dist >= 58) isDraggingHue = true;
+        else isDraggingSV = true;
+        handleWheelPointer(e);
+      });
+
+      wheelCanvas.addEventListener('pointermove', (e) => {
+        if (!isDraggingHue && !isDraggingSV) return;
+        e.preventDefault();
+        handleWheelPointer(e);
+      });
+
+      const onUp = (e) => {
+        if (isDraggingHue || isDraggingSV) {
+          try { wheelCanvas.releasePointerCapture(e.pointerId); } catch(_) {}
+          isDraggingHue = false;
+          isDraggingSV = false;
+        }
+      };
+      wheelCanvas.addEventListener('pointerup', onUp);
+      wheelCanvas.addEventListener('pointercancel', onUp);
+
+      renderHsvWheel();
+    }
+
+    const activeColorDot = document.getElementById('activeColorDot');
+    const rgbPreviewSwatch = document.getElementById('rgbPreviewSwatch');
+    const rgbHexDisplay = document.getElementById('rgbHexDisplay');
+    const nativeColorPicker = document.getElementById('nativeColorPicker');
+    const sliderR = document.getElementById('sliderR');
+    const sliderG = document.getElementById('sliderG');
+    const sliderB = document.getElementById('sliderB');
+    const numR = document.getElementById('numR');
+    const numG = document.getElementById('numG');
+    const numB = document.getElementById('numB');
+
+    function syncColorUI(hex, skipInputs = false, skipHsv = false) {
+      if (!hex) return;
+      appState.currentColor = hex;
+      if (activeColorDot) activeColorDot.style.backgroundColor = hex;
+      if (rgbPreviewSwatch) rgbPreviewSwatch.style.backgroundColor = hex;
+      if (rgbHexDisplay) rgbHexDisplay.innerText = hex.toUpperCase();
+      if (nativeColorPicker) nativeColorPicker.value = hex;
+
+      const rgb = hexToRgb(hex);
+      if (rgb) {
+        if (!skipInputs) {
+          if (sliderR) sliderR.value = rgb.r;
+          if (sliderG) sliderG.value = rgb.g;
+          if (sliderB) sliderB.value = rgb.b;
+          if (numR) numR.value = rgb.r;
+          if (numG) numG.value = rgb.g;
+          if (numB) numB.value = rgb.b;
+        }
+        if (!skipHsv) {
+          hsvState = rgbToHsv(rgb.r, rgb.g, rgb.b);
+          renderHsvWheel();
+        }
+      }
+    }
+
+    function onRgbChange() {
+      const r = Math.max(0, Math.min(255, parseInt((numR ? numR.value : 0) || (sliderR ? sliderR.value : 0) || 0, 10)));
+      const g = Math.max(0, Math.min(255, parseInt((numG ? numG.value : 0) || (sliderG ? sliderG.value : 0) || 0, 10)));
+      const b = Math.max(0, Math.min(255, parseInt((numB ? numB.value : 0) || (sliderB ? sliderB.value : 0) || 0, 10)));
+      if (sliderR) sliderR.value = r; if (numR) numR.value = r;
+      if (sliderG) sliderG.value = g; if (numG) numG.value = g;
+      if (sliderB) sliderB.value = b; if (numB) numB.value = b;
+      const hex = rgbToHex(r, g, b);
+      syncColorUI(hex, true, false);
+    }
+
+    if (sliderR && numR) {
+      sliderR.oninput = () => { numR.value = sliderR.value; onRgbChange(); };
+      numR.oninput = () => { sliderR.value = numR.value; onRgbChange(); };
+      sliderG.oninput = () => { numG.value = sliderG.value; onRgbChange(); };
+      numG.oninput = () => { sliderG.value = numG.value; onRgbChange(); };
+      sliderB.oninput = () => { numB.value = sliderB.value; onRgbChange(); };
+      numB.oninput = () => { sliderB.value = numB.value; onRgbChange(); };
+    }
+
+    if (nativeColorPicker) {
+      nativeColorPicker.oninput = (e) => syncColorUI(e.target.value);
+      nativeColorPicker.onchange = (e) => syncColorUI(e.target.value);
+    }
+
     const paletteFlyout = document.getElementById('paletteFlyout');
     const paletteColors = document.getElementById('paletteColors');
-    const activeColorDot = document.getElementById('activeColorDot');
     const brushSizeInput = document.getElementById('brushSizeInput');
     const brushSizeVal = document.getElementById('brushSizeVal');
 
-    WHITEBOARD_PALETTE.forEach(c => {
-      const btn = document.createElement('button');
-      btn.className = 'w-6 h-6 rounded-full border border-slate-600 transition-transform active:scale-90';
-      btn.style.backgroundColor = c;
-      btn.onclick = () => {
-        appState.currentColor = c;
-        activeColorDot.style.backgroundColor = c;
-        if (appState.tool === 'eraser' || appState.tool === 'lasso') {
-          appState.tool = 'pen';
-          updateToolButtonsUI();
-        }
-        paletteFlyout.classList.add('hidden');
+    if (paletteColors) {
+      paletteColors.innerHTML = '';
+      WHITEBOARD_PALETTE.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'w-6 h-6 rounded-full border border-slate-600 transition-transform active:scale-90 hover:scale-110';
+        btn.style.backgroundColor = c;
+        btn.onclick = () => {
+          syncColorUI(c);
+          if (appState.tool === 'eraser' || appState.tool === 'lasso' || appState.tool === 'select') {
+            appState.tool = 'pen';
+            updateToolButtonsUI();
+          }
+        };
+        paletteColors.appendChild(btn);
+      });
+    }
+
+    function updateBrushSize(newSize) {
+      appState.brushSize = Math.max(1, Math.min(60, Number(newSize) || 4));
+      if (brushSizeInput) brushSizeInput.value = appState.brushSize;
+      if (brushSizeVal) brushSizeVal.innerText = `${appState.brushSize}px`;
+      const tbSz = document.getElementById('toolbarSizeDisplay');
+      if (tbSz) tbSz.innerText = `${appState.brushSize}px`;
+    }
+
+    if (brushSizeInput) {
+      brushSizeInput.oninput = (e) => updateBrushSize(e.target.value);
+    }
+    document.querySelectorAll('.btn-quick-size').forEach(b => {
+      b.onclick = (e) => {
+        e.stopPropagation();
+        updateBrushSize(b.dataset.sz);
       };
-      paletteColors.appendChild(btn);
     });
 
-    // 彩虹全光谱取色器
-    const customColorLabel = document.createElement('label');
-    customColorLabel.className = 'relative w-6 h-6 rounded-full overflow-hidden border border-slate-500 hover:scale-110 transition cursor-pointer flex items-center justify-center';
-    customColorLabel.title = '全光谱自定义取色';
-    customColorLabel.innerHTML = `
-      <div class="w-full h-full bg-[conic-gradient(from_0deg,#ff0000,#ffff00,#00ff00,#00ffff,#0000ff,#ff00ff,#ff0000)]"></div>
-      <input type="color" id="customColorPicker" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
-    `;
-    paletteColors.appendChild(customColorLabel);
-
-    customColorLabel.querySelector('input').onchange = (e) => {
-      const col = e.target.value;
-      appState.currentColor = col;
-      activeColorDot.style.backgroundColor = col;
-      if (appState.tool === 'eraser' || appState.tool === 'lasso') {
-        appState.tool = 'pen';
-        updateToolButtonsUI();
+    const togglePalette = (e) => {
+      if (e) e.stopPropagation();
+      const isHidden = paletteFlyout.classList.contains('hidden');
+      if (isHidden) {
+        closeAllFlyouts('paletteFlyout');
+        const btnPal = document.getElementById('btnTogglePalette');
+        if (btnPal && workbenchWrapper) {
+          const btnRect = btnPal.getBoundingClientRect();
+          const wrapRect = workbenchWrapper.getBoundingClientRect();
+          const targetTop = Math.max(10, Math.min(wrapRect.height - 420, btnRect.top - wrapRect.top - 20));
+          paletteFlyout.style.top = `${targetTop}px`;
+        }
+        paletteFlyout.classList.remove('hidden');
+      } else {
+        paletteFlyout.classList.add('hidden');
       }
-      paletteFlyout.classList.add('hidden');
     };
+    const btnTogglePal = document.getElementById('btnTogglePalette');
+    if (btnTogglePal) btnTogglePal.onclick = togglePalette;
+    const btnTbSz = document.getElementById('btnToolbarSize');
+    if (btnTbSz) btnTbSz.onclick = togglePalette;
 
-    document.getElementById('btnTogglePalette').onclick = (e) => {
-      e.stopPropagation();
-      paletteFlyout.classList.toggle('hidden');
-    };
     document.addEventListener('click', (e) => {
-      if (!paletteFlyout.contains(e.target) && e.target !== document.getElementById('btnTogglePalette')) {
+      if (paletteFlyout && !paletteFlyout.contains(e.target) && (!btnTogglePal || !btnTogglePal.contains(e.target)) && (!btnTbSz || !btnTbSz.contains(e.target))) {
         paletteFlyout.classList.add('hidden');
       }
     });
-
-    brushSizeInput.oninput = (e) => {
-      appState.brushSize = Number(e.target.value);
-      brushSizeVal.innerText = `${appState.brushSize}px`;
-    };
 
     function updateToolButtonsUI() {
       document.querySelectorAll('.tool-btn').forEach(btn => {
@@ -5612,7 +6255,7 @@
       };
     });
 
-    // 绑定多页管理器按钮
+    // 绑定多页管理器与双板并排按钮
     const btnPrevPage = document.getElementById('btnPrevPage');
     const btnNextPage = document.getElementById('btnNextPage');
     const btnAddPage = document.getElementById('btnAddPage');
@@ -5623,95 +6266,121 @@
     if (btnAddPage) btnAddPage.onclick = () => addNewPage();
     if (btnDeletePage) btnDeletePage.onclick = () => deleteCurrentPage();
 
+    const btnToggleDualView = document.getElementById('btnToggleDualView');
+    const btnCloseDualView = document.getElementById('btnCloseDualView');
+    const refPageSelect = document.getElementById('refPageSelect');
+
+    if (btnToggleDualView) btnToggleDualView.onclick = toggleDualSpreadView;
+    if (btnCloseDualView) btnCloseDualView.onclick = toggleDualSpreadView;
+    if (refPageSelect) refPageSelect.onchange = (e) => {
+      appState.referencePageIndex = parseInt(e.target.value, 10) || 0;
+      renderReferenceBoard();
+    };
+
     // 箭头、流程框与便签
-    document.getElementById('btnToolArrow').onclick = () => {
-      saveHistory();
-      const cx = cssWidth / 2, cy = cssHeight / 2;
-      const pts = [];
-      for (let x = cx - 60; x <= cx + 60; x += 10) pts.push({ x, y: cy });
-      pts.push({ x: cx + 45, y: cy - 10 });
-      pts.push({ x: cx + 60, y: cy });
-      pts.push({ x: cx + 45, y: cy + 10 });
+    const btnToolArrow = document.getElementById('btnToolArrow');
+    if (btnToolArrow) {
+      btnToolArrow.onclick = () => {
+        saveHistory();
+        const cx = cssWidth / 2, cy = cssHeight / 2;
+        const pts = [];
+        for (let x = cx - 60; x <= cx + 60; x += 10) pts.push({ x, y: cy });
+        pts.push({ x: cx + 45, y: cy - 10 });
+        pts.push({ x: cx + 60, y: cy });
+        pts.push({ x: cx + 45, y: cy + 10 });
 
-      appState.strokes.push({
-        id: Date.now() + Math.random(),
-        tool: 'pen',
-        color: appState.currentColor,
-        size: Number(appState.brushSize) + 1,
-        points: pts
-      });
-      redrawAllStrokes();
-    };
-
-    document.getElementById('btnToolBox').onclick = () => {
-      saveHistory();
-      const cx = cssWidth / 2, cy = cssHeight / 2;
-      const w = 140, h = 80;
-      const pts = [];
-      for (let x = cx - w/2; x <= cx + w/2; x += 10) pts.push({ x, y: cy - h/2 });
-      for (let y = cy - h/2; y <= cy + h/2; y += 10) pts.push({ x: cx + w/2, y });
-      for (let x = cx + w/2; x >= cx - w/2; x -= 10) pts.push({ x, y: cy + h/2 });
-      for (let y = cy + h/2; y >= cy - h/2; y -= 10) pts.push({ x: cx - w/2, y });
-
-      appState.strokes.push({
-        id: Date.now() + Math.random(),
-        tool: 'pen',
-        color: appState.currentColor,
-        size: Number(appState.brushSize),
-        points: pts
-      });
-      redrawAllStrokes();
-    };
-
-    document.getElementById('btnToolSticky').onclick = () => {
-      const note = document.createElement('div');
-      const colors = ['bg-amber-100 border-amber-300 text-amber-950', 'bg-blue-100 border-blue-300 text-blue-950', 'bg-emerald-100 border-emerald-300 text-emerald-950', 'bg-rose-100 border-rose-300 text-rose-950'];
-      const chosen = colors[Math.floor(Math.random() * colors.length)];
-
-      note.className = `sticky-note absolute p-3 ${chosen} rounded-2xl shadow-xl w-48 h-40 border flex flex-col pointer-events-auto`;
-      note.style.left = `${Math.max(20, cssWidth / 2 - 90 + (Math.random() * 40 - 20))}px`;
-      note.style.top = `${Math.max(20, cssHeight / 2 - 70 + (Math.random() * 40 - 20))}px`;
-      
-      note.innerHTML = `
-        <div class="note-handle flex justify-between items-center mb-1 text-[11px] font-bold opacity-75 cursor-move">
-          <span>📝 灵感便签</span>
-          <button onclick="this.closest('.sticky-note').remove()" class="text-rose-600 hover:text-rose-800 text-base leading-none">×</button>
-        </div>
-        <textarea placeholder="输入讨论要点或行动项..." class="w-full flex-1 bg-transparent text-xs outline-none resize-none leading-relaxed"></textarea>
-      `;
-
-      let isDragging = false, startX, startY, origX, origY;
-      const handle = note.querySelector('.note-handle');
-      handle.onpointerdown = (e) => {
-        isDragging = true;
-        startX = e.clientX; startY = e.clientY;
-        origX = note.offsetLeft; origY = note.offsetTop;
-        handle.setPointerCapture(e.pointerId);
+        appState.strokes.push({
+          id: Date.now() + Math.random(),
+          tool: 'pen',
+          color: appState.currentColor,
+          size: Number(appState.brushSize) + 1,
+          points: pts
+        });
+        redrawAllStrokes();
       };
-      handle.onpointermove = (e) => {
-        if (!isDragging) return;
-        note.style.left = `${origX + (e.clientX - startX)}px`;
-        note.style.top = `${origY + (e.clientY - startY)}px`;
-      };
-      handle.onpointerup = (e) => {
-        isDragging = false;
-        try { handle.releasePointerCapture(e.pointerId); } catch {}
-      };
+    }
 
-      stickyLayer.appendChild(note);
-    };
+    const btnToolBox = document.getElementById('btnToolBox');
+    if (btnToolBox) {
+      btnToolBox.onclick = () => {
+        saveHistory();
+        const cx = cssWidth / 2, cy = cssHeight / 2;
+        const w = 140, h = 80;
+        const pts = [];
+        for (let x = cx - w/2; x <= cx + w/2; x += 10) pts.push({ x, y: cy - h/2 });
+        for (let y = cy - h/2; y <= cy + h/2; y += 10) pts.push({ x: cx + w/2, y });
+        for (let x = cx + w/2; x >= cx - w/2; x -= 10) pts.push({ x, y: cy + h/2 });
+        for (let y = cy + h/2; y >= cy - h/2; y -= 10) pts.push({ x: cx - w/2, y });
 
-    document.getElementById('ratioSelector').onchange = (e) => {
-      appState.ratio = e.target.value;
-      resizeCanvas();
-    };
-    document.getElementById('paperSelector').onchange = (e) => {
-      const prevPaper = appState.paper;
-      const newPaper = e.target.value;
-      adaptPaperContrast(prevPaper, newPaper);
-      appState.paper = newPaper;
-      redrawAllStrokes();
-    };
+        appState.strokes.push({
+          id: Date.now() + Math.random(),
+          tool: 'pen',
+          color: appState.currentColor,
+          size: Number(appState.brushSize),
+          points: pts
+        });
+        redrawAllStrokes();
+      };
+    }
+
+    const btnToolSticky = document.getElementById('btnToolSticky');
+    if (btnToolSticky) {
+      btnToolSticky.onclick = () => {
+        const note = document.createElement('div');
+        const colors = ['bg-amber-100 border-amber-300 text-amber-950', 'bg-blue-100 border-blue-300 text-blue-950', 'bg-emerald-100 border-emerald-300 text-emerald-950', 'bg-rose-100 border-rose-300 text-rose-950'];
+        const chosen = colors[Math.floor(Math.random() * colors.length)];
+
+        note.className = `sticky-note absolute p-3 ${chosen} rounded-2xl shadow-xl w-48 h-40 border flex flex-col pointer-events-auto`;
+        note.style.left = `${Math.max(20, cssWidth / 2 - 90 + (Math.random() * 40 - 20))}px`;
+        note.style.top = `${Math.max(20, cssHeight / 2 - 70 + (Math.random() * 40 - 20))}px`;
+        
+        note.innerHTML = `
+          <div class="note-handle flex justify-between items-center mb-1 text-[11px] font-bold opacity-75 cursor-move">
+            <span>📝 灵感便签</span>
+            <button onclick="this.closest('.sticky-note').remove()" class="text-rose-600 hover:text-rose-800 text-base leading-none">×</button>
+          </div>
+          <textarea placeholder="输入讨论要点或行动项..." class="w-full flex-1 bg-transparent text-xs outline-none resize-none leading-relaxed"></textarea>
+        `;
+
+        let isDragging = false, startX, startY, origX, origY;
+        const handle = note.querySelector('.note-handle');
+        handle.onpointerdown = (e) => {
+          isDragging = true;
+          startX = e.clientX; startY = e.clientY;
+          origX = note.offsetLeft; origY = note.offsetTop;
+          handle.setPointerCapture(e.pointerId);
+        };
+        handle.onpointermove = (e) => {
+          if (!isDragging) return;
+          note.style.left = `${origX + (e.clientX - startX)}px`;
+          note.style.top = `${origY + (e.clientY - startY)}px`;
+        };
+        handle.onpointerup = (e) => {
+          isDragging = false;
+          try { handle.releasePointerCapture(e.pointerId); } catch {}
+        };
+
+        if (stickyLayer) stickyLayer.appendChild(note);
+      };
+    }
+
+    const ratioSelector = document.getElementById('ratioSelector');
+    if (ratioSelector) {
+      ratioSelector.onchange = (e) => {
+        appState.ratio = e.target.value;
+        resizeCanvas();
+      };
+    }
+    const paperSelector = document.getElementById('paperSelector');
+    if (paperSelector) {
+      paperSelector.onchange = (e) => {
+        const prevPaper = appState.paper;
+        const newPaper = e.target.value;
+        if (typeof adaptPaperContrast === 'function') adaptPaperContrast(prevPaper, newPaper);
+        appState.paper = newPaper;
+        redrawAllStrokes();
+      };
+    }
 
     const btnToggleFullscreen = document.getElementById('btnToggleFullscreen');
     const exitFullscreenBtn = document.getElementById('exitFullscreenBtn');
@@ -5726,8 +6395,8 @@
       setTimeout(resizeCanvas, 150);
     }
 
-    btnToggleFullscreen.onclick = toggleFullscreenMode;
-    exitFullscreenBtn.onclick = toggleFullscreenMode;
+    if (btnToggleFullscreen) btnToggleFullscreen.onclick = toggleFullscreenMode;
+    if (exitFullscreenBtn) exitFullscreenBtn.onclick = toggleFullscreenMode;
 
     function setLanguage(lang) {
       if (!TRANSLATIONS[lang]) lang = 'en';
@@ -6239,7 +6908,7 @@
       return row;
     }
 
-        window.addEventListener('DOMContentLoaded', () => {
+    function initAppOnLoad() {
       if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); }); }
       
       // 🌟 12 大大师级笔刷工坊事件绑定
@@ -6270,9 +6939,13 @@
       if (btnMoreBrushes && brushStudioFlyout) {
         btnMoreBrushes.onclick = (e) => {
           e.stopPropagation();
-          brushStudioFlyout.classList.toggle('hidden');
-          const pal = document.getElementById('paletteFlyout');
-          if (pal && !pal.classList.contains('hidden')) pal.classList.add('hidden');
+          const isHidden = brushStudioFlyout.classList.contains('hidden');
+          closeAllFlyouts('brushStudioFlyout');
+          if (isHidden) {
+            brushStudioFlyout.classList.remove('hidden');
+          } else {
+            brushStudioFlyout.classList.add('hidden');
+          }
         };
       }
 
@@ -6301,7 +6974,7 @@
       });
 
       document.addEventListener('click', (e) => {
-        if (brushStudioFlyout && !brushStudioFlyout.contains(e.target) && e.target !== btnMoreBrushes) {
+        if (brushStudioFlyout && !brushStudioFlyout.contains(e.target) && (!btnMoreBrushes || !btnMoreBrushes.contains(e.target))) {
           brushStudioFlyout.classList.add('hidden');
         }
       });
@@ -6310,9 +6983,19 @@
       setLanguage(savedLang);
       const savedTheme = localStorage.getItem('eazyopc_theme') || 'dark';
       applyTheme(savedTheme);
-      activeColorDot.style.backgroundColor = appState.currentColor;
+      const activeColorDot = document.getElementById('activeColorDot');
+      if (activeColorDot) activeColorDot.style.backgroundColor = appState.currentColor;
+
+      if (typeof initHsvColorWheel === 'function') initHsvColorWheel();
+      if (typeof setupWritableDualBoard === 'function') setupWritableDualBoard();
       resizeCanvas();
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAppOnLoad);
+    } else {
+      initAppOnLoad();
+    }
   
         // ================= 💡 独立开发者 IP 社交账号与建议反馈模块 =================
     const creatorSocials = {
