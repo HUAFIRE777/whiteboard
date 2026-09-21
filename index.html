@@ -100,6 +100,313 @@
       }
     ]
   }
+
+    // ================= 🌟 4 大核心能力高保真动态演示与折叠矩阵引擎 =================
+    // 1. 折叠 100 站矩阵逻辑
+    const btnToggleSitesMatrix = document.getElementById('btnToggleSitesMatrix');
+    const sitesMatrixContent = document.getElementById('sitesMatrixContent');
+    const toggleSitesText = document.getElementById('toggleSitesText');
+    if (btnToggleSitesMatrix && sitesMatrixContent) {
+      btnToggleSitesMatrix.onclick = () => {
+        const isHidden = sitesMatrixContent.classList.toggle('hidden');
+        const lang = appState.lang || 'zh';
+        const dict = TRANSLATIONS[lang] || TRANSLATIONS.zh;
+        if (toggleSitesText) {
+          toggleSitesText.innerText = isHidden 
+            ? (dict.expand_matrix || '展开查看 100 个网站矩阵 ▾') 
+            : (dict.collapse_matrix || '收起矩阵 ▴');
+        }
+      };
+    }
+
+    // 2. 动效 1: GoodNotes 同款 420ms 智能吸附动画
+    const demoSnapCanvas = document.getElementById('demoSnapCanvas');
+    const demoSnapText = document.getElementById('demoSnapText');
+    if (demoSnapCanvas) {
+      const dctx = demoSnapCanvas.getContext('2d');
+      let snapStep = 0;
+      let snapAnimProgress = 0;
+
+      function renderSnapDemo() {
+        const w = demoSnapCanvas.width;
+        const h = demoSnapCanvas.height;
+        dctx.clearRect(0, 0, w, h);
+
+        dctx.strokeStyle = 'rgba(100, 116, 139, 0.15)';
+        dctx.lineWidth = 1;
+        for (let x = 20; x < w; x += 20) { dctx.beginPath(); dctx.moveTo(x, 0); dctx.lineTo(x, h); dctx.stroke(); }
+        for (let y = 20; y < h; y += 20) { dctx.beginPath(); dctx.moveTo(0, y); dctx.lineTo(w, y); dctx.stroke(); }
+
+        const cx = w / 2;
+        const cy = h / 2;
+        const r = 38;
+
+        if (snapStep < 120) {
+          if (demoSnapText) demoSnapText.innerText = '✍️ 手写不规则图形...';
+          const progress = Math.min(1, snapStep / 80);
+          dctx.beginPath();
+          dctx.strokeStyle = '#818cf8';
+          dctx.lineWidth = 3;
+          dctx.lineCap = 'round';
+          const totalAngle = Math.PI * 2 * progress;
+          for (let a = 0; a <= totalAngle; a += 0.1) {
+            const jitter = Math.sin(a * 7) * 3 + Math.cos(a * 4) * 2.5;
+            const curR = r + jitter;
+            const px = cx + Math.cos(a) * curR;
+            const py = cy + Math.sin(a) * curR;
+            if (a === 0) dctx.moveTo(px, py);
+            else dctx.lineTo(px, py);
+          }
+          dctx.stroke();
+        } else if (snapStep < 160) {
+          if (demoSnapText) demoSnapText.innerText = '⏱️ 停顿 420ms 识别中...';
+          dctx.beginPath();
+          dctx.strokeStyle = '#a5b4fc';
+          dctx.lineWidth = 3;
+          for (let a = 0; a <= Math.PI * 2; a += 0.1) {
+            const jitter = Math.sin(a * 7) * 3 + Math.cos(a * 4) * 2.5;
+            const curR = r + jitter;
+            const px = cx + Math.cos(a) * curR;
+            const py = cy + Math.sin(a) * curR;
+            if (a === 0) dctx.moveTo(px, py);
+            else dctx.lineTo(px, py);
+          }
+          dctx.stroke();
+        } else {
+          if (demoSnapText) demoSnapText.innerText = '✨ 完美吸附 Snapped!';
+          snapAnimProgress = Math.min(1, snapAnimProgress + 0.08);
+          dctx.beginPath();
+          dctx.strokeStyle = '#38bdf8';
+          dctx.lineWidth = 3.5;
+          dctx.arc(cx, cy, r, 0, Math.PI * 2);
+          dctx.stroke();
+
+          dctx.save();
+          dctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+          dctx.lineWidth = 7;
+          dctx.stroke();
+          dctx.restore();
+        }
+
+        snapStep = (snapStep + 1) % 240;
+        if (snapStep === 0) snapAnimProgress = 0;
+        requestAnimationFrame(renderSnapDemo);
+      }
+      renderSnapDemo();
+    }
+
+    // 3. 动效 2: 360° 旋转与 8 方向矢量变换动画
+    const demoTransformCanvas = document.getElementById('demoTransformCanvas');
+    const demoRotAngle = document.getElementById('demoRotAngle');
+    if (demoTransformCanvas) {
+      const tctx = demoTransformCanvas.getContext('2d');
+      let angle = 0;
+
+      function renderTransformDemo() {
+        const w = demoTransformCanvas.width;
+        const h = demoTransformCanvas.height;
+        tctx.clearRect(0, 0, w, h);
+
+        const cx = w / 2;
+        const cy = h / 2;
+        const bw = 80;
+        const bh = 55;
+
+        tctx.save();
+        tctx.translate(cx, cy);
+        tctx.rotate(angle);
+
+        tctx.fillStyle = 'rgba(37, 99, 235, 0.08)';
+        tctx.fillRect(-bw/2, -bh/2, bw, bh);
+        tctx.strokeStyle = '#2563eb';
+        tctx.lineWidth = 1.5;
+        tctx.strokeRect(-bw/2, -bh/2, bw, bh);
+
+        tctx.fillStyle = '#6366f1';
+        tctx.font = 'bold 12px sans-serif';
+        tctx.textAlign = 'center';
+        tctx.fillText('📝 BOARD', 0, 4);
+
+        tctx.beginPath();
+        tctx.moveTo(0, -bh/2);
+        tctx.lineTo(0, -bh/2 - 18);
+        tctx.stroke();
+        tctx.beginPath();
+        tctx.arc(0, -bh/2 - 18, 5, 0, Math.PI * 2);
+        tctx.fillStyle = '#38bdf8';
+        tctx.fill();
+        tctx.strokeStyle = '#ffffff';
+        tctx.lineWidth = 1.5;
+        tctx.stroke();
+
+        const handles = [
+          [-bw/2, -bh/2], [0, -bh/2], [bw/2, -bh/2],
+          [-bw/2, 0], [bw/2, 0],
+          [-bw/2, bh/2], [0, bh/2], [bw/2, bh/2]
+        ];
+        for (const [hx, hy] of handles) {
+          tctx.fillStyle = '#ffffff';
+          tctx.fillRect(hx - 3, hy - 3, 6, 6);
+          tctx.strokeStyle = '#2563eb';
+          tctx.lineWidth = 1;
+          tctx.strokeRect(hx - 3, hy - 3, 6, 6);
+        }
+
+        tctx.restore();
+
+        const deg = Math.round((angle * 180 / Math.PI) % 360);
+        if (demoRotAngle) demoRotAngle.innerText = `旋转角: ${deg}°`;
+
+        angle += 0.015;
+        requestAnimationFrame(renderTransformDemo);
+      }
+      renderTransformDemo();
+    }
+
+    // 4. 动效 3: 12 款大师笔刷动态笔痕流
+    const demoBrushCanvas = document.getElementById('demoBrushCanvas');
+    const demoBrushSpeed = document.getElementById('demoBrushSpeed');
+    if (demoBrushCanvas) {
+      const bctx = demoBrushCanvas.getContext('2d');
+      let curDemoTool = 'pen';
+      let brushT = 0;
+
+      document.querySelectorAll('.demo-brush-tab').forEach(tab => {
+        tab.onclick = () => {
+          document.querySelectorAll('.demo-brush-tab').forEach(t => {
+            t.classList.remove('bg-indigo-600', 'text-white');
+            t.classList.add('bg-slate-800', 'text-slate-400');
+          });
+          tab.classList.add('bg-indigo-600', 'text-white');
+          tab.classList.remove('bg-slate-800', 'text-slate-400');
+          curDemoTool = tab.dataset.demoBrush;
+          brushT = 0;
+        };
+      });
+
+      function renderBrushDemo() {
+        const w = demoBrushCanvas.width;
+        const h = demoBrushCanvas.height;
+        bctx.clearRect(0, 0, w, h);
+
+        const pts = [];
+        const maxSteps = 160;
+        const curProgress = Math.min(1, brushT / 110);
+        const steps = Math.floor(maxSteps * curProgress);
+
+        for (let i = 0; i < steps; i++) {
+          const t = i / maxSteps;
+          const x = 30 + t * (w - 60);
+          const y = h / 2 + Math.sin(t * Math.PI * 3.5) * 28;
+          pts.push({ x, y });
+        }
+
+        if (pts.length > 1) {
+          bctx.save();
+          if (curDemoTool === 'neon') {
+            bctx.strokeStyle = '#38bdf8';
+            bctx.shadowBlur = 12;
+            bctx.shadowColor = '#38bdf8';
+            bctx.lineWidth = 4.5;
+            bctx.lineCap = 'round';
+            bctx.beginPath();
+            bctx.moveTo(pts[0].x, pts[0].y);
+            for (let i = 1; i < pts.length; i++) bctx.lineTo(pts[i].x, pts[i].y);
+            bctx.stroke();
+          } else if (curDemoTool === 'spray') {
+            bctx.fillStyle = '#a855f7';
+            bctx.globalAlpha = 0.55;
+            for (const p of pts) {
+              for (let d = 0; d < 3; d++) {
+                const ox = (Math.random() - 0.5) * 16;
+                const oy = (Math.random() - 0.5) * 16;
+                bctx.fillRect(p.x + ox, p.y + oy, 1.5, 1.5);
+              }
+            }
+          } else if (curDemoTool === 'maru') {
+            bctx.strokeStyle = '#f8fafc';
+            bctx.lineWidth = 1;
+            bctx.lineCap = 'round';
+            bctx.beginPath();
+            bctx.moveTo(pts[0].x, pts[0].y);
+            for (let i = 1; i < pts.length; i++) bctx.lineTo(pts[i].x, pts[i].y);
+            bctx.stroke();
+          } else {
+            for (let i = 1; i < pts.length; i++) {
+              const p1 = pts[i-1];
+              const p2 = pts[i];
+              const taper = Math.sin((i / maxSteps) * Math.PI);
+              bctx.strokeStyle = '#818cf8';
+              bctx.lineWidth = Math.max(1, 6 * taper);
+              bctx.lineCap = 'round';
+              bctx.beginPath();
+              bctx.moveTo(p1.x, p1.y);
+              bctx.lineTo(p2.x, p2.y);
+              bctx.stroke();
+            }
+          }
+          bctx.restore();
+        }
+
+        brushT = (brushT + 1) % 150;
+        requestAnimationFrame(renderBrushDemo);
+      }
+      renderBrushDemo();
+    }
+
+    // 5. 动效 4: 无限多页与出版级 PDF 合成
+    const demoPagesCanvas = document.getElementById('demoPagesCanvas');
+    const demoPageStatus = document.getElementById('demoPageStatus');
+    if (demoPagesCanvas) {
+      const pctx = demoPagesCanvas.getContext('2d');
+      let pageTick = 0;
+
+      function renderPagesDemo() {
+        const w = demoPagesCanvas.width;
+        const h = demoPagesCanvas.height;
+        pctx.clearRect(0, 0, w, h);
+
+        const pageCount = 3;
+        const activeIdx = Math.floor(pageTick / 70) % pageCount;
+
+        for (let i = 0; i < pageCount; i++) {
+          const offsetX = (w / 2) + (i - activeIdx) * 75;
+          const isCur = i === activeIdx;
+          const pw = 60;
+          const ph = 80;
+
+          pctx.save();
+          pctx.translate(offsetX, h / 2);
+          if (!isCur) pctx.scale(0.85, 0.85);
+
+          pctx.fillStyle = isCur ? '#ffffff' : '#334155';
+          pctx.strokeStyle = isCur ? '#6366f1' : '#475569';
+          pctx.lineWidth = isCur ? 2 : 1;
+          pctx.fillRect(-pw/2, -ph/2, pw, ph);
+          pctx.strokeRect(-pw/2, -ph/2, pw, ph);
+
+          pctx.fillStyle = isCur ? '#0f172a' : '#94a3b8';
+          pctx.font = 'bold 9px monospace';
+          pctx.textAlign = 'center';
+          pctx.fillText(`P.${i + 1}`, 0, -ph/2 + 15);
+
+          pctx.strokeStyle = isCur ? 'rgba(99, 102, 241, 0.4)' : 'rgba(148, 163, 184, 0.2)';
+          pctx.strokeRect(-pw/2 + 8, -ph/2 + 22, pw - 16, 20);
+          pctx.strokeRect(-pw/2 + 8, -ph/2 + 46, pw - 16, 24);
+
+          pctx.restore();
+        }
+
+        if (demoPageStatus) {
+          demoPageStatus.innerText = activeIdx === 2 ? '📄 矢量合并导出 PDF (300 DPI)' : `第 ${activeIdx + 1} / 3 页 · 白板绘制中`;
+        }
+
+        pageTick = (pageTick + 1) % 210;
+        requestAnimationFrame(renderPagesDemo);
+      }
+      renderPagesDemo();
+    }
+
   </script>
 
     <link rel="manifest" href="/manifest.json" />
@@ -174,6 +481,18 @@
     body.is-fullscreen #exitFullscreenBtn {
       display: flex !important;
     }
+
+    /* 强对比度保障：无论白天黑夜，加页 '+' 符号与文字永远高光高亮呈现 */
+    #btnAddPage, #btnAddPage * {
+      color: #ffffff !important;
+      stroke: #ffffff !important;
+      fill: none;
+    }
+    #btnAddPage:hover {
+      background-color: #4338ca !important;
+      filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.6));
+    }
+
     /* Figma / Miro 标杆级矢量选框与变换控制 */
     .selection-box {
       border: 1.5px solid #2563eb;
@@ -822,7 +1141,7 @@
     </button>
 
     <!-- ===== 左侧专业悬浮工具坞 (Figma / Apple Freeform 顶尖矢量图标体系) ===== -->
-    <aside id="leftSidebar" class="absolute left-1.5 sm:left-4 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center gap-1 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 p-1 sm:p-1.5 rounded-2xl shadow-xl transition-all max-h-[85vh] overflow-y-auto scrollbar-none">
+    <aside id="leftSidebar" class="absolute left-1.5 sm:left-4 top-16 sm:top-20 z-30 flex flex-col items-center gap-1 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 p-1 sm:p-1.5 rounded-2xl shadow-xl transition-all max-h-[calc(100vh-5.5rem)] overflow-y-auto scrollbar-none">
       <!-- 0. 鼠标选择与调整 (Select - V) -->
       <button class="tool-btn p-2 rounded-xl text-slate-300 hover:bg-slate-800 text-xs transition flex items-center justify-center" data-tool="select" data-i18n-title="tip_select" title="↖️ 鼠标选择与调整 (快捷键 V，点选图片/文字可拖动、四角缩放或旋转)">
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 3 7 18 3-7 7-3L3 3z"/><path d="m13 13 6 6"/></svg>
@@ -927,7 +1246,7 @@
     <!-- 悬浮调色板 & 粗细弹窗 (Popover) -->
     
     <!-- 🎨 12 大大师级专业笔刷工坊弹窗 (12 Professional Brushes Flyout) -->
-    <div id="brushStudioFlyout" class="hidden absolute left-16 sm:left-20 top-1/2 -translate-y-1/2 z-40 bg-slate-900/95 border border-slate-700 backdrop-blur-md rounded-2xl p-3 shadow-2xl space-y-2.5 w-72 text-white max-h-[85vh] overflow-y-auto scrollbar-none">
+    <div id="brushStudioFlyout" class="hidden absolute left-16 sm:left-20 top-16 sm:top-20 z-40 bg-slate-900/95 border border-slate-700 backdrop-blur-md rounded-2xl p-3 shadow-2xl space-y-2.5 w-72 text-white max-h-[85vh] overflow-y-auto scrollbar-none">
       <div class="flex items-center justify-between pb-1.5 border-b border-slate-700/80">
         <div class="flex items-center gap-1.5">
           <span class="text-sm">🎨</span>
@@ -1035,13 +1354,68 @@
       </div>
     </div>
 
-    <div id="paletteFlyout" class="hidden absolute left-16 sm:left-20 top-1/2 -translate-y-1/2 z-40 bg-slate-900/95 border border-slate-700 backdrop-blur-md rounded-2xl p-3 shadow-2xl space-y-3 w-52 text-white">
-      <div>
-        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1.5" data-i18n="palette_title">画笔颜色</span>
-        <div id="paletteColors" class="grid grid-cols-6 gap-1.5 items-center">
-          <!-- 预设颜色由 JS 填充，末尾带有全光谱自定义取色器 -->
+        <div id="paletteFlyout" class="hidden absolute left-16 sm:left-20 top-16 sm:top-20 z-40 bg-slate-900/95 border border-slate-700 backdrop-blur-md rounded-2xl p-3 shadow-2xl space-y-3 w-64 text-white">
+      <!-- 调色板标题与当前色预览 -->
+      <div class="flex items-center justify-between pb-1.5 border-b border-slate-800">
+        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider" data-i18n="palette_title">画笔色彩与 RGB 取色</span>
+        <div class="flex items-center gap-1.5">
+          <span id="rgbHexDisplay" class="font-mono text-xs text-indigo-300 font-bold">#18181B</span>
+          <span id="rgbPreviewSwatch" class="w-4 h-4 rounded-full border border-white/60 bg-[#18181b] shadow-sm"></span>
         </div>
       </div>
+
+      <!-- 专业 RGB 取色器与滑块体系 -->
+      <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800/80 space-y-2">
+        <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
+          <span class="text-indigo-400 font-bold" data-i18n="rgb_picker">RGB 精密数值调色</span>
+          <label class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 cursor-pointer text-[10px] flex items-center gap-1 transition">
+            <span>🎨</span> <span data-i18n="spectrum_picker">光谱拾色</span>
+            <input type="color" id="nativeColorPicker" class="sr-only" value="#18181b" />
+          </label>
+        </div>
+        
+        <div class="space-y-1.5">
+          <div class="flex items-center gap-2 text-[11px] font-mono">
+            <span class="text-rose-400 font-bold w-3">R</span>
+            <input type="range" id="sliderR" min="0" max="255" value="24" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-rose-500" />
+            <input type="number" id="numR" min="0" max="255" value="24" class="w-10 bg-slate-900 border border-slate-700 text-center text-white text-[11px] rounded py-0.5" />
+          </div>
+          <div class="flex items-center gap-2 text-[11px] font-mono">
+            <span class="text-emerald-400 font-bold w-3">G</span>
+            <input type="range" id="sliderG" min="0" max="255" value="24" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500" />
+            <input type="number" id="numG" min="0" max="255" value="24" class="w-10 bg-slate-900 border border-slate-700 text-center text-white text-[11px] rounded py-0.5" />
+          </div>
+          <div class="flex items-center gap-2 text-[11px] font-mono">
+            <span class="text-blue-400 font-bold w-3">B</span>
+            <input type="range" id="sliderB" min="0" max="255" value="27" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500" />
+            <input type="number" id="numB" min="0" max="255" value="27" class="w-10 bg-slate-900 border border-slate-700 text-center text-white text-[11px] rounded py-0.5" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 经典快捷色板 -->
+      <div>
+        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1.5" data-i18n="quick_swatches">常用预设色</span>
+        <div id="paletteColors" class="grid grid-cols-6 gap-1.5 items-center">
+          <!-- 预设颜色由 JS 填充 -->
+        </div>
+      </div>
+
+      <!-- 粗细控制 -->
+      <div>
+        <div class="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">
+          <span data-i18n="size">粗细</span>
+          <span id="brushSizeVal" class="text-white font-mono">4px</span>
+        </div>
+        <input id="brushSizeInput" type="range" min="1" max="40" value="4" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500" />
+      </div>
+
+      <div class="pt-1">
+        <button id="btnSmartInvert" class="w-full py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] rounded-xl border border-slate-700 flex items-center justify-center gap-1.5 transition" title="智能反转笔划色彩，自动适配黑白底色">
+          <span>🌓</span> <span data-i18n="smart_invert">智能对比度修复 (反色)</span>
+        </button>
+      </div>
+    </div>
       <div>
         <div class="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">
           <span data-i18n="size">粗细</span>
@@ -1072,9 +1446,7 @@
       <span id="pageIndicator" class="font-bold font-mono whitespace-nowrap tracking-wide shrink-0 px-2 text-xs text-indigo-400">第 1 / 1 页</span>
       <button id="btnNextPage" class="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition" title="下一页 (▶)">▶</button>
       <span class="text-slate-700">|</span>
-      <button id="btnAddPage" class="flex items-center gap-1 px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow transition active:scale-95" title="新建空白漫画页 (+)">
-        <span>➕</span> <span data-i18n="add_page">加页</span>
-      </button>
+      <button id="btnAddPage" class="flex items-center gap-1.5 px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow transition active:scale-95" title="新建空白白板页 (+)"><svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span data-i18n="add_page" class="text-white font-bold">加页</span></button>
       <button id="btnDeletePage" class="p-1 hover:bg-rose-900/40 text-slate-400 hover:text-rose-400 rounded-lg text-xs transition" title="删除当前页面">🗑️</button>
     </div>
 
@@ -1119,136 +1491,91 @@
     </div>
 
     <!-- 🌟 真实核心能力全景图鉴 (真实参数与架构展示，告别虚假动画) -->
+        <!-- 🌟 真实核心能力互动全景图鉴与高保真动效演示 -->
     <section class="space-y-4">
       <div class="flex items-center justify-between">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <span>⚡</span> <span>核心能力全景图鉴 · Professional Architecture</span>
+          <span>⚡</span> <span data-i18n="demos_title">核心能力互动图鉴与动态演示 · Interactive Feature Demos</span>
         </h3>
-        <span class="text-[11px] text-slate-500 font-mono">100% 浏览器客户端 Native 硬件加速</span>
+        <span class="text-[11px] text-slate-500 font-mono">100% Native 客户端实时矢量渲染</span>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- 真实规格卡片 1: 12 款大师级笔尖物理引擎 -->
-        <div class="feature-card bg-slate-900/70 border border-slate-800/90 rounded-2xl p-4 space-y-3 hover:border-indigo-500/50 transition">
-          <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800/60 space-y-2">
-            <div class="flex items-center justify-between text-xs font-mono text-slate-400 pb-1 border-b border-slate-800">
-              <span class="text-indigo-400 font-bold">笔尖物理模拟特性</span>
-              <span>12 种专业压感算法</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-[11px]">
-              <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800/80">
-                <span class="text-indigo-300 font-bold block">🖋️ 漫画 G 笔 / 钢笔</span>
-                <span class="text-slate-400 text-[10px]">动态速度导数自适应，起笔轻、落笔重，尖锐笔锋</span>
-              </div>
-              <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800/80">
-                <span class="text-pink-300 font-bold block">🖊️ 漫画丸笔 0.3mm</span>
-                <span class="text-slate-400 text-[10px]">恒定超细 0.8px 线条，人物发丝与建筑透视精密排线</span>
-              </div>
-              <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800/80">
-                <span class="text-amber-300 font-bold block">✨ 赛博霓虹笔</span>
-                <span class="text-slate-400 text-[10px]">Dual-pass 双通道实时外发光渲染，炫彩能量特效</span>
-              </div>
-              <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800/80">
-                <span class="text-emerald-300 font-bold block">💨 网点气溶喷枪</span>
-                <span class="text-slate-400 text-[10px]">半径内极坐标高斯粒子散射，黑白漫画网点渐变</span>
-              </div>
+        <!-- 演示 1: GoodNotes 同款智能几何长按吸附 -->
+        <div class="feature-card bg-slate-900/80 border border-slate-800 rounded-2xl p-4 space-y-3 hover:border-indigo-500/50 transition shadow-lg">
+          <div class="relative bg-slate-950 rounded-xl border border-slate-800 overflow-hidden flex flex-col items-center justify-center p-3 h-40">
+            <canvas id="demoSnapCanvas" width="340" height="130" class="w-full h-full"></canvas>
+            <div id="demoSnapBadge" class="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-[10px] font-mono flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span id="demoSnapText">✍️ 手绘线条中...</span>
             </div>
           </div>
           <div>
             <h4 class="text-sm font-bold text-white flex items-center gap-1.5">
-              <span>🖋️</span> <span>12 款行业大师级手绘笔刷库</span>
+              <span>✨</span> <span data-i18n="demo_snap_title">GoodNotes 同款 420ms 智能几何吸附</span>
             </h4>
-            <p class="text-xs text-slate-400 mt-1 leading-relaxed">
-              内置 G 笔、丸笔、素描铅笔、蓝草稿笔、水彩毛笔、网点喷枪、荧光笔、排线笔、霓虹笔、虚线笔、激光笔与圆珠笔。点击左侧工具坞「更多笔刷」即可随心切换。
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed" data-i18n="demo_snap_desc">
+              在白板上任意绘制圆形、椭圆、多边形或直线，笔尖停顿 420ms 即可瞬间自动吸附为完美平滑矢量图形。
             </p>
           </div>
         </div>
 
-        <!-- 真实规格卡片 2: 工业级矢量自由选区与 360° 旋转矩阵 -->
-        <div class="feature-card bg-slate-900/70 border border-slate-800/90 rounded-2xl p-4 space-y-3 hover:border-indigo-500/50 transition">
-          <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800/60 space-y-2">
-            <div class="flex items-center justify-between text-xs font-mono text-slate-400 pb-1 border-b border-slate-800">
-              <span class="text-blue-400 font-bold">2D 仿射变换矩阵</span>
-              <span>8 方向控点 + 360° 自由旋转</span>
-            </div>
-            <div class="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800/80 font-mono text-[10px] text-slate-300 space-y-1">
-              <div class="flex justify-between text-blue-300">
-                <span>旋转: (x', y') = R(θ) · (x - Cx, y - Cy) + (Cx, Cy)</span>
-              </div>
-              <div class="flex justify-between text-emerald-300">
-                <span>缩放: x' = X_new + (x - X_old) * (W_new / W_old)</span>
-              </div>
-              <div class="text-slate-400 text-[9px] pt-0.5">
-                支持手绘笔画、插入图片与文本同时框选、等比/非等比拉伸、360° 任意角度旋转及一键克隆副本。
-              </div>
+        <!-- 演示 2: 360° 旋转与 8 方向矢量变换 -->
+        <div class="feature-card bg-slate-900/80 border border-slate-800 rounded-2xl p-4 space-y-3 hover:border-indigo-500/50 transition shadow-lg">
+          <div class="relative bg-slate-950 rounded-xl border border-slate-800 overflow-hidden flex flex-col items-center justify-center p-3 h-40">
+            <canvas id="demoTransformCanvas" width="340" height="130" class="w-full h-full"></canvas>
+            <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-blue-500/20 border border-blue-500/40 text-blue-300 text-[10px] font-mono flex items-center gap-1">
+              <span>⟳</span> <span id="demoRotAngle">旋转角: 0°</span>
             </div>
           </div>
           <div>
             <h4 class="text-sm font-bold text-white flex items-center gap-1.5">
-              <span>📐</span> <span>标杆级矢量套索与变换系统</span>
+              <span>📐</span> <span data-i18n="demo_transform_title">Figma 标杆级 360° 矢量旋转与 8 向拉伸</span>
             </h4>
-            <p class="text-xs text-slate-400 mt-1 leading-relaxed">
-              无论是圈选整段笔画还是点击单条线条，均可通过 8 个工业级手柄拉伸缩放，或拖动顶部把手实现 360° 自由旋转。告别传统白板的简陋红叉！
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed" data-i18n="demo_transform_desc">
+              手绘笔画、便利贴与文本均可一键框选。通过 8 个工业级手柄自由等比/非等比缩放，拖动顶部操作杆实现 360° 无级旋转。
             </p>
           </div>
         </div>
 
-        <!-- 真实规格卡片 3: 多页分镜管理与出版级 PDF -->
-        <div class="feature-card bg-slate-900/70 border border-slate-800/90 rounded-2xl p-4 space-y-3 hover:border-indigo-500/50 transition">
-          <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800/60 space-y-2">
-            <div class="flex items-center justify-between text-xs font-mono text-slate-400 pb-1 border-b border-slate-800">
-              <span class="text-indigo-400 font-bold">出版级多页工作流</span>
-              <span>矢量合并无损导出</span>
+        <!-- 演示 3: 12 款专业大师笔刷动态笔痕 -->
+        <div class="feature-card bg-slate-900/80 border border-slate-800 rounded-2xl p-4 space-y-3 hover:border-indigo-500/50 transition shadow-lg">
+          <div class="relative bg-slate-950 rounded-xl border border-slate-800 overflow-hidden flex flex-col items-center justify-center p-3 h-40">
+            <canvas id="demoBrushCanvas" width="340" height="130" class="w-full h-full"></canvas>
+            <div class="absolute top-2 left-2 flex gap-1 z-10">
+              <button class="demo-brush-tab px-2 py-0.5 rounded text-[10px] bg-indigo-600 text-white font-semibold" data-demo-brush="gpen">钢笔</button>
+              <button class="demo-brush-tab px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400 hover:text-white" data-demo-brush="neon">霓虹</button>
+              <button class="demo-brush-tab px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400 hover:text-white" data-demo-brush="spray">喷枪</button>
+              <button class="demo-brush-tab px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400 hover:text-white" data-demo-brush="maru">圆珠笔</button>
             </div>
-            <div class="flex items-center justify-between text-center text-[10px] gap-1 pt-1">
-              <div class="flex-1 p-1.5 rounded bg-slate-900 border border-slate-800 text-slate-300">
-                <span class="block text-indigo-400 font-bold">PAGE 1</span>
-                <span>分镜草稿</span>
-              </div>
-              <span class="text-slate-600">➔</span>
-              <div class="flex-1 p-1.5 rounded bg-slate-900 border border-slate-800 text-slate-300">
-                <span class="block text-indigo-400 font-bold">PAGE 2</span>
-                <span>线稿对白</span>
-              </div>
-              <span class="text-slate-600">➔</span>
-              <div class="flex-1 p-1.5 rounded bg-slate-900 border border-slate-800 text-slate-300">
-                <span class="block text-emerald-400 font-bold">PDF EXPORT</span>
-                <span>300 DPI 导出</span>
-              </div>
+            <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-slate-800/80 border border-slate-700 text-slate-300 text-[10px] font-mono" id="demoBrushSpeed">
+              速度导数压感: 100%
             </div>
           </div>
           <div>
             <h4 class="text-sm font-bold text-white flex items-center gap-1.5">
-              <span>📚</span> <span>无限多页漫画/教案管理与导出</span>
+              <span>🖋️</span> <span data-i18n="demo_brush_title">12 款商业大师级压感笔刷物理引擎</span>
             </h4>
-            <p class="text-xs text-slate-400 mt-1 leading-relaxed">
-              点击底部「➕加页」即可轻松新建页面，支持上一页/下一页无缝翻阅。完成创作后一键合并导出为正式出版级多页 PDF，告别单页拼接烦恼。
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed" data-i18n="demo_brush_desc">
+              搭载钢笔、圆珠笔、素描铅笔、水彩、霓虹发光、网点喷枪与虚线等 12 款专属手绘算法，运笔速度与轻重自适应笔锋。
             </p>
           </div>
         </div>
 
-        <!-- 真实规格卡片 4: 100% 浏览器本地隐私安全 -->
-        <div class="feature-card bg-slate-900/70 border border-slate-800/90 rounded-2xl p-4 space-y-3 hover:border-indigo-500/50 transition">
-          <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800/60 space-y-2">
-            <div class="flex items-center justify-between text-xs font-mono text-slate-400 pb-1 border-b border-slate-800">
-              <span class="text-emerald-400 font-bold">零网络依赖 · 离线可用</span>
-              <span>PWA 桌面级标准</span>
-            </div>
-            <div class="p-2 rounded bg-slate-900 border border-slate-800 text-[11px] text-slate-300 space-y-1">
-              <div class="flex items-center gap-1.5 text-emerald-400">
-                <span>🛡️</span> <span>本地内存沙箱运行，绝不上报任何笔迹与草稿数据</span>
-              </div>
-              <div class="flex items-center gap-1.5 text-slate-400 text-[10px]">
-                <span>⚡</span> <span>原生 Service Worker 离线缓存，无网络时依然秒开创作</span>
-              </div>
+        <!-- 演示 4: 无限多页会议纪要与出版级多页 PDF 合成 -->
+        <div class="feature-card bg-slate-900/80 border border-slate-800 rounded-2xl p-4 space-y-3 hover:border-indigo-500/50 transition shadow-lg">
+          <div class="relative bg-slate-950 rounded-xl border border-slate-800 overflow-hidden flex flex-col items-center justify-center p-3 h-40">
+            <canvas id="demoPagesCanvas" width="340" height="130" class="w-full h-full"></canvas>
+            <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-mono flex items-center gap-1">
+              <span>📚</span> <span id="demoPageStatus">多页文档合并中...</span>
             </div>
           </div>
           <div>
             <h4 class="text-sm font-bold text-white flex items-center gap-1.5">
-              <span>🛡️</span> <span>100% 浏览器客户端零延迟与隐私安全</span>
+              <span>📚</span> <span data-i18n="demo_pages_title">无限多页白板管理与出版级 PDF</span>
             </h4>
-            <p class="text-xs text-slate-400 mt-1 leading-relaxed">
-              基于原生 HTML5 Canvas 2D 与 Pointer Events 架构，所有运算均在本地设备运行。既保证了触控笔与鼠标的零延迟响应，更从根本上保障了作者的知识产权。
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed" data-i18n="demo_pages_desc">
+              告别单页白板拼接！支持自由「➕加页」、快速翻阅与重排，会议完毕一键合成正式 300 DPI 多页矢量 PDF 文档。
             </p>
           </div>
         </div>
@@ -1397,7 +1724,22 @@
     <!-- ================= 5. 全矩阵底部互链导航 & 独立开发者 IP 专区 ================= -->
   
     <!-- ================= 🌟 100 个免费实用独立网站矩阵展台 (100 Free & Practical Sites Directory) ================= -->
-    <section id="sitesDirectory100" class="w-full max-w-5xl mx-auto px-4 py-8 space-y-6">
+        <!-- ================= 🌟 100 个免费实用独立网站矩阵展台 (100 Free & Practical Sites Directory) ================= -->
+    <section id="sitesDirectory100" class="w-full max-w-5xl mx-auto px-4 py-8 space-y-4">
+      <div class="flex items-center justify-between bg-slate-900/90 border border-slate-800 px-4 py-3 rounded-2xl shadow-md">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-1.5">
+            <span data-i18n="challenge_title">开发 100 个免费实用的独立工具网站</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono">7 / 100 (7%)</span>
+          </h2>
+        </div>
+        <button id="btnToggleSitesMatrix" class="flex items-center gap-1.5 text-xs px-3.5 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 font-semibold transition active:scale-95 cursor-pointer">
+          <span id="toggleSitesText" data-i18n="collapse_matrix">收起矩阵 ▴</span>
+        </button>
+      </div>
+
+      <div id="sitesMatrixContent" class="space-y-6 transition-all duration-300">
       <!-- 头部：创始人寄语与挑战宣言 (完全依据 Huafire777 要求规范) -->
       <div class="bg-gradient-to-b from-slate-900/95 to-slate-950/95 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl relative overflow-hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800/80">
@@ -2014,6 +2356,22 @@
         tip_clear: '🗑️ 清空白板所有内容',
         tip_fit: '适应居中',
         add_page: '加页',
+        collapse_matrix: '收起矩阵 ▴',
+        expand_matrix: '展开查看 100 个独立网站矩阵 (7已上线) ▾',
+        challenge_title: '开发 100 个免费实用的独立工具网站',
+        demos_title: '核心能力互动图鉴与动态演示 · Interactive Feature Demos',
+        demo_snap_title: 'GoodNotes 同款 420ms 智能几何吸附',
+        demo_snap_desc: '在白板上任意绘制圆形、椭圆、多边形或直线，笔尖停顿 420ms 即可瞬间自动吸附为出版级完美平滑矢量图形。',
+        demo_transform_title: 'Figma 标杆级 360° 矢量旋转与 8 向拉伸',
+        demo_transform_desc: '手绘笔画、图片与文字均可一键框选。通过 8 个工业级手柄自由等比/非等比缩放，拖动顶部操作杆实现 360° 无级旋转。',
+        demo_brush_title: '12 款商业大师级压感笔刷物理引擎',
+        demo_brush_desc: '搭载钢笔、圆珠笔、素描铅笔、水彩、霓虹发光、网点喷枪与虚线等 12 款专属手绘算法，运笔速度与轻重自适应笔锋。',
+        demo_pages_title: '无限多页白板管理与出版级 PDF',
+        demo_pages_desc: '告别单页白板拼接！支持自由「➕加页」、快速翻阅与重排，会议完毕一键合成正式 300 DPI 多页矢量 PDF 文档。',
+        rgb_picker: 'RGB 精密数值调色',
+        spectrum_picker: '光谱拾色',
+        quick_swatches: '常用预设色',
+        smart_invert: '智能对比度修复 (反色)',
         ratios: {
           free: '♾️ 自适应满屏 (Responsive)',
           a4_p: '📄 A4 纵向 (210×297mm)',
@@ -2085,6 +2443,22 @@
         tip_clear: '🗑️ Clear Canvas',
         tip_fit: 'Fit to Screen',
         add_page: 'Add Page',
+        collapse_matrix: 'Collapse Matrix ▴',
+        expand_matrix: 'Expand 100 Sites Matrix (7 Live) ▾',
+        challenge_title: '100 Free & Practical Web Tools Challenge',
+        demos_title: 'Core Capabilities & Interactive Demos · Live Engine',
+        demo_snap_title: 'GoodNotes-style 420ms Shape Recognition',
+        demo_snap_desc: 'Draw any rough circle, polygon, or straight line and hold for 420ms: it instantly snaps into a publication-grade smooth vector shape.',
+        demo_transform_title: 'Figma-grade 360° Vector Rotation & 8-Way Scale',
+        demo_transform_desc: 'Box-select hand-drawn strokes, sticky notes, and texts. Scale with 8 industrial handles, or drag the top lever for full 360° free rotation.',
+        demo_brush_title: '12 Master Pressure Brush Physics Engines',
+        demo_brush_desc: 'Equipped with Pen, Ballpoint, Pencil, Watercolor, Neon, Screentone, and Dotted lines. Adapts line taper to stroke speed dynamically.',
+        demo_pages_title: 'Multi-Page Canvas Management & PDF Binding',
+        demo_pages_desc: 'Say goodbye to single-page canvas limits! Add pages freely, flip smoothly, and combine into a 300 DPI vector PDF in 1 click.',
+        rgb_picker: 'RGB Numeric Color Tuning',
+        spectrum_picker: 'Spectrum Picker',
+        quick_swatches: 'Preset Swatches',
+        smart_invert: 'Smart Contrast Invert',
         ratios: {
           free: '♾️ Responsive (Full Screen)',
           a4_p: '📄 A4 Portrait (Print)',
@@ -2913,13 +3287,9 @@
           targetCtx.fill();
         } else {
           targetCtx.beginPath();
+          targetCtx.moveTo(s.points[0].x, s.points[0].y);
           for (let i = 1; i < s.points.length; i++) {
-            const p1 = s.points[i - 1];
-            const p2 = s.points[i];
-            const midX = (p1.x + p2.x) / 2;
-            const midY = (p1.y + p2.y) / 2;
-            if (i === 1) targetCtx.moveTo(p1.x, p1.y);
-            targetCtx.quadraticCurveTo(p1.x, p1.y, midX, midY);
+            targetCtx.lineTo(s.points[i].x, s.points[i].y);
           }
           targetCtx.stroke();
         }
@@ -3215,7 +3585,7 @@
         window.addEventListener('pointerup', onRotUp);
       };
 
-      // 整体框拖拽（平移）
+      // 整体框拖拽（平移）：统一委托给 window-level 拖拽处理，绝不在移动过程中销毁 DOM
       box.onpointerdown = (e) => {
         if (e.target.dataset.handle || e.target.dataset.rot || e.target.closest('.selection-action-pill')) return;
         e.stopPropagation();
@@ -3223,35 +3593,6 @@
         saveHistory();
         appState.isDraggingSelection = true;
         appState.dragStartPos = getCanvasCoordinates(e);
-
-        const onBoxMove = (me) => {
-          me.preventDefault();
-          const curPos = getCanvasCoordinates(me);
-          const dx = curPos.x - appState.dragStartPos.x;
-          const dy = curPos.y - appState.dragStartPos.y;
-          appState.dragStartPos = curPos;
-
-          for (const s of (appState.selectedStrokes || [])) {
-            for (const pt of s.points) { pt.x += dx; pt.y += dy; }
-          }
-          for (const t of (appState.selectedTexts || [])) {
-            t.x += dx; t.y += dy;
-          }
-          for (const im of (appState.selectedImages || [])) {
-            im.x += dx; im.y += dy;
-          }
-          redrawAllStrokes();
-          updateSelectionBoxUI();
-        };
-
-        const onBoxUp = () => {
-          appState.isDraggingSelection = false;
-          window.removeEventListener('pointermove', onBoxMove);
-          window.removeEventListener('pointerup', onBoxUp);
-        };
-
-        window.addEventListener('pointermove', onBoxMove);
-        window.addEventListener('pointerup', onBoxUp);
       };
 
       // 🌟 8 方向手柄缩放 (手绘笔迹线条 + 图片 + 文本 完整缩放拉伸)
@@ -3699,8 +4040,12 @@
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
 
-      const midX = (p1.x + p2.x) / 2;
-      const midY = (p1.y + p2.y) / 2;
+      // 彻底防止虚线模式泄漏：默认无条件重置虚线
+      if (s.tool === 'dotted') {
+        ctx.setLineDash([Math.max(4, s.size * 1.8), Math.max(4, s.size * 1.8)]);
+      } else {
+        ctx.setLineDash([]);
+      }
 
       if (s.tool === 'highlighter') {
         ctx.globalCompositeOperation = 'multiply';
@@ -3729,17 +4074,17 @@
         ctx.lineWidth = Math.max(1, s.size * 0.75);
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
-        ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
+        ctx.lineTo(p2.x, p2.y);
         ctx.stroke();
       } else if (s.tool === 'blue_pencil') {
-        ctx.strokeStyle = '#38bdf8';
+        ctx.strokeStyle = s.color || '#38bdf8';
         ctx.globalAlpha = 0.65;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.lineWidth = Math.max(1, s.size * 0.8);
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
-        ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
+        ctx.lineTo(p2.x, p2.y);
         ctx.stroke();
       } else if (s.tool === 'maru') {
         ctx.strokeStyle = s.color;
@@ -3749,7 +4094,7 @@
         ctx.lineWidth = Math.max(0.8, s.size * 0.55);
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
-        ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
+        ctx.lineTo(p2.x, p2.y);
         ctx.stroke();
       } else if (s.tool === 'brush') {
         ctx.strokeStyle = s.color;
@@ -3759,7 +4104,7 @@
         ctx.lineWidth = s.size * 1.35;
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
-        ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
+        ctx.lineTo(p2.x, p2.y);
         ctx.stroke();
       } else if (s.tool === 'crosshatch') {
         ctx.strokeStyle = s.color;
@@ -3769,7 +4114,7 @@
         ctx.lineWidth = s.size * 0.9;
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
-        ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
+        ctx.lineTo(p2.x, p2.y);
         ctx.stroke();
       } else if (s.tool === 'neon') {
         ctx.strokeStyle = s.color;
@@ -3781,18 +4126,17 @@
         ctx.lineWidth = Math.max(2, s.size * 1.2);
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
-        ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
+        ctx.lineTo(p2.x, p2.y);
         ctx.stroke();
       } else if (s.tool === 'dotted') {
         ctx.strokeStyle = s.color;
         ctx.globalAlpha = 1.0;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-        ctx.setLineDash([Math.max(4, s.size * 1.8), Math.max(4, s.size * 1.8)]);
         ctx.lineWidth = s.size;
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
-        ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
+        ctx.lineTo(p2.x, p2.y);
         ctx.stroke();
       } else if (s.tool === 'ballpoint') {
         ctx.strokeStyle = s.color;
@@ -3802,9 +4146,10 @@
         ctx.lineWidth = Math.max(1, s.size * 0.82);
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
-        ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
+        ctx.lineTo(p2.x, p2.y);
         ctx.stroke();
       } else {
+        // 标准笔：动态笔锋自适应，点与点之间 100% 完整相连，彻底告别断点
         const dt = Math.max(8, (p2.time || performance.now()) - (p1.time || performance.now()));
         const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
         const speed = dist / dt;
@@ -3817,7 +4162,7 @@
         ctx.lineWidth = Math.max(1, s.size * dynamicTaper);
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
-        ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
+        ctx.lineTo(p2.x, p2.y);
         ctx.stroke();
       }
 
@@ -3898,7 +4243,7 @@
         let hitStroke = null;
         for (let i = appState.strokes.length - 1; i >= 0; i--) {
           const s = appState.strokes[i];
-          if (isStrokeNearPoint(s, pos.x, pos.y, Math.max(10, (s.size || 3) * 1.5))) {
+          if (isStrokeNearPoint(s, pos.x, pos.y, Math.max(16, (s.size || 3) * 2))) {
             hitStroke = s;
             break;
           }
@@ -4024,17 +4369,25 @@
         const dy = pos.y - appState.dragStartPos.y;
         appState.dragStartPos = pos;
 
-        for (const s of appState.selectedStrokes) {
+        for (const s of (appState.selectedStrokes || [])) {
           for (const pt of s.points) { pt.x += dx; pt.y += dy; }
         }
-        for (const t of appState.selectedTexts) {
+        for (const t of (appState.selectedTexts || [])) {
           t.x += dx; t.y += dy;
         }
-        for (const im of appState.selectedImages) {
+        for (const im of (appState.selectedImages || [])) {
           im.x += dx; im.y += dy;
         }
+        if (appState.selectionBounds) {
+          appState.selectionBounds.x += dx;
+          appState.selectionBounds.y += dy;
+          const boxEl = selectionOverlay.querySelector('.selection-box');
+          if (boxEl) {
+            boxEl.style.left = `${appState.selectionBounds.x}px`;
+            boxEl.style.top = `${appState.selectionBounds.y}px`;
+          }
+        }
         redrawAllStrokes();
-        updateSelectionBoxUI();
         return;
       }
 
@@ -4112,6 +4465,7 @@
       }
       if (appState.isDraggingSelection) {
         appState.isDraggingSelection = false;
+        updateSelectionBoxUI();
         return;
       }
 
@@ -5044,6 +5398,313 @@
         });
       };
     }
+
+    // ================= 🌟 4 大核心能力高保真动态演示与折叠矩阵引擎 =================
+    // 1. 折叠 100 站矩阵逻辑
+    const btnToggleSitesMatrix = document.getElementById('btnToggleSitesMatrix');
+    const sitesMatrixContent = document.getElementById('sitesMatrixContent');
+    const toggleSitesText = document.getElementById('toggleSitesText');
+    if (btnToggleSitesMatrix && sitesMatrixContent) {
+      btnToggleSitesMatrix.onclick = () => {
+        const isHidden = sitesMatrixContent.classList.toggle('hidden');
+        const lang = appState.lang || 'zh';
+        const dict = TRANSLATIONS[lang] || TRANSLATIONS.zh;
+        if (toggleSitesText) {
+          toggleSitesText.innerText = isHidden 
+            ? (dict.expand_matrix || '展开查看 100 个网站矩阵 ▾') 
+            : (dict.collapse_matrix || '收起矩阵 ▴');
+        }
+      };
+    }
+
+    // 2. 动效 1: GoodNotes 同款 420ms 智能吸附动画
+    const demoSnapCanvas = document.getElementById('demoSnapCanvas');
+    const demoSnapText = document.getElementById('demoSnapText');
+    if (demoSnapCanvas) {
+      const dctx = demoSnapCanvas.getContext('2d');
+      let snapStep = 0;
+      let snapAnimProgress = 0;
+
+      function renderSnapDemo() {
+        const w = demoSnapCanvas.width;
+        const h = demoSnapCanvas.height;
+        dctx.clearRect(0, 0, w, h);
+
+        dctx.strokeStyle = 'rgba(100, 116, 139, 0.15)';
+        dctx.lineWidth = 1;
+        for (let x = 20; x < w; x += 20) { dctx.beginPath(); dctx.moveTo(x, 0); dctx.lineTo(x, h); dctx.stroke(); }
+        for (let y = 20; y < h; y += 20) { dctx.beginPath(); dctx.moveTo(0, y); dctx.lineTo(w, y); dctx.stroke(); }
+
+        const cx = w / 2;
+        const cy = h / 2;
+        const r = 38;
+
+        if (snapStep < 120) {
+          if (demoSnapText) demoSnapText.innerText = '✍️ 手写不规则图形...';
+          const progress = Math.min(1, snapStep / 80);
+          dctx.beginPath();
+          dctx.strokeStyle = '#818cf8';
+          dctx.lineWidth = 3;
+          dctx.lineCap = 'round';
+          const totalAngle = Math.PI * 2 * progress;
+          for (let a = 0; a <= totalAngle; a += 0.1) {
+            const jitter = Math.sin(a * 7) * 3 + Math.cos(a * 4) * 2.5;
+            const curR = r + jitter;
+            const px = cx + Math.cos(a) * curR;
+            const py = cy + Math.sin(a) * curR;
+            if (a === 0) dctx.moveTo(px, py);
+            else dctx.lineTo(px, py);
+          }
+          dctx.stroke();
+        } else if (snapStep < 160) {
+          if (demoSnapText) demoSnapText.innerText = '⏱️ 停顿 420ms 识别中...';
+          dctx.beginPath();
+          dctx.strokeStyle = '#a5b4fc';
+          dctx.lineWidth = 3;
+          for (let a = 0; a <= Math.PI * 2; a += 0.1) {
+            const jitter = Math.sin(a * 7) * 3 + Math.cos(a * 4) * 2.5;
+            const curR = r + jitter;
+            const px = cx + Math.cos(a) * curR;
+            const py = cy + Math.sin(a) * curR;
+            if (a === 0) dctx.moveTo(px, py);
+            else dctx.lineTo(px, py);
+          }
+          dctx.stroke();
+        } else {
+          if (demoSnapText) demoSnapText.innerText = '✨ 完美吸附 Snapped!';
+          snapAnimProgress = Math.min(1, snapAnimProgress + 0.08);
+          dctx.beginPath();
+          dctx.strokeStyle = '#38bdf8';
+          dctx.lineWidth = 3.5;
+          dctx.arc(cx, cy, r, 0, Math.PI * 2);
+          dctx.stroke();
+
+          dctx.save();
+          dctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+          dctx.lineWidth = 7;
+          dctx.stroke();
+          dctx.restore();
+        }
+
+        snapStep = (snapStep + 1) % 240;
+        if (snapStep === 0) snapAnimProgress = 0;
+        requestAnimationFrame(renderSnapDemo);
+      }
+      renderSnapDemo();
+    }
+
+    // 3. 动效 2: 360° 旋转与 8 方向矢量变换动画
+    const demoTransformCanvas = document.getElementById('demoTransformCanvas');
+    const demoRotAngle = document.getElementById('demoRotAngle');
+    if (demoTransformCanvas) {
+      const tctx = demoTransformCanvas.getContext('2d');
+      let angle = 0;
+
+      function renderTransformDemo() {
+        const w = demoTransformCanvas.width;
+        const h = demoTransformCanvas.height;
+        tctx.clearRect(0, 0, w, h);
+
+        const cx = w / 2;
+        const cy = h / 2;
+        const bw = 80;
+        const bh = 55;
+
+        tctx.save();
+        tctx.translate(cx, cy);
+        tctx.rotate(angle);
+
+        tctx.fillStyle = 'rgba(37, 99, 235, 0.08)';
+        tctx.fillRect(-bw/2, -bh/2, bw, bh);
+        tctx.strokeStyle = '#2563eb';
+        tctx.lineWidth = 1.5;
+        tctx.strokeRect(-bw/2, -bh/2, bw, bh);
+
+        tctx.fillStyle = '#6366f1';
+        tctx.font = 'bold 12px sans-serif';
+        tctx.textAlign = 'center';
+        tctx.fillText('📝 BOARD', 0, 4);
+
+        tctx.beginPath();
+        tctx.moveTo(0, -bh/2);
+        tctx.lineTo(0, -bh/2 - 18);
+        tctx.stroke();
+        tctx.beginPath();
+        tctx.arc(0, -bh/2 - 18, 5, 0, Math.PI * 2);
+        tctx.fillStyle = '#38bdf8';
+        tctx.fill();
+        tctx.strokeStyle = '#ffffff';
+        tctx.lineWidth = 1.5;
+        tctx.stroke();
+
+        const handles = [
+          [-bw/2, -bh/2], [0, -bh/2], [bw/2, -bh/2],
+          [-bw/2, 0], [bw/2, 0],
+          [-bw/2, bh/2], [0, bh/2], [bw/2, bh/2]
+        ];
+        for (const [hx, hy] of handles) {
+          tctx.fillStyle = '#ffffff';
+          tctx.fillRect(hx - 3, hy - 3, 6, 6);
+          tctx.strokeStyle = '#2563eb';
+          tctx.lineWidth = 1;
+          tctx.strokeRect(hx - 3, hy - 3, 6, 6);
+        }
+
+        tctx.restore();
+
+        const deg = Math.round((angle * 180 / Math.PI) % 360);
+        if (demoRotAngle) demoRotAngle.innerText = `旋转角: ${deg}°`;
+
+        angle += 0.015;
+        requestAnimationFrame(renderTransformDemo);
+      }
+      renderTransformDemo();
+    }
+
+    // 4. 动效 3: 12 款大师笔刷动态笔痕流
+    const demoBrushCanvas = document.getElementById('demoBrushCanvas');
+    const demoBrushSpeed = document.getElementById('demoBrushSpeed');
+    if (demoBrushCanvas) {
+      const bctx = demoBrushCanvas.getContext('2d');
+      let curDemoTool = 'pen';
+      let brushT = 0;
+
+      document.querySelectorAll('.demo-brush-tab').forEach(tab => {
+        tab.onclick = () => {
+          document.querySelectorAll('.demo-brush-tab').forEach(t => {
+            t.classList.remove('bg-indigo-600', 'text-white');
+            t.classList.add('bg-slate-800', 'text-slate-400');
+          });
+          tab.classList.add('bg-indigo-600', 'text-white');
+          tab.classList.remove('bg-slate-800', 'text-slate-400');
+          curDemoTool = tab.dataset.demoBrush;
+          brushT = 0;
+        };
+      });
+
+      function renderBrushDemo() {
+        const w = demoBrushCanvas.width;
+        const h = demoBrushCanvas.height;
+        bctx.clearRect(0, 0, w, h);
+
+        const pts = [];
+        const maxSteps = 160;
+        const curProgress = Math.min(1, brushT / 110);
+        const steps = Math.floor(maxSteps * curProgress);
+
+        for (let i = 0; i < steps; i++) {
+          const t = i / maxSteps;
+          const x = 30 + t * (w - 60);
+          const y = h / 2 + Math.sin(t * Math.PI * 3.5) * 28;
+          pts.push({ x, y });
+        }
+
+        if (pts.length > 1) {
+          bctx.save();
+          if (curDemoTool === 'neon') {
+            bctx.strokeStyle = '#38bdf8';
+            bctx.shadowBlur = 12;
+            bctx.shadowColor = '#38bdf8';
+            bctx.lineWidth = 4.5;
+            bctx.lineCap = 'round';
+            bctx.beginPath();
+            bctx.moveTo(pts[0].x, pts[0].y);
+            for (let i = 1; i < pts.length; i++) bctx.lineTo(pts[i].x, pts[i].y);
+            bctx.stroke();
+          } else if (curDemoTool === 'spray') {
+            bctx.fillStyle = '#a855f7';
+            bctx.globalAlpha = 0.55;
+            for (const p of pts) {
+              for (let d = 0; d < 3; d++) {
+                const ox = (Math.random() - 0.5) * 16;
+                const oy = (Math.random() - 0.5) * 16;
+                bctx.fillRect(p.x + ox, p.y + oy, 1.5, 1.5);
+              }
+            }
+          } else if (curDemoTool === 'maru') {
+            bctx.strokeStyle = '#f8fafc';
+            bctx.lineWidth = 1;
+            bctx.lineCap = 'round';
+            bctx.beginPath();
+            bctx.moveTo(pts[0].x, pts[0].y);
+            for (let i = 1; i < pts.length; i++) bctx.lineTo(pts[i].x, pts[i].y);
+            bctx.stroke();
+          } else {
+            for (let i = 1; i < pts.length; i++) {
+              const p1 = pts[i-1];
+              const p2 = pts[i];
+              const taper = Math.sin((i / maxSteps) * Math.PI);
+              bctx.strokeStyle = '#818cf8';
+              bctx.lineWidth = Math.max(1, 6 * taper);
+              bctx.lineCap = 'round';
+              bctx.beginPath();
+              bctx.moveTo(p1.x, p1.y);
+              bctx.lineTo(p2.x, p2.y);
+              bctx.stroke();
+            }
+          }
+          bctx.restore();
+        }
+
+        brushT = (brushT + 1) % 150;
+        requestAnimationFrame(renderBrushDemo);
+      }
+      renderBrushDemo();
+    }
+
+    // 5. 动效 4: 无限多页与出版级 PDF 合成
+    const demoPagesCanvas = document.getElementById('demoPagesCanvas');
+    const demoPageStatus = document.getElementById('demoPageStatus');
+    if (demoPagesCanvas) {
+      const pctx = demoPagesCanvas.getContext('2d');
+      let pageTick = 0;
+
+      function renderPagesDemo() {
+        const w = demoPagesCanvas.width;
+        const h = demoPagesCanvas.height;
+        pctx.clearRect(0, 0, w, h);
+
+        const pageCount = 3;
+        const activeIdx = Math.floor(pageTick / 70) % pageCount;
+
+        for (let i = 0; i < pageCount; i++) {
+          const offsetX = (w / 2) + (i - activeIdx) * 75;
+          const isCur = i === activeIdx;
+          const pw = 60;
+          const ph = 80;
+
+          pctx.save();
+          pctx.translate(offsetX, h / 2);
+          if (!isCur) pctx.scale(0.85, 0.85);
+
+          pctx.fillStyle = isCur ? '#ffffff' : '#334155';
+          pctx.strokeStyle = isCur ? '#6366f1' : '#475569';
+          pctx.lineWidth = isCur ? 2 : 1;
+          pctx.fillRect(-pw/2, -ph/2, pw, ph);
+          pctx.strokeRect(-pw/2, -ph/2, pw, ph);
+
+          pctx.fillStyle = isCur ? '#0f172a' : '#94a3b8';
+          pctx.font = 'bold 9px monospace';
+          pctx.textAlign = 'center';
+          pctx.fillText(`P.${i + 1}`, 0, -ph/2 + 15);
+
+          pctx.strokeStyle = isCur ? 'rgba(99, 102, 241, 0.4)' : 'rgba(148, 163, 184, 0.2)';
+          pctx.strokeRect(-pw/2 + 8, -ph/2 + 22, pw - 16, 20);
+          pctx.strokeRect(-pw/2 + 8, -ph/2 + 46, pw - 16, 24);
+
+          pctx.restore();
+        }
+
+        if (demoPageStatus) {
+          demoPageStatus.innerText = activeIdx === 2 ? '📄 矢量合并导出 PDF (300 DPI)' : `第 ${activeIdx + 1} / 3 页 · 白板绘制中`;
+        }
+
+        pageTick = (pageTick + 1) % 210;
+        requestAnimationFrame(renderPagesDemo);
+      }
+      renderPagesDemo();
+    }
+
   </script>
 </body>
 </html>
