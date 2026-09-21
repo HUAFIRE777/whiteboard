@@ -177,14 +177,145 @@
       position: absolute;
       pointer-events: auto;
       cursor: move;
+      touch-action: none;
+      box-sizing: border-box;
     }
     .selection-handle {
-      width: 9px;
-      height: 9px;
+      width: 12px;
+      height: 12px;
       background: #ffffff;
       border: 2px solid #4f46e5;
       border-radius: 50%;
       position: absolute;
+      pointer-events: auto;
+      touch-action: none;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+      z-index: 10;
+    }
+    .selection-handle-nw { top: -6px; left: -6px; cursor: nwse-resize; }
+    .selection-handle-ne { top: -6px; right: -6px; cursor: nesw-resize; }
+    .selection-handle-se { bottom: -6px; right: -6px; cursor: nwse-resize; }
+    .selection-handle-sw { bottom: -6px; left: -6px; cursor: nesw-resize; }
+    .selection-delete-btn {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #ef4444;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      pointer-events: auto;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      border: 2px solid #ffffff;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+      z-index: 12;
+      line-height: 1;
+    }
+    .selection-delete-btn:hover {
+      transform: scale(1.15);
+      background: #dc2626;
+    }
+
+    /* 白天明亮模式 (Theme Light) */
+    body.theme-light {
+      background-color: #f8fafc !important;
+      color: #0f172a !important;
+    }
+    body.theme-light #topNavbar {
+      background: rgba(255, 255, 255, 0.94) !important;
+      border-bottom-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+    body.theme-light #topNavbar .text-white,
+    body.theme-light #topNavbar .text-slate-200 {
+      color: #0f172a !important;
+    }
+    body.theme-light #workbenchWrapper {
+      background: #f1f5f9 !important;
+    }
+    body.theme-light #leftSidebar {
+      background: rgba(255, 255, 255, 0.96) !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 12px 36px rgba(15, 23, 42, 0.08) !important;
+    }
+    body.theme-light #leftSidebar button {
+      color: #475569 !important;
+    }
+    body.theme-light #leftSidebar button:hover {
+      background: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+    body.theme-light #leftSidebar .tool-btn-active {
+      background: #4f46e5 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
+    }
+    body.theme-light #zoomDock,
+    body.theme-light #paletteFlyout {
+      background: rgba(255, 255, 255, 0.97) !important;
+      border-color: #cbd5e1 !important;
+      color: #1e293b !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+    }
+    body.theme-light #zoomDock button {
+      color: #334155 !important;
+    }
+    body.theme-light #zoomDock button:hover {
+      background: #f1f5f9 !important;
+    }
+    body.theme-light #ratioSelector,
+    body.theme-light #paperSelector,
+    body.theme-light #btnLangDropdown {
+      color: #1e293b !important;
+      background: transparent !important;
+    }
+    body.theme-light #langMenu {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #1e293b !important;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.12) !important;
+    }
+    body.theme-light #langMenu button {
+      color: #334155 !important;
+    }
+    body.theme-light #langMenu button:hover {
+      background: #eef2ff !important;
+      color: #4f46e5 !important;
+    }
+    body.theme-light .bg-slate-800\/90,
+    body.theme-light .bg-slate-800 {
+      background: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      color: #1e293b !important;
+    }
+    body.theme-light .bg-slate-900\/90,
+    body.theme-light .bg-slate-900 {
+      background: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      color: #1e293b !important;
+    }
+    body.theme-light .bg-slate-900\/50,
+    body.theme-light .bg-slate-900\/40 {
+      background: #ffffff !important;
+      border-color: #e2e8f0 !important;
+    }
+    body.theme-light .text-slate-400 {
+      color: #64748b !important;
+    }
+    body.theme-light .text-slate-300 {
+      color: #475569 !important;
+    }
+    body.theme-light footer {
+      background: #f1f5f9 !important;
+      border-top-color: #e2e8f0 !important;
+      color: #64748b !important;
     }
   </style>
 </head>
@@ -256,6 +387,11 @@
 
     <!-- 右侧动作按钮组 -->
     <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+      <!-- 白天/黑夜模式切换 -->
+      <button id="btnThemeToggle" class="p-1.5 sm:px-2.5 sm:py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 text-slate-200 rounded-xl text-xs flex items-center gap-1 transition cursor-pointer" title="切换白天/夜间模式 (☀️/🌙)">
+        <span id="themeIcon">🌙</span> <span id="themeLabel" class="hidden sm:inline">夜间</span>
+      </button>
+
       <button id="btnToggleFullscreen" class="p-1.5 sm:px-2.5 sm:py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 text-slate-200 rounded-xl text-xs flex items-center gap-1 transition" title="全屏沉浸创作">
         <span>⛶</span> <span class="hidden sm:inline" data-i18n="fullscreen">全屏</span>
       </button>
@@ -294,6 +430,8 @@
 
     <!-- ===== 左侧专业悬浮工具坞 (GoodNotes / Excalidraw 级交互) ===== -->
     <aside id="leftSidebar" class="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center gap-1.5 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 p-1.5 rounded-2xl shadow-2xl transition-all">
+      <!-- 0. 鼠标选择与调整 (Select - V) -->
+      <button class="tool-btn p-2 rounded-xl text-slate-300 hover:bg-slate-800 text-xs transition" data-tool="select" title="↖️ 鼠标选择与调整 (快捷键 V，点选图片/文字可拖动、四角缩放或删除)">↖️</button>
       <!-- 1. 钢笔 (默认) -->
       <button class="tool-btn p-2 rounded-xl text-slate-300 hover:bg-slate-800 text-xs transition tool-btn-active" data-tool="pen" title="钢笔 (自然笔锋压感，停顿吸附完美几何)">🖋️</button>
       <!-- 2. 铅笔 -->
@@ -614,43 +752,43 @@
     const TRANSLATIONS = {
       zh: {
         lbl_ratio: '画幅', lbl_paper: '纸张', fullscreen: '全屏', exit_fullscreen: '退出全屏',
-        export: '导出', palette_title: '画笔颜色', size: '粗细',
+        export: '导出', palette_title: '画笔颜色', size: '粗细', theme_light: '白天', theme_dark: '夜间',
         pro_title: '解锁 EazyOPC Pro 终身版', pro_desc: '一杯咖啡钱，永久买断 4K 原画、透明图、SVG 矢量及全套商业权益。',
         buy_btn: '立即以 $4.99 USD 买断终身授权', has_license: '已有授权码？', activate: '激活', continue_free: '暂不解锁，继续免费使用'
       },
       en: {
         lbl_ratio: 'Ratio', lbl_paper: 'Paper', fullscreen: 'Fullscreen', exit_fullscreen: 'Exit Fullscreen',
-        export: 'Export', palette_title: 'Color Palette', size: 'Size',
+        export: 'Export', palette_title: 'Color Palette', size: 'Size', theme_light: 'Day', theme_dark: 'Night',
         pro_title: 'Unlock EazyOPC Pro Lifetime', pro_desc: 'Price of a coffee for lifetime 4K, Transparent PNG, SVG, and PDF exports.',
         buy_btn: 'Buy Lifetime License for $4.99 USD', has_license: 'Have a license key?', activate: 'Activate', continue_free: 'Continue with free version'
       },
       ja: {
         lbl_ratio: '比率', lbl_paper: '用紙', fullscreen: '全画面', exit_fullscreen: '全画面終了',
-        export: '保存', palette_title: 'カラー', size: '太さ',
+        export: '保存', palette_title: 'カラー', size: '太さ', theme_light: '昼', theme_dark: '夜',
         pro_title: 'EazyOPC Pro 永久ライセンス', pro_desc: '4K無制限、透過PNG、SVGベクター出力を永久利用。',
         buy_btn: '$4.99 で永久購入する', has_license: 'ライセンスをお持ちですか？', activate: '有効化', continue_free: '無料版を続ける'
       },
       ko: {
         lbl_ratio: '비율', lbl_paper: '용지', fullscreen: '전체화면', exit_fullscreen: '전체화면 종료',
-        export: '내보내기', palette_title: '색상', size: '굵기',
+        export: '내보내기', palette_title: '색상', size: '굵기', theme_light: '주간', theme_dark: '야간',
         pro_title: 'EazyOPC Pro 평생 라이선스', pro_desc: '4K 초고화质, 투명 PNG, SVG 벡터 출력 영구 해제.',
         buy_btn: '$4.99 USD 평생 구매', has_license: '인증 코드가 있으신가요?', activate: '활성화', continue_free: '무료 버전 유지'
       },
       de: {
         lbl_ratio: 'Format', lbl_paper: 'Papier', fullscreen: 'Vollbild', exit_fullscreen: 'Vollbild beenden',
-        export: 'Export', palette_title: 'Farbe', size: 'Stärke',
+        export: 'Export', palette_title: 'Farbe', size: 'Stärke', theme_light: 'Tag', theme_dark: 'Nacht',
         pro_title: 'EazyOPC Pro Freischalten', pro_desc: 'Lebenslanger Export von 4K, transparentem PNG und Vektor-SVG.',
         buy_btn: 'Lebenslang für $4.99 kaufen', has_license: 'Haben Sie einen Schlüssel?', activate: 'Aktivieren', continue_free: 'Kostenlos fortfahren'
       },
       es: {
         lbl_ratio: 'Proporción', lbl_paper: 'Papel', fullscreen: 'Pantalla completa', exit_fullscreen: 'Salir',
-        export: 'Exportar', palette_title: 'Paleta', size: 'Grosor',
+        export: 'Exportar', palette_title: 'Paleta', size: 'Grosor', theme_light: 'Día', theme_dark: 'Noche',
         pro_title: 'Desbloquear EazyOPC Pro', pro_desc: 'Exportación 4K, PNG transparente y SVG vectorial de por vida.',
         buy_btn: 'Comprar vitalicio por $4.99', has_license: '¿Tienes clave?', activate: 'Activar', continue_free: 'Continuar gratis'
       },
       fr: {
         lbl_ratio: 'Format', lbl_paper: 'Papier', fullscreen: 'Plein écran', exit_fullscreen: 'Quitter plein écran',
-        export: 'Exporter', palette_title: 'Palette', size: 'Taille',
+        export: 'Exporter', palette_title: 'Palette', size: 'Taille', theme_light: 'Jour', theme_dark: 'Nuit',
         pro_title: 'Débloquer EazyOPC Pro à vie', pro_desc: 'Export 4K, PNG transparent et SVG vectoriel illimités.',
         buy_btn: 'Acheter à vie pour 4,99 $', has_license: 'Avez-vous une clé ?', activate: 'Activer', continue_free: 'Continuer gratuitement'
       }
@@ -658,7 +796,7 @@
 
     const appState = {
       lang: 'zh',
-      tool: 'pen',        // 'pen' | 'pencil' | 'highlighter' | 'text' | 'eraser' | 'lasso' | 'laser'
+      tool: 'pen',        // 'select' | 'pen' | 'pencil' | 'highlighter' | 'text' | 'eraser' | 'lasso' | 'laser'
       paper: 'dot',
       ratio: 'free',
       currentColor: '#18181b',
@@ -1008,7 +1146,7 @@
       }
     }
 
-    // ⭕ 套索选区 UI
+    // ⭕ 鼠标选择与调整 UI (包含平移、四角等比缩放手柄与删除徽章)
     function updateSelectionBoxUI() {
       selectionOverlay.innerHTML = '';
       if ((!appState.selectedStrokes || appState.selectedStrokes.length === 0) &&
@@ -1019,7 +1157,7 @@
       }
 
       let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-      for (const s of appState.selectedStrokes) {
+      for (const s of (appState.selectedStrokes || [])) {
         for (const pt of s.points) {
           if (pt.x < minX) minX = pt.x;
           if (pt.y < minY) minY = pt.y;
@@ -1027,20 +1165,21 @@
           if (pt.y > maxY) maxY = pt.y;
         }
       }
-      for (const t of appState.selectedTexts) {
+      for (const t of (appState.selectedTexts || [])) {
         if (t.x < minX) minX = t.x;
         if (t.y - t.size < minY) minY = t.y - t.size;
-        if (t.x + t.size * 3 > maxX) maxX = t.x + t.size * 3;
+        const estW = Math.max(30, (t.text ? t.text.length : 4) * t.size * 0.7);
+        if (t.x + estW > maxX) maxX = t.x + estW;
         if (t.y > maxY) maxY = t.y;
       }
-      for (const im of appState.selectedImages) {
+      for (const im of (appState.selectedImages || [])) {
         if (im.x < minX) minX = im.x;
         if (im.y < minY) minY = im.y;
         if (im.x + im.width > maxX) maxX = im.x + im.width;
         if (im.y + im.height > maxY) maxY = im.y + im.height;
       }
 
-      const pad = 8;
+      const pad = 6;
       minX -= pad; minY -= pad; maxX += pad; maxY += pad;
       appState.selectionBounds = { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
 
@@ -1050,12 +1189,123 @@
       box.style.top = `${minY}px`;
       box.style.width = `${maxX - minX}px`;
       box.style.height = `${maxY - minY}px`;
+
       box.innerHTML = `
-        <div class="selection-handle -top-1 -left-1"></div>
-        <div class="selection-handle -top-1 -right-1"></div>
-        <div class="selection-handle -bottom-1 -left-1"></div>
-        <div class="selection-handle -bottom-1 -right-1"></div>
+        <div class="selection-handle selection-handle-nw" data-handle="nw" title="缩放"></div>
+        <div class="selection-handle selection-handle-ne" data-handle="ne" title="缩放"></div>
+        <div class="selection-handle selection-handle-se" data-handle="se" title="缩放"></div>
+        <div class="selection-handle selection-handle-sw" data-handle="sw" title="缩放"></div>
+        <button class="selection-delete-btn" title="删除 (Delete)">✕</button>
       `;
+
+      // ✕ 删除徽章
+      const delBtn = box.querySelector('.selection-delete-btn');
+      delBtn.onclick = (e) => {
+        e.stopPropagation();
+        deleteSelectedItems();
+      };
+
+      // 整体框拖拽（移动平移）
+      box.onpointerdown = (e) => {
+        if (e.target.dataset.handle || e.target === delBtn) return;
+        e.stopPropagation();
+        e.preventDefault();
+        saveHistory();
+        appState.isDraggingSelection = true;
+        appState.dragStartPos = getCanvasCoordinates(e);
+
+        const onBoxMove = (me) => {
+          me.preventDefault();
+          const curPos = getCanvasCoordinates(me);
+          const dx = curPos.x - appState.dragStartPos.x;
+          const dy = curPos.y - appState.dragStartPos.y;
+          appState.dragStartPos = curPos;
+          for (const s of (appState.selectedStrokes || [])) {
+            for (const pt of s.points) { pt.x += dx; pt.y += dy; }
+          }
+          for (const t of (appState.selectedTexts || [])) {
+            t.x += dx; t.y += dy;
+          }
+          for (const im of (appState.selectedImages || [])) {
+            im.x += dx; im.y += dy;
+          }
+          redrawAllStrokes();
+          updateSelectionBoxUI();
+        };
+
+        const onBoxUp = () => {
+          appState.isDraggingSelection = false;
+          window.removeEventListener('pointermove', onBoxMove);
+          window.removeEventListener('pointerup', onBoxUp);
+        };
+
+        window.addEventListener('pointermove', onBoxMove);
+        window.addEventListener('pointerup', onBoxUp);
+      };
+
+      // 4 角手柄等比缩放
+      box.querySelectorAll('.selection-handle').forEach(handle => {
+        handle.onpointerdown = (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          saveHistory();
+          const handleType = handle.dataset.handle;
+          const startPos = getCanvasCoordinates(e);
+
+          const snapImgs = (appState.selectedImages || []).map(im => ({ ref: im, x: im.x, y: im.y, w: im.width, h: im.height }));
+          const snapTexts = (appState.selectedTexts || []).map(t => ({ ref: t, size: t.size }));
+
+          const onHandleMove = (me) => {
+            me.preventDefault();
+            const cur = getCanvasCoordinates(me);
+            const dx = cur.x - startPos.x;
+
+            for (const item of snapImgs) {
+              const ratio = item.h / item.w;
+              if (handleType === 'se') {
+                const nw = Math.max(30, Math.round(item.w + dx));
+                item.ref.width = nw;
+                item.ref.height = Math.max(20, Math.round(nw * ratio));
+              } else if (handleType === 'sw') {
+                const nw = Math.max(30, Math.round(item.w - dx));
+                item.ref.x = item.x + (item.w - nw);
+                item.ref.width = nw;
+                item.ref.height = Math.max(20, Math.round(nw * ratio));
+              } else if (handleType === 'ne') {
+                const nw = Math.max(30, Math.round(item.w + dx));
+                const nh = Math.max(20, Math.round(nw * ratio));
+                item.ref.y = item.y + (item.h - nh);
+                item.ref.width = nw;
+                item.ref.height = nh;
+              } else if (handleType === 'nw') {
+                const nw = Math.max(30, Math.round(item.w - dx));
+                const nh = Math.max(20, Math.round(nw * ratio));
+                item.ref.x = item.x + (item.w - nw);
+                item.ref.y = item.y + (item.h - nh);
+                item.ref.width = nw;
+                item.ref.height = nh;
+              }
+            }
+
+            for (const item of snapTexts) {
+              const delta = (handleType === 'se' || handleType === 'ne') ? dx : -dx;
+              item.ref.size = Math.max(12, Math.min(120, Math.round(item.size + delta * 0.2)));
+            }
+
+            redrawAllStrokes();
+            updateSelectionBoxUI();
+          };
+
+          const onHandleUp = () => {
+            window.removeEventListener('pointermove', onHandleMove);
+            window.removeEventListener('pointerup', onHandleUp);
+          };
+
+          window.addEventListener('pointermove', onHandleMove);
+          window.addEventListener('pointerup', onHandleUp);
+        };
+      });
+
       selectionOverlay.appendChild(box);
     }
 
@@ -1065,6 +1315,27 @@
       appState.selectedImages = [];
       appState.selectionBounds = null;
       selectionOverlay.innerHTML = '';
+    }
+
+    function deleteSelectedItems() {
+      if ((!appState.selectedStrokes || appState.selectedStrokes.length === 0) &&
+          (!appState.selectedTexts || appState.selectedTexts.length === 0) &&
+          (!appState.selectedImages || appState.selectedImages.length === 0)) return;
+      saveHistory();
+      if (appState.selectedStrokes && appState.selectedStrokes.length > 0) {
+        const selSet = new Set(appState.selectedStrokes);
+        appState.strokes = appState.strokes.filter(s => !selSet.has(s));
+      }
+      if (appState.selectedTexts && appState.selectedTexts.length > 0) {
+        const selSet = new Set(appState.selectedTexts);
+        appState.texts = appState.texts.filter(t => !selSet.has(t));
+      }
+      if (appState.selectedImages && appState.selectedImages.length > 0) {
+        const selSet = new Set(appState.selectedImages);
+        appState.images = appState.images.filter(im => !selSet.has(im));
+      }
+      clearSelection();
+      redrawAllStrokes();
     }
 
     // 自由打字工具 (Text Tool)
@@ -1130,6 +1401,63 @@
 
       if (appState.tool === 'text') {
         createInlineTextInput(pos.x, pos.y);
+        return;
+      }
+
+      if (appState.tool === 'select') {
+        if (appState.selectionBounds &&
+            pos.x >= appState.selectionBounds.x &&
+            pos.x <= appState.selectionBounds.x + appState.selectionBounds.width &&
+            pos.y >= appState.selectionBounds.y &&
+            pos.y <= appState.selectionBounds.y + appState.selectionBounds.height) {
+          saveHistory();
+          appState.isDraggingSelection = true;
+          appState.dragStartPos = pos;
+          return;
+        }
+
+        // 优先点选最顶层的图片
+        let hitImg = null;
+        for (let i = appState.images.length - 1; i >= 0; i--) {
+          const im = appState.images[i];
+          if (pos.x >= im.x && pos.x <= im.x + im.width && pos.y >= im.y && pos.y <= im.y + im.height) {
+            hitImg = im;
+            break;
+          }
+        }
+        if (hitImg) {
+          saveHistory();
+          appState.selectedImages = [hitImg];
+          appState.selectedTexts = [];
+          appState.selectedStrokes = [];
+          updateSelectionBoxUI();
+          appState.isDraggingSelection = true;
+          appState.dragStartPos = pos;
+          return;
+        }
+
+        // 点选文字
+        let hitText = null;
+        for (let i = appState.texts.length - 1; i >= 0; i--) {
+          const t = appState.texts[i];
+          const estW = Math.max(30, (t.text ? t.text.length : 4) * t.size * 0.7);
+          if (pos.x >= t.x && pos.x <= t.x + estW && pos.y >= t.y - t.size && pos.y <= t.y + 6) {
+            hitText = t;
+            break;
+          }
+        }
+        if (hitText) {
+          saveHistory();
+          appState.selectedTexts = [hitText];
+          appState.selectedImages = [];
+          appState.selectedStrokes = [];
+          updateSelectionBoxUI();
+          appState.isDraggingSelection = true;
+          appState.dragStartPos = pos;
+          return;
+        }
+
+        clearSelection();
         return;
       }
 
@@ -1325,15 +1653,22 @@
         }
         const x = posX !== undefined ? posX - w/2 : (cssWidth - w)/2;
         const y = posY !== undefined ? posY - h/2 : (cssHeight - h)/2;
-        appState.images.push({
+        const newImg = {
           id: Date.now() + Math.random(),
           img: img,
-          x: Math.max(10, x),
-          y: Math.max(10, y),
+          x: Math.max(10, Math.round(x)),
+          y: Math.max(10, Math.round(y)),
           width: w,
           height: h
-        });
+        };
+        appState.images.push(newImg);
+        appState.tool = 'select';
+        updateToolButtonsUI();
+        appState.selectedImages = [newImg];
+        appState.selectedTexts = [];
+        appState.selectedStrokes = [];
         redrawAllStrokes();
+        updateSelectionBoxUI();
       };
       img.src = src;
     }
@@ -1428,13 +1763,15 @@
       }
     };
 
-    // 键盘快捷键 (P/E/L/T/Ctrl+Z/Space)
+    // 键盘快捷键 (V/P/E/L/T/Ctrl+Z/Delete/Space)
     window.addEventListener('keydown', (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       const key = e.key.toLowerCase();
       if ((e.ctrlKey || e.metaKey) && key === 'z') {
         e.preventDefault();
         document.getElementById('btnUndo').click();
+      } else if (key === 'v') {
+        appState.tool = 'select'; updateToolButtonsUI();
       } else if (key === 'p') {
         appState.tool = 'pen'; updateToolButtonsUI();
       } else if (key === 'e') {
@@ -1443,6 +1780,13 @@
         appState.tool = 'lasso'; updateToolButtonsUI();
       } else if (key === 't') {
         appState.tool = 'text'; updateToolButtonsUI();
+      } else if (key === 'delete' || key === 'backspace') {
+        if ((appState.selectedImages && appState.selectedImages.length > 0) ||
+            (appState.selectedTexts && appState.selectedTexts.length > 0) ||
+            (appState.selectedStrokes && appState.selectedStrokes.length > 0)) {
+          e.preventDefault();
+          deleteSelectedItems();
+        }
       } else if (e.code === 'Space') {
         appState.isSpaceDown = true;
         workbenchWrapper.style.cursor = 'grab';
@@ -1738,7 +2082,8 @@
       document.querySelectorAll('.tool-btn').forEach(btn => {
         btn.classList.toggle('tool-btn-active', btn.dataset.tool === appState.tool);
       });
-      if (appState.tool !== 'lasso') clearSelection();
+      if (appState.tool !== 'lasso' && appState.tool !== 'select') clearSelection();
+      canvasCard.style.cursor = appState.tool === 'select' ? 'default' : (appState.tool === 'lasso' ? 'crosshair' : 'crosshair');
     }
 
     document.querySelectorAll('.tool-btn').forEach(btn => {
@@ -1862,6 +2207,29 @@
         const key = el.getAttribute('data-i18n');
         if (dict[key]) el.textContent = dict[key];
       });
+      const isLight = document.body.classList.contains('theme-light');
+      if (themeLabel) themeLabel.innerText = isLight ? (dict.theme_light || '白天') : (dict.theme_dark || '夜间');
+    }
+
+    // 白天 / 夜间模式控制 (Day/Night Theme)
+    const btnThemeToggle = document.getElementById('btnThemeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeLabel = document.getElementById('themeLabel');
+
+    function applyTheme(theme) {
+      const isLight = theme === 'light';
+      document.body.classList.toggle('theme-light', isLight);
+      if (themeIcon) themeIcon.innerText = isLight ? '☀️' : '🌙';
+      const dict = TRANSLATIONS[appState.lang] || TRANSLATIONS.zh;
+      if (themeLabel) themeLabel.innerText = isLight ? (dict.theme_light || '白天') : (dict.theme_dark || '夜间');
+      localStorage.setItem('eazyopc_theme', theme);
+    }
+
+    if (btnThemeToggle) {
+      btnThemeToggle.onclick = () => {
+        const isLight = document.body.classList.contains('theme-light');
+        applyTheme(isLight ? 'dark' : 'light');
+      };
     }
 
     const btnLangDropdown = document.getElementById('btnLangDropdown');
@@ -1906,6 +2274,8 @@
     window.addEventListener('DOMContentLoaded', () => {
       const savedLang = localStorage.getItem('user_lang_pref') || 'zh';
       setLanguage(savedLang);
+      const savedTheme = localStorage.getItem('eazyopc_theme') || 'dark';
+      applyTheme(savedTheme);
       activeColorDot.style.backgroundColor = appState.currentColor;
       resizeCanvas();
     });
