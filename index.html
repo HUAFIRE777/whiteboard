@@ -7525,6 +7525,9 @@ ${pathsSvg}</svg>`;
       btn.onclick = () => {
         appState.tool = btn.dataset.tool;
         updateToolButtonsUI();
+        // Picking a tool in the 「更多工具」 drawer closes it, so the next tap reaches the board (the drawer covers it on phones)
+        const drawer = btn.closest('#moreToolsDrawer');
+        if (drawer) drawer.classList.add('hidden');
       };
     });
 
