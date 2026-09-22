@@ -5041,7 +5041,7 @@
 
     function loadPage(index) {
       if (index < 0 || index >= appState.pages.length) return;
-      if (typeof activeStickyEditor !== 'undefined' && activeStickyEditor) activeStickyEditor.commit();
+      commitOpenEditors();
       syncCurrentPageToState();
       appState.currentPageIndex = index;
       const p = appState.pages[index];
@@ -5234,7 +5234,7 @@
       };
 
       refCanvas.addEventListener('pointerdown', (e) => {
-        if (activeStickyEditor) activeStickyEditor.commit();
+        commitOpenEditors();
         closeAllFlyouts();
         const tool = appState.tool;
 
@@ -5443,7 +5443,15 @@
     }
 
     // ✏️ 沉浸式行内富文本编辑器 (支持 9 款开源商用字体、实时字号/变色/粗体/多行编辑)
+    // The open inline text editor (null when closed). Anything that leaves the editor commits it, so typed text is never lost.
+    let activeTextEditor = null;
+    function commitOpenEditors() {
+      try { if (activeTextEditor) activeTextEditor.commit(); } catch (_) {}
+      try { if (activeStickyEditor) activeStickyEditor.commit(); } catch (_) {}
+    }
+
     function openRichTextEditor(targetText, posX, posY) {
+      if (activeTextEditor) activeTextEditor.commit();
       const existing = document.getElementById('inlineCanvasTextWrapper');
       if (existing) existing.remove();
 
@@ -5554,9 +5562,17 @@
         textarea.style.color = currentColor;
       };
 
+      let closed = false;
       function commitAndClose() {
+        if (closed) return;
+        closed = true;
+        activeTextEditor = null;
         const val = textarea.value.trim();
-        saveHistory();
+        const changed = targetText
+          ? (val !== targetText.text || currentFont !== targetText.fontFamily || currentSize !== Number(targetText.size) || currentColor !== targetText.color || isBold !== !!targetText.bold)
+          : !!val;
+        if (changed) saveHistory();
+        else if (targetText) delete targetText._editing;
         if (targetText) {
           if (val) {
             targetText.text = val;
@@ -5590,7 +5606,13 @@
         wrapper.remove();
         redrawAllStrokes();
         updateSelectionBoxUI();
+        if (changed && typeof scheduleAutosave === 'function') scheduleAutosave();
       }
+      activeTextEditor = { commit: commitAndClose, target: targetText };
+      // Focus leaving the editor (header button, dock, another input...) commits it
+      wrapper.addEventListener('focusout', () => {
+        setTimeout(() => { if (!closed && !wrapper.contains(document.activeElement)) commitAndClose(); }, 0);
+      });
 
       btnDone.onclick = (e) => {
         e.stopPropagation();
@@ -5802,9 +5824,19 @@
 
     let activePointerId = null; // pointer that owns the current stroke / eraser / lasso gesture
 
+    // Any press outside the inline text editor commits it (canvas presses are preventDefault-ed, so no blur happens).
+    // With the text tool a press on the board only finishes the text; the next press starts a new one.
+    window.addEventListener('pointerdown', (e) => {
+      if (!activeTextEditor) return;
+      const w = document.getElementById('inlineCanvasTextWrapper');
+      if (w && w.contains(e.target)) return;
+      activeTextEditor.commit();
+      if (appState.tool === 'text' && e.target === canvas) { e.preventDefault(); e.stopPropagation(); }
+    }, true);
+
     canvas.addEventListener('pointerdown', (e) => {
       // Clicking the canvas finishes an open sticky-note edit first (preventDefault below keeps focus from moving)
-      if (activeStickyEditor) activeStickyEditor.commit();
+      commitOpenEditors();
       // A second pointer while drawing: ignore it; a second finger turns the gesture into a multi-touch
       // gesture (two-finger tap = undo), so the half-drawn stroke is discarded instead of zig-zagging.
       if (isDrawing && activePointerId !== null && e.pointerId !== activePointerId) {
@@ -6604,7 +6636,7 @@
     if (clearAllBtnElem) {
       clearAllBtnElem.onclick = () => {
         if (!confirm(i18nText('confirm_clear_all', '确认清空当前画板吗？所有笔触、文字、图片与便签将被清除。'))) return;
-        if (activeStickyEditor) activeStickyEditor.commit();
+        commitOpenEditors();
         if (appState.isDualSpread && appState.lastActiveBoard === 'left') {
           saveLeftHistory();
           const p0 = appState.pages[0];
@@ -6759,7 +6791,7 @@
     }
 
     function exportImageCanvas(scaleFactor = 2, withWatermark = false, isTransparent = false) {
-      if (activeStickyEditor) activeStickyEditor.commit();
+      commitOpenEditors();
       const offCanvas = document.createElement('canvas');
       const longIsW = cssWidth >= cssHeight;
       const longPx = Math.round(Math.max(cssWidth, cssHeight) * scaleFactor);
@@ -6972,7 +7004,7 @@ ${pathsSvg}</svg>`;
         showToast(i18nText('toast_pdf_loading', 'PDF 组件加载中，请稍后再试'));
         return;
       }
-      if (activeStickyEditor) activeStickyEditor.commit();
+      commitOpenEditors();
       const { jsPDF } = window.jspdf;
       const pageMm = getPdfPageSizeMm();
       const isLandscape = pageMm[0] >= pageMm[1];
@@ -7065,7 +7097,7 @@ ${pathsSvg}</svg>`;
     }
 
     function saveWorkFile() {
-      if (activeStickyEditor) activeStickyEditor.commit();
+      commitOpenEditors();
       const doc = buildDocumentObject(true);
       doc.currentPageIndex = appState.isDualSpread ? 0 : appState.currentPageIndex;
       if (typeof getActiveBoardName === 'function') doc.name = getActiveBoardName();
@@ -7083,7 +7115,7 @@ ${pathsSvg}</svg>`;
 
     // Replaces the whole current board (all pages) with `doc`; leaves dual mode and lands on page 1
     function loadDocumentIntoApp(doc) {
-      if (activeStickyEditor) activeStickyEditor.commit();
+      commitOpenEditors();
       if (appState.isDualSpread) {
         appState.isDualSpread = false;
         updateDualToggleUI();
@@ -8415,7 +8447,7 @@ ${pathsSvg}</svg>`;
 
     function openStickyEditor(st) {
       if (!st || !isStickyItem(st)) return;
-      if (activeStickyEditor) activeStickyEditor.commit();
+      commitOpenEditors();
       clearSelection();
       const ta = document.createElement('textarea');
       ta.className = 'wb-sticky-editor';
@@ -8985,7 +9017,7 @@ ${pathsSvg}</svg>`;
         document.getElementById('proModal').classList.remove('hidden');
         return false;
       }
-      if (activeStickyEditor) activeStickyEditor.commit();
+      commitOpenEditors();
       const { W, H, items } = tpl.build();
       const k = Math.min(1.3, (cssWidth - 40) / W, (cssHeight - 40) / H);
       const ox = (cssWidth - W * k) / 2, oy = (cssHeight - H * k) / 2;
@@ -9141,7 +9173,7 @@ ${pathsSvg}</svg>`;
 
     // Stores the live document under the active board's own key and returns its raw JSON (null on quota failure)
     function stashActiveBoard() {
-      if (activeStickyEditor) activeStickyEditor.commit();
+      commitOpenEditors();
       flushAutosave();
       let raw = null;
       try { raw = localStorage.getItem(AUTOSAVE_KEY); } catch (_) { raw = null; }
