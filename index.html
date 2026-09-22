@@ -222,6 +222,12 @@
       touch-action: none;
       box-shadow: 0 1px 3px rgba(0,0,0,0.25);
       z-index: 10;
+      /* --sel-inv undoes the board's zoom / dual-view shrink so handles keep their on-screen size */
+      transform: scale(var(--sel-inv, 1));
+    }
+    /* Fingers need a bigger target than the 9px handle */
+    @media (pointer: coarse) {
+      .selection-handle::after, .selection-rot-handle::after { content: ''; position: absolute; inset: -9px; border-radius: 50%; }
     }
     .selection-handle-nw { top: -5px; left: -5px; cursor: nwse-resize; }
     .selection-handle-ne { top: -5px; right: -5px; cursor: nesw-resize; }
@@ -235,19 +241,19 @@
     /* 360° 旋转杆与旋转球手柄 */
     .selection-rot-stem {
       position: absolute;
-      top: -24px;
+      top: calc(-24px * var(--sel-inv, 1));
       left: 50%;
       width: 1.5px;
-      height: 24px;
+      height: calc(24px * var(--sel-inv, 1));
       background-color: #2563eb;
       pointer-events: none;
       transform: translateX(-50%);
     }
     .selection-rot-handle {
       position: absolute;
-      top: -32px;
+      top: calc(-32px * var(--sel-inv, 1));
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) scale(var(--sel-inv, 1));
       width: 13px;
       height: 13px;
       background: #ffffff;
@@ -260,9 +266,11 @@
       z-index: 12;
       transition: transform 0.12s ease, background-color 0.12s ease;
     }
+    .selection-box.rot-below .selection-rot-stem { top: auto; bottom: calc(-24px * var(--sel-inv, 1)); }
+    .selection-box.rot-below .selection-rot-handle { top: auto; bottom: calc(-32px * var(--sel-inv, 1)); }
     .selection-rot-handle:hover,
     .selection-rot-handle:active {
-      transform: translateX(-50%) scale(1.3);
+      transform: translateX(-50%) scale(calc(1.3 * var(--sel-inv, 1)));
       background: #2563eb;
       cursor: grabbing;
     }
@@ -4525,10 +4533,19 @@
         if (im.y + im.height > maxY) maxY = im.y + im.height;
       }
 
+      // On-screen px per board px (zoom, dual-view shrink): handles and the pill are counter-scaled to stay usable
+      const cardRect = canvasCard.getBoundingClientRect();
+      const inv = cardRect.width > 0 ? Math.min(3, Math.max(0.3, cssWidth / cardRect.width)) : 1;
+      selectionOverlay.style.setProperty('--sel-inv', String(inv));
+
       const pad = 6;
       minX -= pad; minY -= pad; maxX += pad; maxY += pad;
-      const boxW = Math.max(20, maxX - minX);
-      const boxH = Math.max(20, maxY - minY);
+      // A thin line gets a box big enough to grab (centred on it) instead of a 20px strip that is all handles
+      const MIN_BOX = 36 * inv;
+      if (maxX - minX < MIN_BOX) { const c = (minX + maxX) / 2; minX = c - MIN_BOX / 2; maxX = c + MIN_BOX / 2; }
+      if (maxY - minY < MIN_BOX) { const c = (minY + maxY) / 2; minY = c - MIN_BOX / 2; maxY = c + MIN_BOX / 2; }
+      const boxW = maxX - minX;
+      const boxH = maxY - minY;
       appState.selectionBounds = { x: minX, y: minY, width: boxW, height: boxH };
 
       const box = document.createElement('div');
@@ -4573,6 +4590,10 @@
           <button class="btn-pill-delete" title="删除 (Delete)">🗑️ 删除</button>
         </div>
       `;
+
+      // Edge (stretch) handles would sit on top of the middle of a small box, where people press to drag it
+      if (boxH < 56 * inv) box.querySelectorAll('.selection-handle-n, .selection-handle-s').forEach(h => h.remove());
+      if (boxW < 56 * inv) box.querySelectorAll('.selection-handle-e, .selection-handle-w').forEach(h => h.remove());
 
       // 绑定动作胶囊事件
       const btnEditText = box.querySelector('.btn-pill-edit-text');
@@ -4879,9 +4900,14 @@
 
       // The board clips everything outside it: keep the action pill inside the board even when the
       // selection touches the bottom edge or is wider/taller than the board (it used to vanish there)
+      // No room above the box (it touches the board top): the rotation handle moves below, where it isn't clipped
+      const rotBelow = minY < 40 * inv && minY + boxH + 40 * inv <= cssHeight;
+      if (rotBelow) box.classList.add('rot-below');
       const pill = box.querySelector('.selection-action-pill');
       if (pill) {
-        const pw = pill.offsetWidth || 0, ph = pill.offsetHeight || 26;
+        // On a small (e.g. dual-view phone) board the pill may be wider than the board: shrink it to fit
+        const pScale = Math.min(inv, (cssWidth - 8) / Math.max(1, pill.offsetWidth || 1));
+        const pw = (pill.offsetWidth || 0) * pScale, ph = (pill.offsetHeight || 26) * pScale;
         // The floating page dock covers the bottom of the board: treat its top edge as the usable bottom
         let limitY = cssHeight;
         const pdock = document.getElementById('pageManagerDock');
@@ -4890,13 +4916,18 @@
           if (dr.height && cr.height && dr.top < cr.bottom) limitY = Math.max(ph + 8, Math.min(cssHeight, (dr.top - cr.top) * cssHeight / cr.height));
         }
         const visBottom = Math.min(boxH, limitY - minY); // box-local y of the usable bottom
-        let top = (minY + boxH + 10 + ph <= limitY - 4) ? boxH + 10 : Math.max(-minY + 4, visBottom - ph - 8);
+        const gap = (rotBelow ? 46 : 10) * inv;
+        // below the box → above it (clear of the rotation handle) → inside the box as a last resort
+        const aboveTop = -44 * inv - ph;
+        let top = (minY + boxH + gap + ph <= limitY - 4) ? boxH + gap
+          : (minY + aboveTop >= 4 ? aboveTop : Math.max(-minY + 4, visBottom - ph - 8 * inv));
         let absLeft = minX + boxW / 2 - pw / 2;
         absLeft = Math.max(4, Math.min(cssWidth - pw - 4, absLeft));
         pill.style.top = `${top}px`;
         pill.style.bottom = 'auto';
         pill.style.left = `${absLeft - minX}px`;
-        pill.style.transform = 'none';
+        pill.style.transformOrigin = 'top left';
+        pill.style.transform = pScale !== 1 ? `scale(${pScale})` : 'none';
       }
     }
 
