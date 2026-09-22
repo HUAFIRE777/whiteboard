@@ -167,6 +167,14 @@
       display: flex !important;
     }
 
+    /* Hidden scrollbars for horizontally scrolling toolbars (mobile) */
+    .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    @media (max-width: 639px) {
+      body { overflow-x: clip; }
+      #topNavbar select { max-width: 132px; }
+    }
+
     /* 强对比度保障：无论白天黑夜，加页 '+' 符号与文字永远高光高亮呈现 */
     #btnAddPage, #btnAddPage * {
       color: #ffffff !important;
@@ -917,7 +925,7 @@
 <body class="flex flex-col font-sans theme-light">
 
   <!-- ================= 1. 顶部全局品牌导航栏 ================= -->
-  <header id="topNavbar" class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-3 sm:px-6 py-2.5 flex items-center justify-between gap-2 transition-all">
+  <header id="topNavbar" class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-2 sm:px-6 py-2.5 flex items-center justify-between gap-1.5 sm:gap-2 transition-all">
     <div class="flex items-center gap-3 flex-shrink-0">
       <a href="https://eazyopc.com" class="flex items-center gap-2 group" title="EazyOPC Home">
         <!-- 专属矢量 Logo -->
@@ -944,15 +952,15 @@
         <div>
           <div class="text-sm font-extrabold tracking-tight text-white flex items-center gap-1.5 leading-none">
             <span>Whiteboard</span>
-            <span class="text-[10px] font-semibold px-1.5 py-0.2 bg-indigo-500/20 text-indigo-300 rounded">by EazyOPC</span>
+            <span class="hidden sm:inline text-[10px] font-semibold px-1.5 py-0.2 bg-indigo-500/20 text-indigo-300 rounded">by EazyOPC</span>
           </div>
           <span class="text-[10px] text-slate-400 hidden sm:inline leading-none" data-i18n="site_subtitle">极简点阵与灵感便签白板</span>
         </div>
       </a>
     </div>
 
-    <!-- 中部控制：画幅比例选择 & 底纹预设 -->
-    <div class="flex items-center gap-2 overflow-x-auto py-1">
+    <!-- 中部控制：画幅比例选择 & 底纹预设 (scrolls horizontally inside itself on small screens) -->
+    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 min-w-0 flex-1 sm:flex-none">
       <div class="flex items-center gap-1 bg-slate-800/90 border border-slate-700/80 rounded-xl px-2 py-1 flex-shrink-0">
         <span class="text-[11px] text-slate-400 font-medium">📐 <span class="hidden md:inline" data-i18n="lbl_ratio">画幅</span>:</span>
         <select id="ratioSelector" class="bg-transparent text-slate-200 text-xs outline-none cursor-pointer font-medium max-w-[160px] sm:max-w-[200px]">
@@ -1009,15 +1017,15 @@
         <span class="hidden sm:inline" data-i18n="fullscreen">全屏</span>
       </button>
 
-      <button id="btnExport" class="flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-lg transition-transform active:scale-95">
+      <button id="btnExport" class="flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold p-1.5 sm:px-3 sm:py-1.5 rounded-xl shadow-lg transition-transform active:scale-95" title="Export">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-        <span data-i18n="export">导出</span>
+        <span class="hidden sm:inline" data-i18n="export">导出</span>
       </button>
 
       <div class="relative">
-        <button id="btnLangDropdown" class="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs cursor-pointer border border-slate-700">
+        <button id="btnLangDropdown" class="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs cursor-pointer border border-slate-700">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
-          <span id="currentLangLabel">中</span> <span>▾</span>
+          <span id="currentLangLabel">中</span> <span class="hidden sm:inline">▾</span>
         </button>
         <div id="langMenu" class="hidden absolute right-0 mt-1 w-32 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-1 z-50 flex flex-col gap-0.5 text-xs text-slate-200">
           <button class="lang-opt text-left px-2.5 py-1.5 hover:bg-indigo-600 rounded-xl transition" data-lang="zh">🇨🇳 简体中文</button>
@@ -1030,9 +1038,9 @@
         </div>
       </div>
 
-      <button id="btnTopProBadge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/15 border border-amber-500/30 hover:bg-amber-500/25 text-amber-300 rounded-xl text-xs font-semibold transition">
+      <button id="btnTopProBadge" class="flex items-center gap-1.5 p-1.5 sm:px-2.5 sm:py-1 bg-amber-500/15 border border-amber-500/30 hover:bg-amber-500/25 text-amber-300 rounded-xl text-xs font-semibold transition">
         <svg class="w-3 h-3 text-amber-400 inline-block" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-        <span id="proBadgeLabel">Pro</span>
+        <span id="proBadgeLabel" class="hidden sm:inline">Pro</span>
       </button>
     </div>
   </header>
@@ -1469,13 +1477,13 @@
     </div>
 
     <!-- 中下方悬浮多页/漫画纸张管理器 (Page Manager Dock) -->
-    <div id="pageManagerDock" class="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 px-3 py-1.5 rounded-full shadow-xl text-xs text-slate-200 whitespace-nowrap flex-nowrap shrink-0 max-w-[92vw] select-none">
+    <div id="pageManagerDock" class="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 flex items-center gap-0.5 sm:gap-1.5 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 px-1.5 sm:px-3 py-1.5 rounded-full shadow-xl text-xs text-slate-200 whitespace-nowrap flex-nowrap shrink-0 max-w-[94vw] overflow-x-auto no-scrollbar select-none">
       <button id="btnPrevPage" class="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition" title="上一页 (◀)">◀</button>
-      <span id="pageIndicator" class="font-bold font-mono whitespace-nowrap tracking-wide shrink-0 px-2 text-xs text-indigo-400">第 1 / 1 页</span>
+      <span id="pageIndicator" class="font-bold font-mono whitespace-nowrap tracking-wide shrink-0 px-1 sm:px-2 text-[10px] sm:text-xs text-indigo-400">第 1 / 1 页</span>
       <button id="btnNextPage" class="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition" title="下一页 (▶)">▶</button>
       <span class="text-slate-700">|</span>
-      <button id="btnAddPage" class="flex items-center gap-1.5 px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow transition active:scale-95" title="新建空白白板页 (+)"><svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span data-i18n="add_page" class="text-white font-bold">加页</span></button>
-      <button id="btnToggleDualView" class="flex items-center gap-1 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold shadow transition active:scale-95" title="双板并排独立书写模式 (支持同时独立书写左侧与右侧画板)"><span>📖</span><span id="lblDualView" data-i18n="dual_view">双板并排</span></button>
+      <button id="btnAddPage" class="shrink-0 flex items-center gap-1.5 px-2 sm:px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow transition active:scale-95" title="新建空白白板页 (+)"><svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span data-i18n="add_page" class="hidden sm:inline text-white font-bold">加页</span></button>
+      <button id="btnToggleDualView" class="shrink-0 flex items-center gap-1 px-2 sm:px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold shadow transition active:scale-95" title="双板并排独立书写模式 (支持同时独立书写左侧与右侧画板)"><span>📖</span><span id="lblDualView" class="hidden sm:inline" data-i18n="dual_view">双板并排</span></button>
       <button id="btnDeletePage" class="p-1 hover:bg-rose-900/40 text-slate-400 hover:text-rose-400 rounded-lg text-xs transition" title="删除当前页面">🗑️</button>
     </div>
 
@@ -3349,6 +3357,16 @@
       let maxW = Math.max(300, containerRect.width - (document.body.classList.contains('is-fullscreen') ? 0 : 32));
       let maxH = Math.max(300, containerRect.height - (document.body.classList.contains('is-fullscreen') ? 0 : 32));
 
+      // Small screens: keep the canvas clear of the left tool dock (reserve its width and shift the stage)
+      const stageEl = document.getElementById('artboardStage');
+      const dockEl = document.getElementById('leftSidebar');
+      let dockReserve = 0;
+      if (window.innerWidth < 640 && dockEl && !document.body.classList.contains('is-fullscreen')) {
+        dockReserve = Math.round(dockEl.getBoundingClientRect().width || 0) + 4;
+        maxW = Math.max(200, containerRect.width - 16 - dockReserve);
+      }
+      if (stageEl) stageEl.style.marginLeft = dockReserve ? `${dockReserve}px` : '';
+
       // Logical page size is computed as in single mode; dual mode only scales the display (see below)
       const singleMaxW = maxW;
 
@@ -4596,10 +4614,11 @@
       const rightBadge = document.getElementById('rightPageBadge');
       if (btn) {
         if (appState.isDualSpread) {
-          btn.className = 'dual-active flex items-center gap-1 px-2.5 py-1 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg transition active:scale-95';
+          btn.className = 'dual-active shrink-0 flex items-center gap-1 px-2 sm:px-2.5 py-1 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg transition active:scale-95';
         } else {
-          btn.className = 'flex items-center gap-1 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold shadow transition active:scale-95';
+          btn.className = 'shrink-0 flex items-center gap-1 px-2 sm:px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold shadow transition active:scale-95';
         }
+        btn.title = appState.isDualSpread ? i18nText('single_view', '单板模式') : i18nText('dual_view', '双板并排');
       }
       if (lbl) {
         lbl.textContent = appState.isDualSpread ? i18nText('single_view', '单板模式') : i18nText('dual_view', '双板并排');
