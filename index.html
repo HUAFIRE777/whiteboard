@@ -2917,6 +2917,151 @@
       return !!tool && !NON_STROKE_TOOLS.has(tool);
     }
 
+    // ================= 💾 Local autosave (all pages + sticky notes) =================
+    // Stored: pages (strokes, texts, images as src data URLs), current page index, paper, ratio, sticky notes.
+    // Not stored: undo/redo stacks, videos (object URLs cannot survive a reload).
+    const AUTOSAVE_KEY = 'eazyopc_whiteboard_doc_v1';
+    let autosaveTimer = null;
+    let autosaveReady = false; // becomes true after the saved document was restored on load
+
+    function scheduleAutosave() {
+      if (!autosaveReady) return;
+      clearTimeout(autosaveTimer);
+      autosaveTimer = setTimeout(flushAutosave, 800);
+    }
+
+    function serializeImageForSave(im) {
+      const src = im && im.img ? (im.img.currentSrc || im.img.src) : (im && im.src);
+      if (!src) return null;
+      return { id: im.id, src, x: im.x, y: im.y, width: im.width, height: im.height, rotation: im.rotation || 0 };
+    }
+
+    function serializePageForSave(p, withImages) {
+      return {
+        id: p.id,
+        strokes: p.strokes || [],
+        texts: (p.texts || []).map(t => { const c = { ...t }; delete c._editing; return c; }),
+        images: withImages ? (p.images || []).map(serializeImageForSave).filter(Boolean) : []
+      };
+    }
+
+    function collectStickyNotesForSave() {
+      const layer = document.getElementById('stickyLayer');
+      if (!layer) return [];
+      return Array.from(layer.querySelectorAll('.wb-sticky')).map(n => {
+        const ta = n.querySelector('textarea');
+        return {
+          left: parseFloat(n.style.left) || 0,
+          top: parseFloat(n.style.top) || 0,
+          bg: n.dataset.bg || '#fef08a',
+          border: n.dataset.border || '#fde047',
+          text: ta ? ta.value : ''
+        };
+      });
+    }
+
+    function flushAutosave() {
+      clearTimeout(autosaveTimer);
+      autosaveTimer = null;
+      if (!autosaveReady) return;
+      try {
+        // Read the live page from appState without mutating appState.pages
+        const cur = appState.currentPageIndex;
+        const pages = appState.pages.map((p, idx) => (idx === cur
+          ? { id: p.id, strokes: appState.strokes, texts: appState.texts, images: appState.images }
+          : p));
+        const build = (withImages) => JSON.stringify({
+          v: 1,
+          savedAt: Date.now(),
+          currentPageIndex: cur,
+          paper: appState.paper,
+          ratio: appState.ratio,
+          pages: pages.map(pg => serializePageForSave(pg, withImages)),
+          stickies: collectStickyNotesForSave()
+        });
+        try {
+          localStorage.setItem(AUTOSAVE_KEY, build(true));
+        } catch (quotaErr) {
+          // Most likely the quota: keep strokes/texts, drop embedded images
+          try { localStorage.setItem(AUTOSAVE_KEY, build(false)); } catch (_) {}
+        }
+      } catch (_) { /* never let autosave break drawing */ }
+    }
+
+    function restoreAutosave() {
+      let doc = null;
+      try {
+        const raw = localStorage.getItem(AUTOSAVE_KEY);
+        if (raw) doc = JSON.parse(raw);
+      } catch (_) { doc = null; }
+      if (!doc || !Array.isArray(doc.pages) || doc.pages.length === 0) return false;
+
+      const onImgLoad = () => {
+        redrawAllStrokes();
+        if (appState.isDualSpread) renderReferenceBoard();
+      };
+      const rebuildImages = (list) => (Array.isArray(list) ? list : [])
+        .filter(im => im && typeof im.src === 'string' && im.src)
+        .map(im => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = onImgLoad;
+          img.src = im.src;
+          return {
+            id: im.id || (Date.now() + Math.random()),
+            img,
+            x: Number(im.x) || 0,
+            y: Number(im.y) || 0,
+            width: Number(im.width) || 100,
+            height: Number(im.height) || 100,
+            rotation: Number(im.rotation) || 0
+          };
+        });
+
+      appState.pages = doc.pages.map((pg, i) => ({
+        id: (pg && pg.id) || (Date.now() + i),
+        strokes: pg && Array.isArray(pg.strokes) ? pg.strokes.filter(st => st && Array.isArray(st.points)) : [],
+        texts: pg && Array.isArray(pg.texts) ? pg.texts.filter(t => t && typeof t.text === 'string') : [],
+        images: rebuildImages(pg && pg.images),
+        history: [],
+        redoStack: []
+      }));
+      const idx = Math.min(Math.max(0, parseInt(doc.currentPageIndex, 10) || 0), appState.pages.length - 1);
+      appState.currentPageIndex = idx;
+      const live = appState.pages[idx];
+      appState.strokes = live.strokes.slice();
+      appState.texts = live.texts.slice();
+      appState.images = live.images.slice();
+      appState.history = [];
+      appState.redoStack = [];
+
+      const selectHas = (sel, val) => !!sel && Array.from(sel.options).some(o => o.value === val);
+      const paperSel = document.getElementById('paperSelector');
+      if (typeof doc.paper === 'string' && selectHas(paperSel, doc.paper)) {
+        appState.paper = doc.paper;
+        paperSel.value = doc.paper;
+      }
+      const ratioSel = document.getElementById('ratioSelector');
+      if (typeof doc.ratio === 'string' && selectHas(ratioSel, doc.ratio)) {
+        appState.ratio = doc.ratio;
+        ratioSel.value = doc.ratio;
+      }
+
+      if (Array.isArray(doc.stickies) && typeof addPastelStickyNote === 'function') {
+        for (const n of doc.stickies) {
+          if (n) addPastelStickyNote(n.bg || '#fef08a', n.border || '#fde047', n);
+        }
+      }
+      return true;
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') flushAutosave();
+    });
+    window.addEventListener('pagehide', flushAutosave);
+    // Any finished pointer gesture (drag, resize/rotate handles, sticky moves...) schedules a debounced save
+    window.addEventListener('pointerup', () => scheduleAutosave(), true);
+
     const canvas = document.getElementById('mainCanvas');
     const ctx = canvas.getContext('2d');
     const mainCtx = ctx;
@@ -4077,6 +4222,7 @@
       clearSelection();
       redrawAllStrokes();
       updatePageUI();
+      if (typeof scheduleAutosave === 'function') scheduleAutosave();
     }
 
     function addNewPage() {
@@ -5513,18 +5659,29 @@
       touchStartCount = 0;
     });
 
+    // "Clear all" (drawer button). In dual mode it clears the board that was used last.
     const clearAllBtnElem = document.getElementById('btnClearAll') || document.getElementById('btnClearAllDrawer');
     if (clearAllBtnElem) {
       clearAllBtnElem.onclick = () => {
-        if (confirm('确认清空画板吗？所有笔触、文字与图片将被清除。')) {
+        if (!confirm(i18nText('confirm_clear_all', '确认清空当前画板吗？所有笔触、文字、图片与便签将被清除。'))) return;
+        if (appState.isDualSpread && appState.lastActiveBoard === 'left') {
+          saveLeftHistory();
+          const p0 = appState.pages[0];
+          if (p0) { p0.strokes = []; p0.texts = []; p0.images = []; }
+          renderReferenceBoard();
+        } else {
           saveHistory();
           appState.strokes = [];
           appState.texts = [];
           appState.images = [];
           clearSelection();
-          if (typeof stickyLayer !== 'undefined' && stickyLayer) stickyLayer.innerHTML = '';
           redrawAllStrokes();
         }
+        if (typeof stickyLayer !== 'undefined' && stickyLayer) stickyLayer.innerHTML = '';
+        if (typeof renderLayersUI === 'function') renderLayersUI();
+        const drawer = document.getElementById('moreToolsDrawer');
+        if (drawer) drawer.classList.add('hidden');
+        flushAutosave(); // persist the cleared state immediately
       };
     }
 
@@ -6244,6 +6401,7 @@
       ratioSelector.onchange = (e) => {
         appState.ratio = e.target.value;
         resizeCanvas();
+        scheduleAutosave();
       };
     }
     const paperSelector = document.getElementById('paperSelector');
@@ -6254,6 +6412,8 @@
         if (typeof adaptPaperContrast === 'function') adaptPaperContrast(prevPaper, newPaper);
         appState.paper = newPaper;
         redrawAllStrokes();
+        if (appState.isDualSpread) renderReferenceBoard();
+        scheduleAutosave();
       };
     }
 
@@ -6410,13 +6570,16 @@
       };
     });
 
-    function addPastelStickyNote(bgColor, borderColor) {
-      saveHistory();
-      const cx = (cssWidth - 160) / 2 + (Math.random() - 0.5) * 60;
-      const cy = (cssHeight - 140) / 2 + (Math.random() - 0.5) * 60;
+    // restoreData (optional): { left, top, text } when re-creating a note from autosave
+    function addPastelStickyNote(bgColor, borderColor, restoreData = null) {
+      if (!restoreData) saveHistory();
+      const cx = restoreData ? (Number(restoreData.left) || 0) : (cssWidth - 160) / 2 + (Math.random() - 0.5) * 60;
+      const cy = restoreData ? (Number(restoreData.top) || 0) : (cssHeight - 140) / 2 + (Math.random() - 0.5) * 60;
 
       const note = document.createElement('div');
-      note.className = 'absolute p-3 rounded-xl shadow-lg cursor-move border select-none group pointer-events-auto transition-transform';
+      note.className = 'wb-sticky absolute p-3 rounded-xl shadow-lg cursor-move border select-none group pointer-events-auto transition-transform';
+      note.dataset.bg = bgColor;
+      note.dataset.border = borderColor;
       note.style.left = `${cx}px`;
       note.style.top = `${cy}px`;
       note.style.width = '160px';
@@ -6427,6 +6590,8 @@
       const textarea = document.createElement('textarea');
       textarea.className = 'w-full h-20 bg-transparent border-none outline-none resize-none text-xs font-sans text-stone-800 leading-relaxed';
       textarea.placeholder = '点击输入灵感便签...';
+      if (restoreData && typeof restoreData.text === 'string') textarea.value = restoreData.text;
+      textarea.addEventListener('input', () => scheduleAutosave());
       note.appendChild(textarea);
 
       const delBtn = document.createElement('button');
@@ -6436,6 +6601,7 @@
         e.stopPropagation();
         note.remove();
         renderLayersUI();
+        scheduleAutosave();
       };
       note.appendChild(delBtn);
 
@@ -6466,8 +6632,10 @@
       });
 
       stickyLayer.appendChild(note);
+      if (restoreData) return;
       setTimeout(() => textarea.focus(), 100);
       renderLayersUI();
+      scheduleAutosave();
     }
 
     // ==========================================
@@ -6489,13 +6657,7 @@
     }
 
     // btnUndoDrawer is wired once above (undoBtnElem → undo()).
-    const btnClearAllDrawer = document.getElementById('btnClearAllDrawer');
-    if (btnClearAllDrawer) {
-      btnClearAllDrawer.onclick = () => {
-        const btnClear = document.getElementById('btnClearAll');
-        if (btnClear) btnClear.click();
-      };
-    }
+    // btnClearAllDrawer is wired once above (clearAllBtnElem).
 
     // ==========================================
     // 🎬 白板媒体导入与视频图层 (Draw-Over-Video)
@@ -6860,7 +7022,13 @@
 
       if (typeof initHsvColorWheel === 'function') initHsvColorWheel();
       if (typeof setupWritableDualBoard === 'function') setupWritableDualBoard();
+      // Restore the autosaved document before the first render. If restoring throws, keep autosave
+      // disabled for this session so the saved data is never overwritten by an empty board.
+      let restoreFailed = false;
+      try { restoreAutosave(); } catch (err) { restoreFailed = true; console.warn('Autosave restore failed', err); }
+      autosaveReady = !restoreFailed;
       resizeCanvas();
+      updatePageUI();
     }
 
     if (document.readyState === 'loading') {
