@@ -115,6 +115,11 @@
 
   <!-- Tailwind CSS & jsPDF CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Tailwind dark: variants follow the site theme (html.dark), not the OS setting, so docks and panels match the theme
+    try { tailwind.config = { darkMode: 'class' }; } catch (e) {}
+    try { if ((localStorage.getItem('eazyopc_theme') || 'dark') !== 'light') document.documentElement.classList.add('dark'); } catch (e) { document.documentElement.classList.add('dark'); }
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   
   <style>
@@ -957,6 +962,14 @@
     }
     .hdr-btn:hover { background: var(--surface-2); color: var(--text-strong); }
     .hdr-ico { width: 16px; height: 16px; flex-shrink: 0; }
+    #topNavbar .hdr-btn svg { width: 16px; height: 16px; }
+    #btnExport, #btnTopProBadge { height: var(--btn-h-sm); padding-top: 0 !important; padding-bottom: 0 !important; border-radius: var(--r-md) !important; }
+    #btnTopProBadge { background: linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(217, 119, 6, 0.18)) !important; border-color: rgba(245, 158, 11, 0.55) !important; color: #fbbf24 !important; font-weight: 800 !important; }
+    body.theme-light #btnTopProBadge { background: #fef3c7 !important; border-color: #f59e0b !important; }
+    body.theme-light #btnTopProBadge, body.theme-light #btnTopProBadge span { color: #92400e !important; }
+    body.theme-light #topNavbar #btnExport, body.theme-light #topNavbar #btnExport span { color: #ffffff !important; }
+    @media (max-width: 479px) { #topNavbar > div:first-child a > div { display: none; } }
+    @media (max-width: 639px) { .hdr-btn { padding: 0 7px; } #btnExport, #btnTopProBadge { padding-left: 8px !important; padding-right: 8px !important; } }
     body.theme-light #topNavbar .hdr-btn, body.theme-light #topNavbar .hdr-btn span { color: #0f172a !important; }
     body.theme-light #topNavbar .hdr-btn { border-color: #d6dde8; background: #ffffff; }
     body.theme-light #topNavbar .hdr-btn:hover { background: #f1f5f9; }
@@ -1043,6 +1056,54 @@
     body.theme-light .wb-modal-panel .wb-badge-pro { background: #fef3c7; color: #92400e; }
     body.theme-light .wb-modal-panel .wb-badge-active { background: #e0e7ff; color: #3730a3; }
     body.theme-light .wb-shortcuts kbd { background: #f8fafc; border-color: #94a3b8; color: #0f172a; }
+
+    /* ================= Round 4: floating docks follow the theme (dark glass / white glass) ================= */
+    body:not(.theme-light) :is(#leftSidebar, #zoomDock, #pageManagerDock) {
+      background: rgba(15, 23, 42, 0.82) !important; border-color: rgba(148, 163, 184, 0.2) !important; color: #e2e8f0 !important;
+      -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+    }
+    body:not(.theme-light) :is(#stickyColorMenu, #moreToolsDrawer, #mediaMenu, #layersPanel, #brushStudioFlyout) {
+      background: rgba(15, 23, 42, 0.94) !important; border-color: rgba(148, 163, 184, 0.22) !important; color: #e2e8f0 !important;
+      -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    }
+    body.theme-light :is(#stickyColorMenu, #moreToolsDrawer, #mediaMenu, #layersPanel) {
+      background: rgba(255, 255, 255, 0.97) !important; border-color: #cbd5e1 !important; color: #0f172a !important;
+    }
+    body.theme-light :is(#stickyColorMenu, #moreToolsDrawer, #mediaMenu, #layersPanel) :is(span, div, button) { color: #0f172a; }
+    #leftSidebar { gap: 2px; padding: 6px !important; border-radius: var(--r-lg) !important; top: 50% !important; transform: translateY(-50%); max-height: calc(100% - 24px); overflow-y: auto; scrollbar-width: none; }
+    #leftSidebar::-webkit-scrollbar { display: none; }
+    #leftSidebar > button { width: 36px; height: 36px; padding: 0 !important; border-radius: var(--r-md) !important; flex-shrink: 0; }
+    #leftSidebar > button svg { width: var(--ico) !important; height: var(--ico) !important; }
+    #leftSidebar > button:hover { background: rgba(148, 163, 184, 0.16); }
+    #leftSidebar > button.tool-btn-active, #leftSidebar > button.tool-btn-active:hover { background: var(--accent-strong) !important; color: #ffffff !important; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35) !important; }
+    #leftSidebar > div.h-px { flex-shrink: 0; width: 24px; margin: 4px 0; }
+    body:not(.theme-light) #leftSidebar > div.h-px { background: rgba(148, 163, 184, 0.22) !important; }
+    #zoomDock, #pageManagerDock { border-radius: var(--r-md) !important; }
+    #pageManagerDock { border-radius: 9999px !important; }
+    body:not(.theme-light) #zoomDock button:hover, body:not(.theme-light) #pageManagerDock button:not(#btnAddPage):hover { background: rgba(148, 163, 184, 0.16) !important; color: #ffffff !important; }
+    #zoomDock button { min-width: 28px; height: 28px; }
+    @media (max-width: 639px) {
+      #leftSidebar { top: 8px !important; transform: none; max-height: calc(100% - 72px); }
+    }
+    :is(#stickyColorMenu, #moreToolsDrawer, #mediaMenu, #layersPanel, #brushStudioFlyout, #paletteFlyout, #shapePanel) { left: 76px !important; }
+    @media (max-width: 639px) { :is(#stickyColorMenu, #moreToolsDrawer, #mediaMenu, #layersPanel, #brushStudioFlyout, #paletteFlyout, #shapePanel) { left: 58px !important; max-width: calc(100vw - 66px); } }
+    /* Existing modals: consistent 150 ms entrance */
+    :is(#exportModal, #proModal, #restoreModal, #feedbackModal, #mobileSaveModal) > div { animation: wbModalIn 150ms ease-out; }
+    @media (prefers-reduced-motion: reduce) { :is(#exportModal, #proModal, #restoreModal, #feedbackModal, #mobileSaveModal) > div { animation: none; } }
+
+    /* Empty-canvas hint */
+    #emptyCanvasHint { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: none; user-select: none; z-index: 5;
+      font-size: 13px; font-weight: 600; color: rgba(100, 116, 139, 0.85); letter-spacing: 0.01em; white-space: nowrap; transition: opacity 200ms ease; }
+    #emptyCanvasHint kbd { display: inline-flex; min-width: 20px; height: 20px; padding: 0 5px; align-items: center; justify-content: center; border-radius: 5px; border: 1px solid rgba(100, 116, 139, 0.45); font-family: ui-monospace, Menlo, monospace; font-size: 11px; margin: 0 2px; }
+    #emptyCanvasHint.is-hidden { opacity: 0; }
+    @media (max-width: 639px) { #emptyCanvasHint { white-space: normal; text-align: center; width: 80%; font-size: 12px; } }
+
+    /* SEO / intro typography */
+    #seoArticleSection p { line-height: 1.7; }
+    #seoArticleSection .seo-prose { max-width: 68ch; }
+    #seoArticleSection h2 { letter-spacing: -0.02em; line-height: 1.25; }
+    #seoArticleSection h3 { font-size: 16px; }
+    #seoArticleSection .grid > * { height: 100%; }
 
     /* ================= Round 4: shared toast ================= */
     .wb-toast {
@@ -1304,11 +1365,11 @@
       </div>
 
       <!-- 白天/黑夜模式切换 -->
-      <button id="btnThemeToggle" class="p-1.5 sm:px-2.5 sm:py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 text-slate-200 rounded-xl text-xs flex items-center gap-1 transition cursor-pointer" title="切换白天/夜间模式 (☀️/🌙)">
+      <button id="btnThemeToggle" class="hdr-btn" title="切换白天/夜间模式 (☀️/🌙)">
         <span id="themeIcon">🌙</span> <span id="themeLabel" class="hidden sm:inline">夜间</span>
       </button>
 
-      <button id="btnToggleFullscreen" class="p-1.5 sm:px-2.5 sm:py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 text-slate-200 rounded-xl text-xs flex items-center gap-1.5 transition" title="全屏沉浸创作">
+      <button id="btnToggleFullscreen" class="hdr-btn" title="全屏沉浸创作">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
         <span class="hidden sm:inline" data-i18n="fullscreen">全屏</span>
       </button>
@@ -1319,7 +1380,7 @@
       </button>
 
       <div class="relative">
-        <button id="btnLangDropdown" class="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs cursor-pointer border border-slate-700">
+        <button id="btnLangDropdown" class="hdr-btn">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
           <span id="currentLangLabel">中</span> <span class="hidden sm:inline">▾</span>
         </button>
@@ -1829,6 +1890,7 @@
       <button id="btnZoomReset" class="px-1.5 py-0.5 hover:bg-slate-800 rounded-lg font-mono text-[11px]" title="重置 100%">100%</button>
       <button id="btnZoomIn" class="w-6 h-6 flex items-center justify-center hover:bg-slate-800 rounded-lg font-bold" title="放大 (Ctrl+滚轮)">+</button>
       <span class="text-slate-600">|</span>
+      <button id="btnShortcuts" type="button" class="px-1.5 py-0.5 rounded-lg text-[11px] font-bold" data-i18n-title="tip_shortcuts" title="键盘快捷键 (?)" aria-label="Keyboard shortcuts">?</button>
       <button id="btnZoomFit" class="px-1.5 py-0.5 hover:bg-slate-800 rounded-lg text-[11px]" data-i18n-title="tip_fit" title="适应居中">📐 <span data-i18n="fit">适中</span></button>
     </div>
 
@@ -1862,6 +1924,7 @@
         <div id="stickyLayer" class="absolute inset-0 pointer-events-none"></div>
         <!-- 套索拖动选区层 -->
         <div id="selectionOverlay" class="absolute inset-0 pointer-events-none"></div>
+        <div id="emptyCanvasHint" class="is-hidden" aria-hidden="true"><span data-i18n="empty_hint">拿起画笔开始画吧 · 按 <kbd>?</kbd> 查看快捷键</span></div>
         <div id="rightPageBadge" class="hidden absolute bottom-2 right-3 px-2 py-0.5 rounded-md bg-stone-900/60 text-[10px] text-indigo-300 font-mono select-none pointer-events-none border border-slate-700/50 backdrop-blur-sm">第 2 页</div>
       </div>
     </div>
@@ -3358,6 +3421,12 @@
     // ================= Round 4 strings (zh + en; other languages fall back to en, then zh) =================
     const R4_I18N = {
       zh: {
+        empty_hint: '拿起画笔开始画吧 · 按 <kbd>?</kbd> 查看快捷键', tip_shortcuts: '键盘快捷键 (?)',
+        shortcuts_title: '键盘快捷键', shortcuts_sub: '输入文字时快捷键不会触发',
+        sc_select: '选择 / 移动', sc_hand: '抓手平移', sc_pen: '画笔', sc_eraser: '橡皮擦', sc_lasso: '套索圈选', sc_text: '文字', sc_rect: '矩形', sc_ellipse: '椭圆',
+        sc_diamond: '菱形', sc_arrow: '箭头 / 连接线', sc_sticky: '新便签', sc_edit: '编辑选中的便签', sc_shift: '拖动时等比 / 45° 线', sc_delete: '删除所选',
+        sc_undo: '撤销', sc_redo: '重做', sc_save: '保存作品', sc_open: '打开作品', sc_zoom: '缩放', sc_help: '显示本面板', sc_wheel: '滚轮', sc_space: '空格',
+        svg_copied_toast: '🎉 SVG 已复制到剪贴板，可在 Canva、Figma 或 Illustrator 中粘贴编辑。',
         tpl_modal_title: '模板', tpl_modal_sub: '插入到当前页面，可撤销。免费版含看板、头脑风暴、周计划，其余模板需 Pro。', tpl_free: '免费',
         toast_tpl_inserted: '已插入模板：{name}（可 Ctrl/Cmd+Z 撤销）',
         boards_modal_title: '我的白板', boards_modal_sub: '所有白板只保存在这台设备的浏览器里。换设备请用「保存作品」。',
@@ -3407,6 +3476,7 @@
         tip_box: '形状：矩形 / 圆角矩形 / 椭圆 / 菱形 / 三角形（R / O / D）',
         tip_arrow: '连接线 / 箭头：从便签或图形上拖出即可连接，移动时自动跟随（A）',
         tip_sticky: '便签：黄 / 粉 / 绿 / 蓝四色（N）',
+        tip_pen: '画笔 (P) · 再点一次可选择其他笔刷',
         shape_panel_title: '形状与连接线',
         shape_rect: '矩形 (R)', shape_roundrect: '圆角矩形', shape_ellipse: '椭圆 (O)', shape_diamond: '菱形 (D)', shape_triangle: '三角形',
         shape_line: '直线', shape_arrow: '单向箭头 (A)', shape_arrow2: '双向箭头',
@@ -3424,6 +3494,12 @@
         toast_autosave_quota: '浏览器存储空间不足，自动保存未包含图片。请用「保存作品」把完整作品（含图片）存到本机。'
       },
       en: {
+        empty_hint: 'Pick up a pen and start drawing · press <kbd>?</kbd> for shortcuts', tip_shortcuts: 'Keyboard shortcuts (?)',
+        shortcuts_title: 'Keyboard shortcuts', shortcuts_sub: 'Shortcuts never fire while you are typing',
+        sc_select: 'Select / move', sc_hand: 'Pan', sc_pen: 'Pen', sc_eraser: 'Eraser', sc_lasso: 'Lasso select', sc_text: 'Text', sc_rect: 'Rectangle', sc_ellipse: 'Ellipse',
+        sc_diamond: 'Diamond', sc_arrow: 'Arrow / connector', sc_sticky: 'New sticky note', sc_edit: 'Edit selected sticky', sc_shift: 'Square / circle / 45° while dragging', sc_delete: 'Delete selection',
+        sc_undo: 'Undo', sc_redo: 'Redo', sc_save: 'Save work', sc_open: 'Open work', sc_zoom: 'Zoom', sc_help: 'Show this panel', sc_wheel: 'Wheel', sc_space: 'Space',
+        svg_copied_toast: '🎉 SVG copied to the clipboard — paste it into Canva, Figma or Illustrator to keep editing.',
         tpl_modal_title: 'Templates', tpl_modal_sub: 'Inserted on the current page and undoable. Kanban, Brainstorm and Weekly plan are free; the others need Pro.', tpl_free: 'Free',
         toast_tpl_inserted: 'Inserted template: {name} (Ctrl/Cmd+Z to undo)',
         boards_modal_title: 'My boards', boards_modal_sub: 'All boards are stored only in this browser on this device. Use “Save work” to move one to another device.',
@@ -3473,6 +3549,7 @@
         tip_box: 'Shapes: rectangle / rounded / ellipse / diamond / triangle (R / O / D)',
         tip_arrow: 'Connector / arrow: drag from a sticky or shape to connect; it follows when they move (A)',
         tip_sticky: 'Sticky note: yellow / pink / green / blue (N)',
+        tip_pen: 'Pen (P) · click again to choose another brush',
         shape_panel_title: 'Shapes & connectors',
         shape_rect: 'Rectangle (R)', shape_roundrect: 'Rounded rectangle', shape_ellipse: 'Ellipse (O)', shape_diamond: 'Diamond (D)', shape_triangle: 'Triangle',
         shape_line: 'Line', shape_arrow: 'Arrow (A)', shape_arrow2: 'Double arrow',
@@ -3490,9 +3567,9 @@
         toast_autosave_quota: 'Browser storage is full, so autosave skipped the images. Use “Save work” to keep the complete work (with images) on this device.'
       }
     };
-    const R4_STALE_KEYS = ['tip_box', 'tip_arrow', 'tip_sticky', 'site_subtitle', 'demo_snap_title', 'demo_snap_desc',
+    const R4_STALE_KEYS = ['tip_box', 'tip_arrow', 'tip_sticky', 'tip_pen', 'site_subtitle', 'demo_snap_title', 'demo_snap_desc',
       'demo_brush_title', 'demo_brush_desc', 'demo_pages_title', 'demo_pages_desc', 'fmt_pdf', 'fmt_pdf_desc',
-      'fmt_svg_canva_desc', 'tier_free_desc', 'pro_perk_4'];
+      'fmt_svg_canva_desc', 'tier_free_desc', 'pro_perk_4', 'svg_copied_toast'];
     for (const lang of Object.keys(TRANSLATIONS)) {
       if (lang !== 'zh' && lang !== 'en') {
         // Other languages: drop copy that described features the app does not have, so the en fallback is used
@@ -4104,6 +4181,7 @@
     function redrawAllStrokes(targetCtx = ctx, scale = dpr, transparent = false, src = null) {
       const board = src || appState;
       rerouteConnectors(board);
+      if (targetCtx === mainCtx && !src) updateEmptyHint();
       renderBackgroundOnContext(targetCtx, cssWidth, cssHeight, scale, transparent);
 
       targetCtx.save();
@@ -6427,6 +6505,11 @@
         }
         return;
       }
+      if (e.key === '?' && !mod && !e.altKey) {
+        e.preventDefault();
+        openShortcutsModal();
+        return;
+      }
       if (key === 'enter' && !mod && getSingleSelectedSticky()) {
         e.preventDefault();
         openStickyEditor(getSingleSelectedSticky());
@@ -6838,7 +6921,7 @@ ${pathsSvg}</svg>`;
         const dict = TRANSLATIONS[appState.lang] || TRANSLATIONS.zh;
         try {
           await navigator.clipboard.writeText(svgContent);
-          alert(dict.svg_copied_toast || '🎉 矢量 SVG 已成功复制到剪贴板！可以直接在 Canva、Figma 或 Illustrator 中按 Ctrl+V (Mac: Cmd+V) 立即无缝粘贴可自由编辑的矢量线稿！');
+          showToast(dict.svg_copied_toast || '🎉 SVG 已复制到剪贴板，可在 Canva、Figma 或 Illustrator 中粘贴编辑。', 5000);
         } catch (err) {
           const ta = document.createElement('textarea');
           ta.value = svgContent;
@@ -6846,7 +6929,7 @@ ${pathsSvg}</svg>`;
           ta.select();
           document.execCommand('copy');
           ta.remove();
-          alert(dict.svg_copied_toast || '🎉 矢量 SVG 已成功复制到剪贴板！可以直接在 Canva、Figma 或 Illustrator 中按 Ctrl+V (Mac: Cmd+V) 立即无缝粘贴可自由编辑的矢量线稿！');
+          showToast(dict.svg_copied_toast || '🎉 SVG 已复制到剪贴板，可在 Canva、Figma 或 Illustrator 中粘贴编辑。', 5000);
         }
       };
     }
@@ -7833,6 +7916,12 @@ ${pathsSvg}</svg>`;
     }
 
     // 🔷 形状 / 连接线工具与样式面板
+    // Every dock flyout opens next to the button that opened it (the dock is vertically centred)
+    [['btnToggleStickyMenu', 'stickyColorMenu'], ['btnToggleMoreTools', 'moreToolsDrawer'], ['btnToggleMediaMenu', 'mediaMenu'],
+     ['btnToggleLayers', 'layersPanel'], ['btnCurrentBrush', 'brushStudioFlyout']].forEach(([bid, fid]) => {
+      const b = document.getElementById(bid), f = document.getElementById(fid);
+      if (b && f) b.addEventListener('click', () => { if (!f.classList.contains('hidden')) positionFlyoutNear(f, b); });
+    });
     const btnToolBox = document.getElementById('btnToolBox');
     const btnToolConnector = document.getElementById('btnToolConnector');
     const shapePanel = document.getElementById('shapePanel');
@@ -8053,6 +8142,7 @@ ${pathsSvg}</svg>`;
     function applyTheme(theme) {
       const isLight = theme === 'light';
       document.body.classList.toggle('theme-light', isLight);
+      document.documentElement.classList.toggle('dark', !isLight);
       if (themeIcon) themeIcon.innerText = isLight ? '☀️' : '🌙';
       const dict = TRANSLATIONS[appState.lang] || TRANSLATIONS.zh;
       if (themeLabel) themeLabel.innerText = isLight ? (dict.theme_light || '白天') : (dict.theme_dark || '夜间');
@@ -9216,6 +9306,52 @@ ${pathsSvg}</svg>`;
       renderBoardsList();
     });
 
+    // ================= Empty-canvas hint & keyboard shortcuts panel =================
+    function updateEmptyHint() {
+      const el = document.getElementById('emptyCanvasHint');
+      if (!el) return;
+      const empty = !appState.strokes.length && !appState.texts.length && !appState.images.length && !(appState.videos || []).length &&
+        !(appState.isDualSpread && appState.pages[0] && ((appState.pages[0].strokes || []).length || (appState.pages[0].images || []).length || (appState.pages[0].texts || []).length));
+      el.classList.toggle('is-hidden', !empty);
+    }
+
+    const SHORTCUTS = [
+      ['sc_select', '选择 / 移动', ['V']], ['sc_hand', '抓手平移', ['H', 'Space']], ['sc_pen', '画笔', ['P']], ['sc_eraser', '橡皮擦', ['E']],
+      ['sc_lasso', '套索圈选', ['L']], ['sc_text', '文字', ['T']], ['sc_rect', '矩形', ['R']], ['sc_ellipse', '椭圆', ['O']],
+      ['sc_diamond', '菱形', ['D']], ['sc_arrow', '箭头 / 连接线', ['A']], ['sc_sticky', '新便签', ['N']], ['sc_edit', '编辑选中的便签', ['Enter']],
+      ['sc_shift', '拖动时等比 / 45° 线', ['Shift']], ['sc_delete', '删除所选', ['Del']], ['sc_undo', '撤销', ['Ctrl/⌘', 'Z']],
+      ['sc_redo', '重做', ['Ctrl/⌘', 'Shift', 'Z']], ['sc_save', '保存作品', ['Ctrl/⌘', 'S']], ['sc_open', '打开作品', ['Ctrl/⌘', 'O']],
+      ['sc_zoom', '缩放', ['Ctrl/⌘', '滚轮']], ['sc_help', '显示本面板', ['?']]
+    ];
+    const shortcutsModal = document.getElementById('shortcutsModal');
+    function openShortcutsModal() {
+      const list = document.getElementById('shortcutsList');
+      if (!shortcutsModal || !list) return;
+      list.innerHTML = '';
+      for (const [key, zh, keys] of SHORTCUTS) {
+        const label = document.createElement('span');
+        label.textContent = i18nText(key, zh);
+        const k = document.createElement('span');
+        k.className = 'k';
+        keys.forEach(x => { const kb = document.createElement('kbd'); kb.textContent = x === '滚轮' ? i18nText('sc_wheel', '滚轮') : (x === 'Space' ? i18nText('sc_space', '空格') : x); k.appendChild(kb); });
+        list.appendChild(label); list.appendChild(k);
+      }
+      closeAllFlyouts();
+      shortcutsModal.classList.remove('hidden');
+    }
+    const btnShortcuts = document.getElementById('btnShortcuts');
+    if (btnShortcuts) btnShortcuts.onclick = (e) => { e.stopPropagation(); openShortcutsModal(); };
+    if (shortcutsModal) {
+      const c = document.getElementById('btnCloseShortcutsModal');
+      if (c) c.onclick = () => shortcutsModal.classList.add('hidden');
+      shortcutsModal.addEventListener('click', (e) => { if (e.target === shortcutsModal) shortcutsModal.classList.add('hidden'); });
+    }
+    // Esc closes the Round 4 modals
+    window.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      ['shortcutsModal', 'templatesModal', 'boardsModal'].forEach(id => { const m = document.getElementById(id); if (m) m.classList.add('hidden'); });
+    });
+
     function initAppOnLoad() {
       if ('serviceWorker' in navigator) {
         const registerSW = () => navigator.serviceWorker.register('/sw.js').catch(() => {});
@@ -9264,7 +9400,16 @@ ${pathsSvg}</svg>`;
       if (btnCurrentBrush && brushStudioFlyout) {
         btnCurrentBrush.onclick = (e) => {
           e.stopPropagation();
-          appState.tool = btnCurrentBrush.dataset.tool || 'gpen';
+          const brushTool = btnCurrentBrush.dataset.tool || 'gpen';
+          // Clicking the already-active brush opens the brush studio to pick another brush
+          if (appState.tool === brushTool) {
+            const isHidden = brushStudioFlyout.classList.contains('hidden');
+            closeAllFlyouts('brushStudioFlyout');
+            brushStudioFlyout.classList.toggle('hidden', !isHidden);
+            if (isHidden) positionFlyoutNear(brushStudioFlyout, btnCurrentBrush);
+            return;
+          }
+          appState.tool = brushTool;
           updateToolButtonsUI();
         };
       }
