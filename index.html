@@ -5486,7 +5486,7 @@
       wrapper.style.top = `${Math.max(10, currentY - 48)}px`;
 
       wrapper.innerHTML = `
-        <div class="inline-text-toolbar flex items-center gap-1.5 px-2 py-1 bg-slate-900/95 border border-indigo-500/80 rounded-xl shadow-xl text-white text-xs backdrop-blur-md">
+        <div class="inline-text-toolbar flex flex-wrap items-center gap-1.5 px-2 py-1 bg-slate-900/95 border border-indigo-500/80 rounded-xl shadow-xl text-white text-xs backdrop-blur-md">
           <select class="inline-font-select bg-slate-800 text-white text-[11px] px-1.5 py-0.5 rounded border border-slate-700 outline-none cursor-pointer">
             <option value="'Noto Sans SC', sans-serif">📐 思源黑体 (标准黑体)</option>
             <option value="'Noto Serif SC', serif">📖 思源宋体 (典雅经典)</option>
@@ -5506,6 +5506,8 @@
         <textarea id="inlineCanvasTextArea" class="bg-white/90 dark:bg-slate-900/90 border-2 border-dashed border-indigo-500 rounded-lg p-2 outline-none resize-none overflow-hidden shadow-2xl transition" placeholder="在此直接打字..." style="font-size:${currentSize}px; font-family:${currentFont}; color:${currentColor}; font-weight:${isBold ? 'bold' : 'normal'}; line-height:1.25; min-width:160px; min-height:${currentSize * 1.5}px;"></textarea>
       `;
 
+      // Narrow boards (phones): the toolbar wraps and the editor never gets wider than the board
+      wrapper.style.maxWidth = `${Math.max(160, cssWidth - 12)}px`;
       canvasCard.appendChild(wrapper);
 
       // 放进画布后按实际宽度再夹一次，避免文字工具条超出画板右边
@@ -5528,7 +5530,7 @@
         textarea.style.height = 'auto';
         textarea.style.height = `${Math.max(currentSize * 1.5, textarea.scrollHeight)}px`;
         textarea.style.width = 'auto';
-        textarea.style.width = `${Math.max(160, textarea.scrollWidth + 24)}px`;
+        textarea.style.width = `${Math.min(Math.max(160, cssWidth - 12), Math.max(160, textarea.scrollWidth + 24))}px`;
       };
 
       textarea.addEventListener('input', autoResize);
