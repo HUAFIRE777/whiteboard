@@ -916,6 +916,72 @@
     body.theme-light #pageManagerDock button#btnToggleDualView.dual-active * {
       color: #ffffff !important;
     }
+    /* ================= Round 4: design tokens + shared components ================= */
+    :root {
+      --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-6: 24px;
+      --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 24px;
+      --sh-sm: 0 1px 2px rgba(0, 0, 0, 0.18);
+      --sh-md: 0 8px 24px rgba(0, 0, 0, 0.28);
+      --sh-lg: 0 24px 60px -12px rgba(0, 0, 0, 0.5);
+      --accent: #6366f1; --accent-strong: #4f46e5; --accent-soft: rgba(99, 102, 241, 0.16);
+      --gold: #f59e0b;
+      --surface: rgba(15, 23, 42, 0.86); --surface-solid: #0f172a; --surface-2: #1e293b; --surface-3: #273449;
+      --hairline: rgba(148, 163, 184, 0.2); --text: #e2e8f0; --text-strong: #f8fafc; --text-muted: #94a3b8;
+      --ring: 0 0 0 2px rgba(99, 102, 241, 0.65);
+      --btn-h-sm: 32px; --btn-h-md: 36px; --btn-h-lg: 40px;
+      --ico: 18px;
+    }
+    body.theme-light {
+      --sh-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+      --sh-md: 0 8px 24px rgba(15, 23, 42, 0.1);
+      --sh-lg: 0 24px 60px -12px rgba(15, 23, 42, 0.22);
+      --surface: rgba(255, 255, 255, 0.94); --surface-solid: #ffffff; --surface-2: #f1f5f9; --surface-3: #e2e8f0;
+      --hairline: #dbe1ea; --text: #0f172a; --text-strong: #0f172a; --text-muted: #475569;
+      --accent-soft: rgba(79, 70, 229, 0.1);
+    }
+
+    /* Header ghost buttons */
+    .hdr-btn {
+      height: var(--btn-h-sm); padding: 0 10px; display: inline-flex; align-items: center; gap: 6px;
+      border-radius: var(--r-md); border: 1px solid var(--hairline); background: transparent; color: var(--text);
+      font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+    }
+    .hdr-btn:hover { background: var(--surface-2); color: var(--text-strong); }
+    .hdr-ico { width: 16px; height: 16px; flex-shrink: 0; }
+    body.theme-light #topNavbar .hdr-btn, body.theme-light #topNavbar .hdr-btn span { color: #0f172a !important; }
+    body.theme-light #topNavbar .hdr-btn { border-color: #d6dde8; background: #ffffff; }
+    body.theme-light #topNavbar .hdr-btn:hover { background: #f1f5f9; }
+
+    /* Focus rings everywhere (keyboard only) */
+    :where(button, a, select, input, textarea, [tabindex]):focus-visible { outline: none; box-shadow: var(--ring); border-radius: var(--r-sm); }
+
+    /* Floating panels that follow the site theme (dark glass / white glass) */
+    .wb-flyout {
+      background: var(--surface); color: var(--text); border: 1px solid var(--hairline);
+      -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: var(--sh-lg);
+    }
+    .wb-hairline { border-color: var(--hairline) !important; }
+    .wb-icon-btn { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--r-sm); color: var(--text-muted); font-size: 13px; }
+    .wb-icon-btn:hover { background: var(--surface-2); color: var(--text-strong); }
+    .wb-label { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.02em; }
+    .wb-hint { font-size: 11px; line-height: 1.6; color: var(--text-muted); }
+    body.theme-light .wb-flyout, body.theme-light .wb-flyout span, body.theme-light .wb-flyout div { color: #0f172a; }
+    body.theme-light .wb-flyout .wb-label, body.theme-light .wb-flyout .wb-hint { color: #334155 !important; font-weight: 700; }
+    .wb-segmented { display: flex; gap: 2px; padding: 2px; border-radius: var(--r-sm); background: var(--surface-2); border: 1px solid var(--hairline); }
+    .wb-segmented button { flex: 1; height: 28px; border-radius: 6px; font-size: 11px; font-weight: 700; color: var(--text-muted); transition: background-color 120ms ease, color 120ms ease; }
+    .wb-segmented button:hover { color: var(--text-strong); }
+    .wb-segmented button.is-active { background: var(--accent-strong); color: #ffffff !important; }
+    .wb-swatch { width: 22px; height: 22px; border-radius: 9999px; border: 1.5px solid rgba(148, 163, 184, 0.55); transition: transform 120ms ease; }
+    .wb-swatch:hover { transform: scale(1.12); }
+    .wb-swatch.is-active { box-shadow: 0 0 0 2px var(--surface-solid), 0 0 0 4px var(--accent); }
+    .shape-kind-btn { height: 40px; display: flex; align-items: center; justify-content: center; border-radius: var(--r-sm); color: var(--text); background: var(--surface-2); border: 1px solid var(--hairline); transition: background-color 120ms ease, color 120ms ease; }
+    .shape-kind-btn svg { width: 20px; height: 20px; }
+    .shape-kind-btn:hover { border-color: var(--accent); }
+    .shape-kind-btn.is-active { background: var(--accent-strong); border-color: var(--accent-strong); color: #ffffff !important; }
+    .wb-drawer-btn { display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 8px; border-radius: var(--r-sm); font-size: 11px; font-weight: 700; color: inherit; border: 1px solid var(--hairline); }
+    .wb-drawer-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .wb-drawer-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
+
     /* ================= Round 4: shared toast ================= */
     .wb-toast {
       position: fixed; left: 50%; bottom: 24px; z-index: 90; max-width: min(92vw, 520px);
@@ -1158,6 +1224,23 @@
 
     <!-- 右侧动作按钮组 -->
     <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+      <!-- 📁 作品文件与我的白板 (本地) -->
+      <div class="hidden sm:flex items-center gap-1 hdr-group">
+        <button id="btnBoardsManager" type="button" class="hdr-btn" data-i18n-title="tip_my_boards" title="我的白板：在本机管理多块白板" aria-label="My boards">
+          <svg class="hdr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          <span class="hidden xl:inline" data-i18n="btn_my_boards">我的白板</span>
+        </button>
+        <button id="btnSaveWork" type="button" class="hdr-btn" data-i18n-title="tip_save_work" title="保存作品 (Ctrl/Cmd+S)" aria-label="Save work">
+          <svg class="hdr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <span class="hidden lg:inline" data-i18n="btn_save_work">保存作品</span>
+        </button>
+        <button id="btnOpenWork" type="button" class="hdr-btn" data-i18n-title="tip_open_work" title="打开作品 (Ctrl/Cmd+O)" aria-label="Open work">
+          <svg class="hdr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 11v5m0-5-2 2m2-2 2 2"/></svg>
+          <span class="hidden lg:inline" data-i18n="btn_open_work">打开作品</span>
+        </button>
+        <input type="file" id="openWorkInput" accept=".eazyopc,application/json" class="hidden" />
+      </div>
+
       <!-- 白天/黑夜模式切换 -->
       <button id="btnThemeToggle" class="p-1.5 sm:px-2.5 sm:py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 text-slate-200 rounded-xl text-xs flex items-center gap-1 transition cursor-pointer" title="切换白天/夜间模式 (☀️/🌙)">
         <span id="themeIcon">🌙</span> <span id="themeLabel" class="hidden sm:inline">夜间</span>
@@ -1371,6 +1454,12 @@
         <button class="tool-btn flex items-center gap-2 p-1.5 rounded-xl hover:bg-stone-100 dark:hover:bg-slate-800 border border-transparent transition text-left" data-tool="laser">
           <span>🔴</span> <span class="text-[11px] font-medium" data-i18n="tool_laser">激光教鞭</span>
         </button>
+      </div>
+      <div class="pt-1.5 border-t border-stone-200 dark:border-slate-800 grid grid-cols-2 gap-1.5">
+        <button id="btnSaveWorkDrawer" type="button" class="wb-drawer-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg><span data-i18n="btn_save_work">保存作品</span></button>
+        <button id="btnOpenWorkDrawer" type="button" class="wb-drawer-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span data-i18n="btn_open_work">打开作品</span></button>
+        <button id="btnBoardsDrawer" type="button" class="wb-drawer-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span data-i18n="btn_my_boards">我的白板</span></button>
+        <button id="btnTemplatesDrawer" type="button" class="wb-drawer-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span data-i18n="btn_templates">模板</span></button>
       </div>
       <div class="pt-1.5 border-t border-stone-200 dark:border-slate-800 flex justify-between">
         <button id="btnUndoDrawer" class="py-1 px-2 text-xs text-stone-600 hover:bg-stone-100 dark:hover:bg-slate-800 rounded-lg transition" data-i18n="tool_undo">↩️ 撤销</button>
@@ -3160,6 +3249,65 @@
         }
       }
     };
+
+    // ================= Round 4 strings (zh + en; other languages fall back to en, then zh) =================
+    const R4_I18N = {
+      zh: {
+        sticky_placeholder: '双击输入便签内容…',
+        sticky_yellow: '黄色', sticky_pink: '粉色', sticky_green: '绿色', sticky_blue: '蓝色',
+        pill_edit_sticky: '编辑', pill_edit_sticky_tip: '编辑便签文字（双击便签或按 Enter 也可以）',
+        layer_sticky: '便签', layer_image: '图片',
+        tip_box: '形状：矩形 / 圆角矩形 / 椭圆 / 菱形 / 三角形（R / O / D）',
+        tip_arrow: '连接线 / 箭头：从便签或图形上拖出即可连接，移动时自动跟随（A）',
+        tip_sticky: '便签：黄 / 粉 / 绿 / 蓝四色（N）',
+        shape_panel_title: '形状与连接线',
+        shape_rect: '矩形 (R)', shape_roundrect: '圆角矩形', shape_ellipse: '椭圆 (O)', shape_diamond: '菱形 (D)', shape_triangle: '三角形',
+        shape_line: '直线', shape_arrow: '单向箭头 (A)', shape_arrow2: '双向箭头',
+        shape_stroke_color: '描边颜色', shape_fill: '填充', shape_fill_none: '无', shape_fill_translucent: '半透明', shape_fill_solid: '实色',
+        shape_width: '线宽', shape_routing: '连接线路径', shape_routing_straight: '直线', shape_routing_elbow: '折线',
+        shape_hint: '拖动绘制，按住 Shift 画正方形 / 正圆或 45° 线。从便签、图片或图形上拖出箭头即可连接，移动它们时箭头自动跟随。选中图形后修改这里的样式会直接应用。',
+        btn_save_work: '保存作品', btn_open_work: '打开作品',
+        tip_save_work: '保存作品：把全部页面（含图片、便签、图形）下载为 .eazyopc 文件 (Ctrl/Cmd+S)',
+        tip_open_work: '打开作品：载入 .eazyopc 作品文件 (Ctrl/Cmd+O，也可以直接拖到画布上)',
+        toast_saved_work: '已保存作品文件 {name}',
+        toast_opened_work: '已打开作品（{pages} 页）',
+        toast_open_failed: '无法打开：这不是有效的 EazyOPC 作品文件。',
+        confirm_other_site: '这个作品文件来自 EazyOPC 的另一个工具（{site}），部分内容可能无法完全还原。仍然打开吗？',
+        confirm_replace_board: '打开作品会替换当前白板的全部页面。当前内容可以先用「保存作品」存到本机。继续打开吗？',
+        toast_autosave_quota: '浏览器存储空间不足，自动保存未包含图片。请用「保存作品」把完整作品（含图片）存到本机。'
+      },
+      en: {
+        sticky_placeholder: 'Double-click to write…',
+        sticky_yellow: 'Yellow', sticky_pink: 'Pink', sticky_green: 'Green', sticky_blue: 'Blue',
+        pill_edit_sticky: 'Edit', pill_edit_sticky_tip: 'Edit note text (or double-click the note / press Enter)',
+        layer_sticky: 'Sticky', layer_image: 'Image',
+        tip_box: 'Shapes: rectangle / rounded / ellipse / diamond / triangle (R / O / D)',
+        tip_arrow: 'Connector / arrow: drag from a sticky or shape to connect; it follows when they move (A)',
+        tip_sticky: 'Sticky note: yellow / pink / green / blue (N)',
+        shape_panel_title: 'Shapes & connectors',
+        shape_rect: 'Rectangle (R)', shape_roundrect: 'Rounded rectangle', shape_ellipse: 'Ellipse (O)', shape_diamond: 'Diamond (D)', shape_triangle: 'Triangle',
+        shape_line: 'Line', shape_arrow: 'Arrow (A)', shape_arrow2: 'Double arrow',
+        shape_stroke_color: 'Stroke colour', shape_fill: 'Fill', shape_fill_none: 'None', shape_fill_translucent: 'Translucent', shape_fill_solid: 'Solid',
+        shape_width: 'Stroke width', shape_routing: 'Connector path', shape_routing_straight: 'Straight', shape_routing_elbow: 'Elbow',
+        shape_hint: 'Drag to draw; hold Shift for squares / circles or 45° lines. Drag an arrow from a sticky, image or shape to connect them — it follows when they move. With shapes selected, these styles apply to them.',
+        btn_save_work: 'Save work', btn_open_work: 'Open work',
+        tip_save_work: 'Save work: download every page (images, stickies, shapes included) as an .eazyopc file (Ctrl/Cmd+S)',
+        tip_open_work: 'Open work: load an .eazyopc file (Ctrl/Cmd+O, or drop it on the canvas)',
+        toast_saved_work: 'Saved {name}',
+        toast_opened_work: 'Opened work ({pages} pages)',
+        toast_open_failed: 'Cannot open: this is not a valid EazyOPC work file.',
+        confirm_other_site: 'This work file comes from another EazyOPC tool ({site}); some content may not be restored exactly. Open it anyway?',
+        confirm_replace_board: 'Opening a work file replaces every page of the current board. You can keep the current content with “Save work” first. Continue?',
+        toast_autosave_quota: 'Browser storage is full, so autosave skipped the images. Use “Save work” to keep the complete work (with images) on this device.'
+      }
+    };
+    for (const lang of Object.keys(TRANSLATIONS)) {
+      if (lang !== 'zh' && lang !== 'en') {
+        // Other languages: drop outdated overlapping keys so the en fallback is used instead of stale copy
+        for (const k of Object.keys(R4_I18N.en)) if (R4_I18N.zh[k] !== undefined) delete TRANSLATIONS[lang][k];
+      }
+      if (R4_I18N[lang]) Object.assign(TRANSLATIONS[lang], R4_I18N[lang]);
+    }
 
     const appState = {
       lang: 'zh',
@@ -5889,6 +6037,7 @@
       e.preventDefault();
       if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
         const file = e.dataTransfer.files[0];
+        if (isWorkFile(file)) { openWorkFromFile(file); return; }
         if (file.type.startsWith('image/')) {
           const reader = new FileReader();
           reader.onload = (ev) => addImageToCanvas(ev.target.result);
@@ -6059,9 +6208,12 @@
 
     // 键盘快捷键 (H/V/P/E/L/T, Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z / Ctrl+Y redo, Delete, Space)
     window.addEventListener('keydown', (e) => {
-      if (isEditableTarget(e.target)) return;
       const key = (e.key || '').toLowerCase();
       const mod = e.ctrlKey || e.metaKey;
+      // 保存作品 / 打开作品 work everywhere (also while typing) and replace the browser's own dialogs
+      if (mod && !e.altKey && !e.shiftKey && key === 's') { e.preventDefault(); saveWorkFile(); return; }
+      if (mod && !e.altKey && !e.shiftKey && key === 'o') { e.preventDefault(); triggerOpenWork(); return; }
+      if (isEditableTarget(e.target)) return;
       if (mod && !e.altKey && key === 'z') {
         e.preventDefault();
         if (e.shiftKey) redo(); else undo();
@@ -6558,6 +6710,101 @@ ${pathsSvg}</svg>`;
       a.click();
       a.remove();
     }
+
+    // ================= 📁 作品文件：保存作品 / 打开作品 (.eazyopc JSON) =================
+    function formatStamp(d = new Date()) {
+      const z = (n) => String(n).padStart(2, '0');
+      return `${d.getFullYear()}${z(d.getMonth() + 1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}`;
+    }
+
+    function hasAnyContent() {
+      const pageHas = (p) => p && ((p.strokes || []).length || (p.texts || []).length || (p.images || []).length);
+      if (appState.strokes.length || appState.texts.length || appState.images.length) return true;
+      return appState.pages.some((p, i) => i !== appState.currentPageIndex && pageHas(p));
+    }
+
+    function saveWorkFile() {
+      if (activeStickyEditor) activeStickyEditor.commit();
+      const doc = buildDocumentObject(true);
+      doc.currentPageIndex = appState.isDualSpread ? 0 : appState.currentPageIndex;
+      if (typeof getActiveBoardName === 'function') doc.name = getActiveBoardName();
+      const name = `Whiteboard-${formatStamp()}.eazyopc`;
+      const blob = new Blob([JSON.stringify(doc)], { type: 'application/json' });
+      handleFileDownloadOrShare(blob, name, 'application/json');
+      showToast(i18nText('toast_saved_work', '已保存作品文件 {name}', { name }));
+    }
+
+    // Validates a parsed .eazyopc object. Returns the document or null.
+    function validateWorkDocument(doc) {
+      if (!doc || typeof doc !== 'object' || doc.app !== 'eazyopc' || !Array.isArray(doc.pages) || !doc.pages.length) return null;
+      return doc;
+    }
+
+    // Replaces the whole current board (all pages) with `doc`; leaves dual mode and lands on page 1
+    function loadDocumentIntoApp(doc) {
+      if (activeStickyEditor) activeStickyEditor.commit();
+      if (appState.isDualSpread) {
+        appState.isDualSpread = false;
+        updateDualToggleUI();
+      }
+      clearSelection();
+      if (!applyDocumentObject(doc)) return false;
+      appState.currentPageIndex = 0;
+      const p0 = appState.pages[0];
+      appState.strokes = (p0.strokes || []).slice();
+      appState.texts = (p0.texts || []).slice();
+      appState.images = (p0.images || []).slice();
+      appState.history = [];
+      appState.redoStack = [];
+      appState.zoom = 1; appState.panX = 0; appState.panY = 0;
+      resizeCanvas();
+      loadPage(0);
+      if (typeof renderLayersUI === 'function') renderLayersUI();
+      if (typeof updateEmptyHint === 'function') updateEmptyHint();
+      flushAutosave();
+      return true;
+    }
+
+    function openWorkFromFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        let doc = null;
+        try { doc = validateWorkDocument(JSON.parse(String(reader.result || ''))); } catch (_) { doc = null; }
+        if (!doc) { showToast(i18nText('toast_open_failed', '无法打开：这不是有效的 EazyOPC 作品文件。'), 5000); return; }
+        if (doc.site && doc.site !== 'whiteboard' &&
+            !confirm(i18nText('confirm_other_site', '这个作品文件来自 EazyOPC 的另一个工具（{site}），部分内容可能无法完全还原。仍然打开吗？', { site: String(doc.site).slice(0, 40) }))) return;
+        if (hasAnyContent() && !confirm(i18nText('confirm_replace_board', '打开作品会替换当前白板的全部页面。当前内容可以先用「保存作品」存到本机。继续打开吗？'))) return;
+        if (loadDocumentIntoApp(doc)) {
+          showToast(i18nText('toast_opened_work', '已打开作品（{pages} 页）', { pages: appState.pages.length }));
+        } else {
+          showToast(i18nText('toast_open_failed', '无法打开：这不是有效的 EazyOPC 作品文件。'), 5000);
+        }
+      };
+      reader.onerror = () => showToast(i18nText('toast_open_failed', '无法打开：这不是有效的 EazyOPC 作品文件。'), 5000);
+      reader.readAsText(file);
+    }
+
+    function isWorkFile(file) {
+      return !!file && (/\.eazyopc$/i.test(file.name || '') || file.type === 'application/json' || /\.json$/i.test(file.name || ''));
+    }
+
+    const openWorkInput = document.getElementById('openWorkInput');
+    function triggerOpenWork() { if (openWorkInput) { openWorkInput.value = ''; openWorkInput.click(); } }
+    if (openWorkInput) {
+      openWorkInput.onchange = (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (f) openWorkFromFile(f);
+      };
+    }
+    ['btnSaveWork', 'btnSaveWorkDrawer'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) b.onclick = (e) => { e.stopPropagation(); saveWorkFile(); closeAllFlyouts(); };
+    });
+    ['btnOpenWork', 'btnOpenWorkDrawer'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) b.onclick = (e) => { e.stopPropagation(); triggerOpenWork(); closeAllFlyouts(); };
+    });
 
     // 🎨 HSV 色相环与饱和度/亮度拾色器系统
     let hsvState = { h: 0, s: 0, v: 0.1 };
@@ -7529,17 +7776,19 @@ ${pathsSvg}</svg>`;
       const labels = { zh: '中', en: 'EN', ja: '日', ko: '한', de: 'DE', es: 'ES', fr: 'FR' };
       document.getElementById('currentLangLabel').textContent = labels[lang] || 'EN';
       const dict = TRANSLATIONS[lang];
+      // Missing keys fall back to English (then Chinese) so no element keeps the previous language's text
+      const pick = (key) => dict[key] || TRANSLATIONS.en[key] || TRANSLATIONS.zh[key] || '';
       document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (dict[key]) el.innerHTML = dict[key];
+        const val = pick(el.getAttribute('data-i18n'));
+        if (val) el.innerHTML = val;
       });
       document.querySelectorAll('[data-i18n-title]').forEach(el => {
-        const key = el.getAttribute('data-i18n-title');
-        if (dict[key]) el.title = dict[key];
+        const val = pick(el.getAttribute('data-i18n-title'));
+        if (val) { el.title = val; if (el.hasAttribute('aria-label') || el.tagName === 'BUTTON') el.setAttribute('aria-label', val); }
       });
       document.querySelectorAll('[data-i18n-ph]').forEach(el => {
-        const key = el.getAttribute('data-i18n-ph');
-        if (dict[key]) el.placeholder = dict[key];
+        const val = pick(el.getAttribute('data-i18n-ph'));
+        if (val) el.placeholder = val;
       });
       if (dict.ratios) {
         const ratioSel = document.getElementById('ratioSelector');
