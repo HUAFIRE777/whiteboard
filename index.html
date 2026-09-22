@@ -4603,7 +4603,7 @@
       box.ondblclick = (e) => {
         e.stopPropagation();
         const st = getSingleSelectedSticky();
-        if (st) { openStickyEditor(st); return; }
+        if (st) { if (!activeStickyEditor || activeStickyEditor.st !== st) openStickyEditor(st); return; }
         if (appState.selectedTexts && appState.selectedTexts.length === 1 && !(appState.selectedStrokes || []).length && !(appState.selectedImages || []).length) {
           openRichTextEditor(appState.selectedTexts[0]);
         }
@@ -4702,6 +4702,18 @@
         if (e.target.dataset.handle || e.target.dataset.rot || e.target.closest('.selection-action-pill')) return;
         e.stopPropagation();
         e.preventDefault();
+        // Double tap / double click on a single selected sticky opens its editor (touch devices get no dblclick)
+        const nowTap = performance.now();
+        const tapSticky = getSingleSelectedSticky();
+        if (tapSticky && ((appState._lastBoxTapSticky === tapSticky && nowTap - (appState._lastBoxTapTime || 0) < 380) ||
+            (appState._lastClickedSticky === tapSticky && nowTap - (appState._lastStickyClickTime || 0) < 380))) {
+          appState._lastBoxTapSticky = null;
+          appState._lastClickedSticky = null;
+          openStickyEditor(tapSticky);
+          return;
+        }
+        appState._lastBoxTapSticky = tapSticky;
+        appState._lastBoxTapTime = nowTap;
         saveHistory();
         appState.isDraggingSelection = true;
         appState.dragStartPos = getCanvasCoordinates(e);
@@ -5030,6 +5042,7 @@
 
     function loadPage(index) {
       if (index < 0 || index >= appState.pages.length) return;
+      if (typeof activeStickyEditor !== 'undefined' && activeStickyEditor) activeStickyEditor.commit();
       syncCurrentPageToState();
       appState.currentPageIndex = index;
       const p = appState.pages[index];
@@ -5209,6 +5222,7 @@
       };
 
       refCanvas.addEventListener('pointerdown', (e) => {
+        if (activeStickyEditor) activeStickyEditor.commit();
         closeAllFlyouts();
         const tool = appState.tool;
 
@@ -5773,6 +5787,8 @@
     let activePointerId = null; // pointer that owns the current stroke / eraser / lasso gesture
 
     canvas.addEventListener('pointerdown', (e) => {
+      // Clicking the canvas finishes an open sticky-note edit first (preventDefault below keeps focus from moving)
+      if (activeStickyEditor) activeStickyEditor.commit();
       // A second pointer while drawing: ignore it; a second finger turns the gesture into a multi-touch
       // gesture (two-finger tap = undo), so the half-drawn stroke is discarded instead of zig-zagging.
       if (isDrawing && activePointerId !== null && e.pointerId !== activePointerId) {
@@ -6385,7 +6401,7 @@
       return {
         strokes: JSON.parse(JSON.stringify(strokes || [])),
         texts: JSON.parse(JSON.stringify(texts || [], (k, v) => (k === '_editing' ? undefined : v))),
-        images: (images || []).map(im => ({ ...im }))
+        images: (images || []).map(im => { const c = { ...im }; delete c._editing; return c; })
       };
     }
 
@@ -6572,6 +6588,7 @@
     if (clearAllBtnElem) {
       clearAllBtnElem.onclick = () => {
         if (!confirm(i18nText('confirm_clear_all', '确认清空当前画板吗？所有笔触、文字、图片与便签将被清除。'))) return;
+        if (activeStickyEditor) activeStickyEditor.commit();
         if (appState.isDualSpread && appState.lastActiveBoard === 'left') {
           saveLeftHistory();
           const p0 = appState.pages[0];
@@ -8086,6 +8103,7 @@ ${pathsSvg}</svg>`;
     if (btnToggleFullscreen) btnToggleFullscreen.onclick = toggleFullscreenMode;
     if (exitFullscreenBtn) exitFullscreenBtn.onclick = toggleFullscreenMode;
 
+    const i18nOriginalHTML = new WeakMap();
     function setLanguage(lang) {
       if (!TRANSLATIONS[lang]) lang = 'en';
       appState.lang = lang;
@@ -8096,10 +8114,12 @@ ${pathsSvg}</svg>`;
       const labels = { zh: '中', en: 'EN', ja: '日', ko: '한', de: 'DE', es: 'ES', fr: 'FR' };
       document.getElementById('currentLangLabel').textContent = labels[lang] || 'EN';
       const dict = TRANSLATIONS[lang];
-      // Missing keys fall back to English (then Chinese) so no element keeps the previous language's text
-      const pick = (key) => dict[key] || TRANSLATIONS.en[key] || TRANSLATIONS.zh[key] || '';
+      // Missing keys fall back to English (non-zh) and then to the original Chinese markup, so no element keeps
+      // the previous language's text after switching
+      const pick = (key) => dict[key] || (lang !== 'zh' && TRANSLATIONS.en[key]) || TRANSLATIONS.zh[key] || '';
       document.querySelectorAll('[data-i18n]').forEach(el => {
-        const val = pick(el.getAttribute('data-i18n'));
+        if (!i18nOriginalHTML.has(el)) i18nOriginalHTML.set(el, el.innerHTML);
+        const val = pick(el.getAttribute('data-i18n')) || i18nOriginalHTML.get(el);
         if (val) el.innerHTML = val;
       });
       document.querySelectorAll('[data-i18n-title]').forEach(el => {
