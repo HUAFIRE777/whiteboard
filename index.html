@@ -5201,6 +5201,19 @@
       });
     }
 
+    // 双板模式下在左板用选择/文字/套索时给出提示（左板只支持画笔和橡皮），避免"点了没反应"
+    let _leftBoardHintAt = 0;
+    function hintLeftBoardTool(tool) {
+      if (!['select', 'text', 'lasso'].includes(tool)) return;
+      if (Date.now() - _leftBoardHintAt < 4000) return;
+      _leftBoardHintAt = Date.now();
+      const zh = (document.documentElement.lang || '').startsWith('zh');
+      const msg = zh
+        ? '左边是第 1 页，双板模式下只能用画笔和橡皮。要选择、移动或打字，请点「单板模式」回到第 1 页。'
+        : 'The left board (page 1) supports pen and eraser only in dual view. To select, move or type, switch to Single Board.';
+      try { showCreatorToast(msg, 4500); } catch (e) {}
+    }
+
     function setupWritableDualBoard() {
       const refCanvas = document.getElementById('referenceCanvas');
       if (!refCanvas || refCanvas._bound) return;
@@ -5234,7 +5247,7 @@
         }
 
         // Only drawing tools and the eraser act on the left board
-        if (tool !== 'eraser' && !isStrokeTool(tool)) return;
+        if (tool !== 'eraser' && !isStrokeTool(tool)) { hintLeftBoardTool(tool); return; }
 
         const p = appState.pages[0]; // 左板固定绘制到第 1 页
         if (!p) return;
@@ -5475,6 +5488,10 @@
       `;
 
       canvasCard.appendChild(wrapper);
+
+      // 放进画布后按实际宽度再夹一次，避免文字工具条超出画板右边
+
+      { const ww = wrapper.offsetWidth; const left = parseFloat(wrapper.style.left) || 0; if (ww && left + ww > cssWidth - 6) wrapper.style.left = `${Math.max(6, cssWidth - ww - 6)}px`; }
 
       const textarea = wrapper.querySelector('#inlineCanvasTextArea');
       textarea.value = currentVal; // set as value (never interpolate user text into innerHTML)
@@ -9467,7 +9484,7 @@ ${pathsSvg}</svg>`;
           if (savedLang && TRANSLATIONS[savedLang]) startLang = savedLang;
         } catch (_) {}
       }
-      setLanguage(startLang || 'zh');
+      setLanguage(startLang || (function () { try { const langs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || ""]; for (const l of langs) { const c = String(l).toLowerCase().slice(0, 2); if (TRANSLATIONS[c]) return c; } } catch (e) {} return "en"; })()); // 无 ?lang / 无保存设置时跟随浏览器语言，否则英文
       const savedTheme = localStorage.getItem('eazyopc_theme') || 'dark';
       applyTheme(savedTheme);
       const activeColorDot = document.getElementById('activeColorDot');
