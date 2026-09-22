@@ -5387,7 +5387,7 @@
       resizeCanvas();
       clearSelection();
       redrawAllStrokes();
-      if (appState.isDualSpread) renderReferenceBoard();
+      renderReferenceBoard(); // also hides the left card when leaving dual mode
       updatePageUI();
       if (typeof scheduleAutosave === 'function') scheduleAutosave();
     }
