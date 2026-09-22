@@ -1375,12 +1375,12 @@
       <button id="btnNextPage" class="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition" title="下一页 (▶)">▶</button>
       <span class="text-slate-700">|</span>
       <button id="btnAddPage" class="flex items-center gap-1.5 px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow transition active:scale-95" title="新建空白白板页 (+)"><svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span data-i18n="add_page" class="text-white font-bold">加页</span></button>
-      <button id="btnToggleDualView" class="flex items-center gap-1 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold shadow transition active:scale-95" title="双板并排独立书写模式 (支持同时独立书写左侧与右侧画板)"><span>📖</span><span id="lblDualView">双板并排</span></button>
+      <button id="btnToggleDualView" class="flex items-center gap-1 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold shadow transition active:scale-95" title="双板并排独立书写模式 (支持同时独立书写左侧与右侧画板)"><span>📖</span><span id="lblDualView" data-i18n="dual_view">双板并排</span></button>
       <button id="btnDeletePage" class="p-1 hover:bg-rose-900/40 text-slate-400 hover:text-rose-400 rounded-lg text-xs transition" title="删除当前页面">🗑️</button>
     </div>
 
     <!-- 真实物理纸张容器 (支持双板并排独立书写) -->
-    <div id="artboardStage" class="flex items-center justify-center gap-4 transition-all max-w-full">
+    <div id="artboardStage" class="relative flex items-center justify-center gap-4 transition-transform origin-center max-w-full">
       <!-- 📄 左侧交互画板 (第 1 页，双板模式) -->
       <div id="referenceCanvasCard" class="hidden relative rounded-2xl shadow-2xl ring-1 ring-slate-800 overflow-hidden flex items-center justify-center bg-white origin-center">
         <canvas id="referenceCanvas" class="cursor-crosshair touch-none"></canvas>
@@ -1388,7 +1388,7 @@
       </div>
 
       <!-- ✏️ 当前主绘制画板 (第 2 页，单板模式为默认主画板) -->
-      <div id="canvasCard" class="relative rounded-2xl shadow-2xl ring-1 ring-slate-800 overflow-hidden flex items-center justify-center transition-transform bg-white origin-center">
+      <div id="canvasCard" class="relative rounded-2xl shadow-2xl ring-1 ring-slate-800 overflow-hidden flex items-center justify-center bg-white origin-center">
         <!-- 视频图层渲染容器 (置于主画布下方，支持在演示视频上方直接批注涂鸦) -->
         <div id="videoLayerContainer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
         <canvas id="mainCanvas"></canvas>
@@ -2225,6 +2225,11 @@
   <script>
     const TRANSLATIONS = {
       zh: {
+        page_indicator: '第 {cur} / {total} 页',
+        page_indicator_dual: '第 1 - {cur} / {total} 页 (双板)',
+        dual_view: '双板并排',
+        single_view: '单板模式',
+        confirm_clear_all: '确认清空当前画板吗？所有笔触、文字、图片与便签将被清除。',
         sticky_menu_title: '四色马卡龙即时贴便利贴',
         media_title: '导入多媒体',
         import_video: '导入演示视频 (可涂鸦)',
@@ -2334,10 +2339,10 @@
           free: '♾️ 自适应满屏 (Responsive)',
           a4_p: '📄 A4 纵向 (210×297mm)',
           a4_l: '📄 A4 横向 (297×210mm)',
-          16_9: '💻 16:9 演示宽屏 (Presentation)',
-          9_16: '📱 9:16 移动竖屏 (Mobile Post)',
-          4_3: '📱 4:3 经典平板 (Tablet)',
-          1_1: '🔲 1:1 正方形 (Square)'
+          '16_9': '💻 16:9 演示宽屏 (Presentation)',
+          '9_16': '📱 9:16 移动竖屏 (Mobile Post)',
+          '4_3': '📱 4:3 经典平板 (Tablet)',
+          '1_1': '🔲 1:1 正方形 (Square)'
         },
         papers: {
           dot: '极简点阵纸 (Dot Matrix)',
@@ -2350,6 +2355,11 @@
         }
       },
       en: {
+        page_indicator: 'Page {cur} / {total}',
+        page_indicator_dual: 'Pages 1 - {cur} / {total} (Dual)',
+        dual_view: 'Dual View',
+        single_view: 'Single View',
+        confirm_clear_all: 'Clear this board? All strokes, text, images and sticky notes will be removed.',
         tier_free_title: 'Option 1: Free Export',
         tier_free_desc: 'Outputs 1080P standard PNG with a subtle watermark. Ideal for quick sketches, notes, and sharing.',
         tier_pro_title: 'Option 2: Pro Lifetime Access',
@@ -2468,10 +2478,10 @@
           free: '♾️ Responsive (Full Screen)',
           a4_p: '📄 A4 Portrait (Print)',
           a4_l: '📄 A4 Landscape',
-          16_9: '💻 16:9 Presentation',
-          9_16: '📱 9:16 Mobile Story',
-          4_3: '📱 4:3 Tablet (iPad)',
-          1_1: '🔲 1:1 Square (Social)'
+          '16_9': '💻 16:9 Presentation',
+          '9_16': '📱 9:16 Mobile Story',
+          '4_3': '📱 4:3 Tablet (iPad)',
+          '1_1': '🔲 1:1 Square (Social)'
         },
         papers: {
           dot: 'Dot Matrix Grid',
@@ -2540,10 +2550,10 @@
           free: '♾️ 全画面適応 (Responsive)',
           a4_p: '📄 A4 縦向き (210×297mm)',
           a4_l: '📄 A4 横向き (297×210mm)',
-          16_9: '💻 16:9 プレゼン用',
-          9_16: '📱 9:16 モバイル縦画面',
-          4_3: '📱 4:3 タブレット (iPad)',
-          1_1: '🔲 1:1 正方形 (SNS)'
+          '16_9': '💻 16:9 プレゼン用',
+          '9_16': '📱 9:16 モバイル縦画面',
+          '4_3': '📱 4:3 タブレット (iPad)',
+          '1_1': '🔲 1:1 正方形 (SNS)'
         },
         papers: {
           dot: 'ドット方眼紙 (Dot Matrix)',
@@ -2612,10 +2622,10 @@
           free: '♾️ 반응형 전체화면 (Responsive)',
           a4_p: '📄 A4 세로 (210×297mm)',
           a4_l: '📄 A4 가로 (297×210mm)',
-          16_9: '💻 16:9 발표용 와이드',
-          9_16: '📱 9:16 모바일 세로',
-          4_3: '📱 4:3 태블릿 (iPad)',
-          1_1: '🔲 1:1 정사각형 (SNS)'
+          '16_9': '💻 16:9 발표용 와이드',
+          '9_16': '📱 9:16 모바일 세로',
+          '4_3': '📱 4:3 태블릿 (iPad)',
+          '1_1': '🔲 1:1 정사각형 (SNS)'
         },
         papers: {
           dot: '점 격자 노트 (Dot Matrix)',
@@ -2684,10 +2694,10 @@
           free: '♾️ Vollbild (Responsive)',
           a4_p: '📄 A4 Hochformat (210×297mm)',
           a4_l: '📄 A4 Querformat (297×210mm)',
-          16_9: '💻 16:9 Breitbild (Präsentation)',
-          9_16: '📱 9:16 Handy Hochformat',
-          4_3: '📱 4:3 Tablet (iPad)',
-          1_1: '🔲 1:1 Quadrat (Social)'
+          '16_9': '💻 16:9 Breitbild (Präsentation)',
+          '9_16': '📱 9:16 Handy Hochformat',
+          '4_3': '📱 4:3 Tablet (iPad)',
+          '1_1': '🔲 1:1 Quadrat (Social)'
         },
         papers: {
           dot: 'Punktgitter (Dot Matrix)',
@@ -2756,10 +2766,10 @@
           free: '♾️ Pantalla completa (Adaptable)',
           a4_p: '📄 A4 Vertical (210×297mm)',
           a4_l: '📄 A4 Horizontal (297×210mm)',
-          16_9: '💻 16:9 Presentación Panorámica',
-          9_16: '📱 9:16 Historia Móvil',
-          4_3: '📱 4:3 Tableta (iPad)',
-          1_1: '🔲 1:1 Cuadrado (Social)'
+          '16_9': '💻 16:9 Presentación Panorámica',
+          '9_16': '📱 9:16 Historia Móvil',
+          '4_3': '📱 4:3 Tableta (iPad)',
+          '1_1': '🔲 1:1 Cuadrado (Social)'
         },
         papers: {
           dot: 'Cuadrícula de Puntos (Dot Matrix)',
@@ -2828,10 +2838,10 @@
           free: '♾️ Plein écran (Adaptable)',
           a4_p: '📄 A4 Portrait (210×297mm)',
           a4_l: '📄 A4 Paysage (297×210mm)',
-          16_9: '💻 16:9 Présentation Large',
-          9_16: '📱 9:16 Story Mobile',
-          4_3: '📱 4:3 Tablette (iPad)',
-          1_1: '🔲 1:1 Carré (Réseaux)'
+          '16_9': '💻 16:9 Présentation Large',
+          '9_16': '📱 9:16 Story Mobile',
+          '4_3': '📱 4:3 Tablette (iPad)',
+          '1_1': '🔲 1:1 Carré (Réseaux)'
         },
         papers: {
           dot: 'Papier Pointillé (Dot Matrix)',
@@ -2886,9 +2896,30 @@
       panStart: { x: 0, y: 0 }
     };
     window.appState = appState;
+    appState.lastActiveBoard = 'right'; // 'left' | 'right' — undo/redo target in dual mode
+
+    // i18n lookup with zh default and en fallback; {name} placeholders are replaced from vars
+    function i18nText(key, zhFallback, vars) {
+      const lang = appState.lang || 'zh';
+      const dict = TRANSLATIONS[lang] || TRANSLATIONS.zh;
+      let str = (dict && dict[key]) ||
+        (lang !== 'zh' && TRANSLATIONS.en && TRANSLATIONS.en[key]) ||
+        (TRANSLATIONS.zh && TRANSLATIONS.zh[key]) || zhFallback || key;
+      if (vars) {
+        for (const k of Object.keys(vars)) str = str.split(`{${k}}`).join(String(vars[k]));
+      }
+      return str;
+    }
+
+    // Tools that never create strokes (everything else is a drawing tool)
+    const NON_STROKE_TOOLS = new Set(['hand', 'select', 'lasso', 'text', 'laser', 'eraser']);
+    function isStrokeTool(tool) {
+      return !!tool && !NON_STROKE_TOOLS.has(tool);
+    }
 
     const canvas = document.getElementById('mainCanvas');
     const ctx = canvas.getContext('2d');
+    const mainCtx = ctx;
     const canvasCard = document.getElementById('canvasCard');
     const workbenchWrapper = document.getElementById('workbenchWrapper');
     const laserLayer = document.getElementById('laserLayer');
@@ -3037,9 +3068,34 @@
       redrawAllStrokes();
     }
 
+    // Zoom & pan transform the shared #artboardStage so both boards (dual mode) move together
     function applyZoomAndPan() {
-      canvasCard.style.transform = `translate(${appState.panX}px, ${appState.panY}px) scale(${appState.zoom})`;
-      document.getElementById('btnZoomReset').innerText = `${Math.round(appState.zoom * 100)}%`;
+      const stage = document.getElementById('artboardStage');
+      const t = `translate(${appState.panX}px, ${appState.panY}px) scale(${appState.zoom})`;
+      if (stage) stage.style.transform = t;
+      else canvasCard.style.transform = t;
+      const zr = document.getElementById('btnZoomReset');
+      if (zr) zr.innerText = `${Math.round(appState.zoom * 100)}%`;
+    }
+
+    // Dual mode keeps each page's logical size (so content drawn in single mode is never clipped)
+    // and only shrinks the DISPLAY of both cards uniformly. The scale is applied as a CSS transform on
+    // the cards (children such as selection/text/sticky overlays are positioned in logical px and scale
+    // along); negative margins give the flex layout the scaled footprint. Pointer mapping divides by the
+    // on-screen rect, so it stays exact.
+    function applyCardDisplayScale(card, scale) {
+      if (!card) return;
+      if (scale < 0.999) {
+        card.style.transformOrigin = 'top left';
+        card.style.transform = `scale(${scale})`;
+        card.style.marginRight = `${-(1 - scale) * cssWidth}px`;
+        card.style.marginBottom = `${-(1 - scale) * cssHeight}px`;
+      } else {
+        card.style.transform = 'none';
+        card.style.transformOrigin = '';
+        card.style.marginRight = '';
+        card.style.marginBottom = '';
+      }
     }
 
     function resizeCanvas() {
@@ -3048,9 +3104,8 @@
       let maxW = Math.max(300, containerRect.width - (document.body.classList.contains('is-fullscreen') ? 0 : 32));
       let maxH = Math.max(300, containerRect.height - (document.body.classList.contains('is-fullscreen') ? 0 : 32));
 
-      if (appState.isDualSpread) {
-        maxW = Math.max(300, (maxW - 36) * 0.48);
-      }
+      // Logical page size is computed as in single mode; dual mode only scales the display (see below)
+      const singleMaxW = maxW;
 
       let targetRatio = null;
       if (appState.ratio === 'a4_p') targetRatio = 210 / 297;
@@ -3083,6 +3138,13 @@
       cssWidth = Math.round(cssWidth);
       cssHeight = Math.round(cssHeight);
 
+      let displayScale = 1;
+      if (appState.isDualSpread) {
+        const perBoardW = Math.max(150, (singleMaxW - 36) * 0.5);
+        displayScale = Math.min(1, perBoardW / cssWidth, maxH / cssHeight);
+      }
+      appState.displayScale = displayScale;
+
       canvasCard.style.width = `${cssWidth}px`;
       canvasCard.style.height = `${cssHeight}px`;
 
@@ -3101,6 +3163,8 @@
         refCanvas.style.width = `${cssWidth}px`;
         refCanvas.style.height = `${cssHeight}px`;
       }
+      applyCardDisplayScale(canvasCard, displayScale);
+      applyCardDisplayScale(refCard, appState.isDualSpread ? displayScale : 1);
 
       applyZoomAndPan();
       redrawAllStrokes();
@@ -3197,7 +3261,9 @@
       targetCtx.restore();
     }
 
-    function redrawAllStrokes(targetCtx = ctx, scale = dpr, transparent = false) {
+    // src (optional): { strokes, texts, images } of another board (e.g. dual-mode left page). Defaults to appState.
+    function redrawAllStrokes(targetCtx = ctx, scale = dpr, transparent = false, src = null) {
+      const board = src || appState;
       renderBackgroundOnContext(targetCtx, cssWidth, cssHeight, scale, transparent);
 
       targetCtx.save();
@@ -3205,7 +3271,7 @@
       targetCtx.scale(scale, scale);
 
       // 0. 渲染插入的白板视频 (支持在视频上直接圈画批注)
-      if (appState.videos && appState.videos.length > 0) {
+      if (!src && appState.videos && appState.videos.length > 0) {
         for (const v of appState.videos) {
           if (v.visible !== false && v.videoEl && (v.videoEl.readyState >= 2 || v.videoEl.currentTime > 0)) {
             targetCtx.save();
@@ -3223,7 +3289,7 @@
       }
 
       // 1. 渲染插入/粘贴的图片 (支持 360° 旋转)
-      for (const im of appState.images) {
+      for (const im of (board.images || [])) {
         if (im.img && im.img.complete) {
           targetCtx.save();
           const cx = im.x + im.width / 2;
@@ -3236,7 +3302,7 @@
       }
 
             // 2. 渲染 12 大商业级手绘笔画 (G-Pen, 丸笔, 铅笔, 蓝笔, 毛笔, 喷枪, 荧光, 排线, 霓虹, 虚线, 激光, 圆珠笔)
-      for (const s of appState.strokes) {
+      for (const s of (board.strokes || [])) {
         if (!s.points || s.points.length === 0) continue;
         targetCtx.save();
 
@@ -3355,7 +3421,7 @@
       }
 
       // 3. 渲染自由打字文本 (支持 9 款开源艺术字体、多行对齐与 360° 旋转)
-      for (const t of appState.texts) {
+      for (const t of (board.texts || [])) {
         if (t._editing) continue;
         targetCtx.save();
         const fontSize = Number(t.size) || 24;
@@ -3420,15 +3486,23 @@
       return false;
     }
 
-    function eraseStrokesAt(x, y) {
+    // Removes strokes/texts near (x, y) from the given board ({ strokes, texts }); returns true if anything changed
+    function eraseOnBoard(board, x, y) {
       const hitRadius = Math.max(20, appState.brushSize * 3);
-      const initialStrokeCount = appState.strokes.length;
-      appState.strokes = appState.strokes.filter(s => !isStrokeNearPoint(s, x, y, hitRadius));
-      
-      const initialTextCount = appState.texts.length;
-      appState.texts = appState.texts.filter(t => Math.hypot(t.x - x, t.y - y) > hitRadius * 1.5);
+      const strokes = board.strokes || [];
+      const texts = board.texts || [];
+      const nextStrokes = strokes.filter(s => !isStrokeNearPoint(s, x, y, hitRadius));
+      const nextTexts = texts.filter(t => Math.hypot(t.x - x, t.y - y) > hitRadius * 1.5);
+      const changed = nextStrokes.length < strokes.length || nextTexts.length < texts.length;
+      if (changed) {
+        board.strokes = nextStrokes;
+        board.texts = nextTexts;
+      }
+      return changed;
+    }
 
-      if (appState.strokes.length < initialStrokeCount || appState.texts.length < initialTextCount) {
+    function eraseStrokesAt(x, y) {
+      if (eraseOnBoard(appState, x, y)) {
         redrawAllStrokes();
         return true;
       }
@@ -3915,14 +3989,13 @@
         const clonedList = [];
         for (const t of appState.selectedTexts) {
           const clone = {
+            ...t,
             id: Date.now() + Math.random(),
-            text: t.text,
             x: t.x + 24,
             y: t.y + 24,
-            size: t.size,
-            color: t.color,
             rotation: t.rotation || 0
           };
+          delete clone._editing;
           appState.texts.push(clone);
           clonedList.push(clone);
         }
@@ -3961,29 +4034,18 @@
       redrawAllStrokes();
     }
 
-    // 快捷键 Delete / Backspace 删除选中项
-    window.addEventListener('keydown', (e) => {
-      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-      if (e.key === 'Delete' || e.key === 'Backspace') {
-        if ((appState.selectedStrokes && appState.selectedStrokes.length > 0) ||
-            (appState.selectedTexts && appState.selectedTexts.length > 0) ||
-            (appState.selectedImages && appState.selectedImages.length > 0)) {
-          e.preventDefault();
-          deleteSelectedItems();
-        }
-      }
-    });
+    // (Delete / Backspace shortcut is handled by the main keyboard handler below)
 
     // 🌟 漫画多页纸张管理系统 (Multi-Page Comic Book Engine)
     function updatePageUI() {
       const indicator = document.getElementById('pageIndicator');
       if (indicator) {
         const total = appState.pages.length;
+        const cur = appState.currentPageIndex + 1;
         if (appState.isDualSpread) {
-          indicator.innerText = `第 1 - 2 / ${Math.max(2, total)} 页 (双板)`;
+          indicator.innerText = i18nText('page_indicator_dual', '第 1 - {cur} / {total} 页 (双板)', { cur, total });
         } else {
-          const cur = appState.currentPageIndex + 1;
-          indicator.innerText = `第 ${cur} / ${total} 页`;
+          indicator.innerText = i18nText('page_indicator', '第 {cur} / {total} 页', { cur, total });
         }
       }
       if (appState.isDualSpread) renderReferenceBoard();
@@ -4029,6 +4091,18 @@
       };
       appState.pages.push(newPage);
       loadPage(appState.pages.length - 1);
+      if (typeof scheduleAutosave === 'function') scheduleAutosave();
+    }
+
+    // Loads pages[index] into the live state WITHOUT syncing the current state back (used after a page was removed)
+    function loadPageWithoutSync(index) {
+      appState.currentPageIndex = index;
+      const p = appState.pages[index];
+      appState.strokes = (p.strokes || []).slice();
+      appState.texts = (p.texts || []).slice();
+      appState.images = (p.images || []).slice();
+      appState.history = (p.history || []).slice();
+      appState.redoStack = (p.redoStack || []).slice();
     }
 
     function deleteCurrentPage() {
@@ -4040,14 +4114,24 @@
         appState.images = [];
         clearSelection();
         redrawAllStrokes();
+        if (typeof scheduleAutosave === 'function') scheduleAutosave();
         return;
       }
       const dict = TRANSLATIONS[appState.lang] || TRANSLATIONS.zh;
       if (!confirm(dict.confirm_delete_page || '确定要删除当前页面吗？此操作无法撤销。')) return;
       appState.pages.splice(appState.currentPageIndex, 1);
+      if (appState.isDualSpread && appState.pages.length < 2) {
+        // Dual mode needs 2 pages: fall back to page 1 and leave dual mode through the normal toggle (→ loadPage(0))
+        loadPageWithoutSync(0);
+        toggleDualSpreadView();
+        if (typeof scheduleAutosave === 'function') scheduleAutosave();
+        return;
+      }
       if (appState.currentPageIndex >= appState.pages.length) {
         appState.currentPageIndex = appState.pages.length - 1;
       }
+      // In dual mode the right board must never show page 1 (index 0), which lives on the left board
+      if (appState.isDualSpread && appState.currentPageIndex < 1) appState.currentPageIndex = 1;
       const p = appState.pages[appState.currentPageIndex];
       appState.strokes = (p.strokes || []).slice();
       appState.texts = (p.texts || []).slice();
@@ -4057,6 +4141,7 @@
       clearSelection();
       redrawAllStrokes();
       updatePageUI();
+      if (typeof scheduleAutosave === 'function') scheduleAutosave();
     }
 
     // 🔤 高精度文本度量与包围盒计算系统 (支持多行与动态字体系数)
@@ -4104,86 +4189,13 @@
       refCard.classList.remove('hidden');
       refCard.style.display = 'flex';
 
-      const refIdx = 0; // 左侧画板固定为第 1 页
-      appState.referencePageIndex = 0;
-
-      const p = appState.pages[refIdx];
+      appState.referencePageIndex = 0; // 左侧画板固定为第 1 页
+      const p = appState.pages[0];
       if (!p) return;
 
+      // Same renderer as the main board so every brush (spray dots, highlighter, neon...) looks identical
       const refCtx = refCanvas.getContext('2d');
-      renderBackgroundOnContext(refCtx, cssWidth, cssHeight, dpr, false);
-
-      refCtx.save();
-      refCtx.setTransform(1, 0, 0, 1, 0, 0);
-      refCtx.scale(dpr, dpr);
-
-      // 渲染对照页图片
-      for (const im of (p.images || [])) {
-        if (im.img && im.img.complete) {
-          refCtx.save();
-          const cx = im.x + im.width / 2;
-          const cy = im.y + im.height / 2;
-          refCtx.translate(cx, cy);
-          if (im.rotation) refCtx.rotate(im.rotation);
-          refCtx.drawImage(im.img, -im.width / 2, -im.height / 2, im.width, im.height);
-          refCtx.restore();
-        }
-      }
-
-      // 渲染对照页笔触
-      for (const s of (p.strokes || [])) {
-        if (!s.points || s.points.length === 0) continue;
-        refCtx.save();
-        refCtx.strokeStyle = s.color || '#18181b';
-        refCtx.fillStyle = s.color || '#18181b';
-        refCtx.lineCap = 'round';
-        refCtx.lineJoin = 'round';
-        refCtx.lineWidth = Math.max(1, s.size || 3);
-        if (s.tool === 'highlighter') {
-          refCtx.globalCompositeOperation = 'multiply';
-          refCtx.globalAlpha = 0.35;
-          refCtx.lineWidth = (s.size || 3) * 3.6;
-        }
-
-        if (s.points.length === 1) {
-          refCtx.beginPath();
-          refCtx.arc(s.points[0].x, s.points[0].y, Math.max(1.5, (s.size || 3) / 2), 0, Math.PI * 2);
-          refCtx.fill();
-        } else if (s.points.length === 2) {
-          refCtx.beginPath();
-          refCtx.moveTo(s.points[0].x, s.points[0].y);
-          refCtx.lineTo(s.points[1].x, s.points[1].y);
-          refCtx.stroke();
-        } else {
-          refCtx.beginPath();
-          refCtx.moveTo(s.points[0].x, s.points[0].y);
-          for (let i = 1; i < s.points.length - 1; i++) {
-            const p1 = s.points[i];
-            const p2 = s.points[i + 1];
-            refCtx.quadraticCurveTo(p1.x, p1.y, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
-          }
-          refCtx.lineTo(s.points[s.points.length - 1].x, s.points[s.points.length - 1].y);
-          refCtx.stroke();
-        }
-        refCtx.restore();
-      }
-
-      // 渲染对照页文本
-      for (const t of (p.texts || [])) {
-        if (!t.text) continue;
-        refCtx.save();
-        refCtx.font = `${t.bold ? 'bold' : 'normal'} ${t.size || 24}px ${t.fontFamily || "'Noto Sans SC', sans-serif"}`;
-        refCtx.fillStyle = t.color || '#18181b';
-        refCtx.textBaseline = 'top';
-        const lines = String(t.text).split('\n');
-        const lineHeight = (t.size || 24) * 1.35;
-        lines.forEach((line, idx) => {
-          refCtx.fillText(line, t.x, t.y + idx * lineHeight);
-        });
-        refCtx.restore();
-      }
-
-      refCtx.restore();
+      redrawAllStrokes(refCtx, dpr, false, { strokes: p.strokes || [], texts: p.texts || [], images: p.images || [] });
     }
 
     function getRefCanvasCoordinates(e) {
@@ -4200,114 +4212,153 @@
 
     let isRefDrawing = false;
     let currentRefStroke = null;
+    let refActivePointerId = null;
+    let refRenderQueued = false;
+
+    function queueReferenceRender() {
+      if (refRenderQueued) return;
+      refRenderQueued = true;
+      requestAnimationFrame(() => {
+        refRenderQueued = false;
+        renderReferenceBoard();
+      });
+    }
 
     function setupWritableDualBoard() {
       const refCanvas = document.getElementById('referenceCanvas');
       if (!refCanvas || refCanvas._bound) return;
       refCanvas._bound = true;
 
-      function eraseOnLeftPage(pos) {
-        const p = appState.pages[0];
-        if (!p || !p.strokes) return;
-        const r = Math.max(12, (Number(appState.brushSize) || 8) * 1.5);
-        p.strokes = p.strokes.filter(s => {
-          if (!s.points) return true;
-          return !s.points.some(pt => Math.hypot(pt.x - pos.x, pt.y - pos.y) <= r);
-        });
-      }
+      const endRefStroke = (e) => {
+        if (!isRefDrawing) return;
+        if (e && refActivePointerId !== null && e.pointerId !== refActivePointerId) return;
+        isRefDrawing = false;
+        currentRefStroke = null;
+        if (e && refActivePointerId !== null) {
+          try { refCanvas.releasePointerCapture(refActivePointerId); } catch (_) {}
+        }
+        refActivePointerId = null;
+        renderReferenceBoard();
+        if (typeof scheduleAutosave === 'function') scheduleAutosave();
+      };
 
       refCanvas.addEventListener('pointerdown', (e) => {
         closeAllFlyouts();
-        e.preventDefault();
-        const pos = getRefCanvasCoordinates(e);
-        const p = appState.pages[0]; // 左板固定绘制到第 1 页
-        if (!p) return;
-        if (!p.strokes) p.strokes = [];
-        if (!p.history) p.history = [];
-        p.history.push(JSON.parse(JSON.stringify(p.strokes)));
-        if (p.history.length > 30) p.history.shift();
+        const tool = appState.tool;
 
-        if (appState.tool === 'eraser') {
-          isRefDrawing = true;
-          eraseOnLeftPage(pos);
-          renderReferenceBoard();
+        // Hand tool / space / middle button pans the whole stage (both boards)
+        if (tool === 'hand' || appState.isSpaceDown || e.button === 1) {
+          e.preventDefault();
+          appState.isPanning = true;
+          appState.panStart = { x: e.clientX - appState.panX, y: e.clientY - appState.panY };
           return;
         }
+
+        // Only drawing tools and the eraser act on the left board
+        if (tool !== 'eraser' && !isStrokeTool(tool)) return;
+
+        const p = appState.pages[0]; // 左板固定绘制到第 1 页
+        if (!p) return;
+
+        // A second finger while drawing = gesture (e.g. two-finger tap undo): discard the in-progress stroke
+        if (isRefDrawing && refActivePointerId !== null && e.pointerId !== refActivePointerId) {
+          if (e.pointerType === 'touch' && currentRefStroke) {
+            p.strokes = (p.strokes || []).filter(st => st !== currentRefStroke);
+            if (p.history && p.history.length) p.history.pop();
+            try { refCanvas.releasePointerCapture(refActivePointerId); } catch (_) {}
+            isRefDrawing = false;
+            currentRefStroke = null;
+            refActivePointerId = null;
+            renderReferenceBoard();
+          }
+          return;
+        }
+
+        e.preventDefault();
+        const pos = getRefCanvasCoordinates(e);
+        refActivePointerId = e.pointerId;
+        try { refCanvas.setPointerCapture(e.pointerId); } catch (_) {}
+        saveLeftHistory();
+
+        if (tool === 'eraser') {
+          isRefDrawing = true;
+          if (eraseOnBoard(p, pos.x, pos.y)) renderReferenceBoard();
+          return;
+        }
+
+        const pressure = (e.pressure !== undefined && e.pressure > 0) ? e.pressure : 0.5;
+        const strokeWidth = computeStrokeWidth(tool, pressure);
+        pos.time = performance.now();
+        pos.pressure = pressure;
+        if (tool === 'spray') pos.sprayDots = generateSprayDots(pos.x, pos.y, strokeWidth);
 
         isRefDrawing = true;
         currentRefStroke = {
           id: Date.now() + Math.random(),
-          tool: appState.tool,
+          tool: tool,
           color: appState.currentColor,
-          size: Number(appState.brushSize) || 3,
+          size: Math.max(1.5, strokeWidth),
           points: [pos]
         };
         p.strokes.push(currentRefStroke);
-
-        const refCtx = refCanvas.getContext('2d');
-        refCtx.save();
-        refCtx.setTransform(1, 0, 0, 1, 0, 0);
-        refCtx.scale(dpr, dpr);
-        refCtx.fillStyle = currentRefStroke.color;
-        refCtx.beginPath();
-        refCtx.arc(pos.x, pos.y, Math.max(1, currentRefStroke.size / 2), 0, Math.PI * 2);
-        refCtx.fill();
-        refCtx.restore();
+        renderReferenceBoard();
       });
 
       refCanvas.addEventListener('pointermove', (e) => {
         if (!isRefDrawing) return;
+        if (refActivePointerId !== null && e.pointerId !== refActivePointerId) return;
         e.preventDefault();
-        const pos = getRefCanvasCoordinates(e);
 
-        if (appState.tool === 'eraser') {
-          eraseOnLeftPage(pos);
-          renderReferenceBoard();
+        if (appState.tool === 'eraser' || !currentRefStroke) {
+          const pos = getRefCanvasCoordinates(e);
+          const p = appState.pages[0];
+          if (p && eraseOnBoard(p, pos.x, pos.y)) queueReferenceRender();
           return;
         }
 
-        if (!currentRefStroke) return;
-        const pts = currentRefStroke.points;
-        if (pts.length > 0) {
-          const last = pts[pts.length - 1];
-          if (Math.hypot(pos.x - last.x, pos.y - last.y) < 2) return;
-        }
-        pos.time = performance.now();
-        pts.push(pos);
-
         const refCtx = refCanvas.getContext('2d');
-        refCtx.save();
-        refCtx.setTransform(1, 0, 0, 1, 0, 0);
-        refCtx.scale(dpr, dpr);
-        refCtx.strokeStyle = currentRefStroke.color;
-        refCtx.lineCap = 'round';
-        refCtx.lineJoin = 'round';
-        refCtx.lineWidth = currentRefStroke.size;
-
-        if (pts.length >= 3) {
-          const p0 = pts[pts.length - 3], pA = pts[pts.length - 2], pB = pts[pts.length - 1];
-          refCtx.beginPath();
-          refCtx.moveTo((p0.x + pA.x)/2, (p0.y + pA.y)/2);
-          refCtx.quadraticCurveTo(pA.x, pA.y, (pA.x + pB.x)/2, (pA.y + pB.y)/2);
-          refCtx.stroke();
-        } else if (pts.length === 2) {
-          refCtx.beginPath();
-          refCtx.moveTo(pts[0].x, pts[0].y);
-          refCtx.lineTo(pts[1].x, pts[1].y);
-          refCtx.stroke();
+        const events = (e.getCoalescedEvents && typeof e.getCoalescedEvents === 'function') ? e.getCoalescedEvents() : [e];
+        for (const ce of (events.length ? events : [e])) {
+          const cPos = getRefCanvasCoordinates(ce);
+          const pts = currentRefStroke.points;
+          if (pts.length > 0) {
+            const last = pts[pts.length - 1];
+            if (Math.hypot(cPos.x - last.x, cPos.y - last.y) < 2) continue;
+          }
+          cPos.time = performance.now();
+          cPos.pressure = (ce.pressure !== undefined && ce.pressure > 0) ? ce.pressure : 0.5;
+          if (currentRefStroke.tool === 'spray') {
+            cPos.sprayDots = generateSprayDots(cPos.x, cPos.y, currentRefStroke.size);
+          }
+          pts.push(cPos);
+          if (pts.length >= 2) {
+            const pPrev = pts.length >= 3 ? pts[pts.length - 3] : null;
+            renderLiveStrokeSegment(currentRefStroke, pts[pts.length - 2], pts[pts.length - 1], pPrev, refCtx);
+          }
         }
-        refCtx.restore();
       });
 
-      const onRefUp = () => {
-        if (isRefDrawing) {
-          isRefDrawing = false;
-          currentRefStroke = null;
-          renderReferenceBoard();
+      refCanvas.addEventListener('pointerup', endRefStroke);
+      refCanvas.addEventListener('pointercancel', endRefStroke);
+      refCanvas.addEventListener('lostpointercapture', endRefStroke);
+    }
+
+    // Dual toggle button + label; re-applied after setLanguage so the label always matches the current state
+    function updateDualToggleUI() {
+      const btn = document.getElementById('btnToggleDualView');
+      const lbl = document.getElementById('lblDualView');
+      const rightBadge = document.getElementById('rightPageBadge');
+      if (btn) {
+        if (appState.isDualSpread) {
+          btn.className = 'dual-active flex items-center gap-1 px-2.5 py-1 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg transition active:scale-95';
+        } else {
+          btn.className = 'flex items-center gap-1 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold shadow transition active:scale-95';
         }
-      };
-      refCanvas.addEventListener('pointerup', onRefUp);
-      refCanvas.addEventListener('pointerleave', onRefUp);
+      }
+      if (lbl) {
+        lbl.textContent = appState.isDualSpread ? i18nText('single_view', '单板模式') : i18nText('dual_view', '双板并排');
+      }
+      if (rightBadge) rightBadge.classList.toggle('hidden', !appState.isDualSpread);
     }
 
     function toggleDualSpreadView() {
@@ -4334,26 +4385,15 @@
         loadPage(1); // 右板加载第 2 页
       }
 
-      const btn = document.getElementById('btnToggleDualView');
-      const lbl = document.getElementById('lblDualView');
-      const rightBadge = document.getElementById('rightPageBadge');
-      if (btn && lbl) {
-        if (appState.isDualSpread) {
-          btn.className = 'flex items-center gap-1 px-2.5 py-1 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg transition active:scale-95';
-          lbl.innerText = '单板模式';
-          if (rightBadge) rightBadge.classList.remove('hidden');
-        } else {
-          btn.className = 'flex items-center gap-1 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold shadow transition active:scale-95';
-          lbl.innerText = '双板并排';
-          if (rightBadge) rightBadge.classList.add('hidden');
-        }
-      }
+      appState.lastActiveBoard = 'right';
+      updateDualToggleUI();
 
       resizeCanvas();
       clearSelection();
       redrawAllStrokes();
       if (appState.isDualSpread) renderReferenceBoard();
       updatePageUI();
+      if (typeof scheduleAutosave === 'function') scheduleAutosave();
     }
 
     function closeAllFlyouts(exceptId = null) {
@@ -4436,12 +4476,13 @@
           <input type="color" class="inline-color-input w-5 h-5 rounded cursor-pointer border-0 bg-transparent" value="${currentColor.startsWith('#') && currentColor.length === 7 ? currentColor : '#18181b'}" title="文字色彩" />
           <button type="button" class="btn-inline-done px-2.5 py-0.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[11px] font-bold shadow transition">完成 ✔</button>
         </div>
-        <textarea id="inlineCanvasTextArea" class="bg-white/90 dark:bg-slate-900/90 border-2 border-dashed border-indigo-500 rounded-lg p-2 outline-none resize-none overflow-hidden shadow-2xl transition" placeholder="在此直接打字..." style="font-size:${currentSize}px; font-family:${currentFont}; color:${currentColor}; font-weight:${isBold ? 'bold' : 'normal'}; line-height:1.25; min-width:160px; min-height:${currentSize * 1.5}px;">${currentVal}</textarea>
+        <textarea id="inlineCanvasTextArea" class="bg-white/90 dark:bg-slate-900/90 border-2 border-dashed border-indigo-500 rounded-lg p-2 outline-none resize-none overflow-hidden shadow-2xl transition" placeholder="在此直接打字..." style="font-size:${currentSize}px; font-family:${currentFont}; color:${currentColor}; font-weight:${isBold ? 'bold' : 'normal'}; line-height:1.25; min-width:160px; min-height:${currentSize * 1.5}px;"></textarea>
       `;
 
       canvasCard.appendChild(wrapper);
 
       const textarea = wrapper.querySelector('#inlineCanvasTextArea');
+      textarea.value = currentVal; // set as value (never interpolate user text into innerHTML)
       const fontSelect = wrapper.querySelector('.inline-font-select');
       const szMinus = wrapper.querySelector('.btn-sz-minus');
       const szPlus = wrapper.querySelector('.btn-sz-plus');
@@ -4585,7 +4626,24 @@
       return dots;
     }
 
-    function renderLiveStrokeSegment(s, p1, p2, pPrev = null) {
+    // Stored stroke width for a tool/pressure (shared by the main and the left dual board)
+    function computeStrokeWidth(tool, pressure) {
+      const baseSize = Number(appState.brushSize) || 4;
+      if (tool === 'pencil') return baseSize * 0.75;
+      if (tool === 'maru') return Math.max(0.8, baseSize * 0.55);
+      if (tool === 'blue_pencil') return Math.max(1, baseSize * 0.8);
+      if (tool === 'brush') return baseSize * (0.7 + 0.8 * pressure);
+      if (tool === 'ballpoint') return baseSize * 0.82;
+      if (tool === 'crosshatch') return baseSize * 0.9;
+      if (tool === 'neon') return Math.max(2, baseSize * 1.2);
+      if (tool === 'dotted') return baseSize;
+      if (tool === 'highlighter') return baseSize * 3.6;
+      if (tool === 'spray') return baseSize * 2.2;
+      return baseSize * (0.5 + 0.8 * Math.pow(pressure, 1.3));
+    }
+
+    function renderLiveStrokeSegment(s, p1, p2, pPrev = null, targetCtx = null) {
+      const ctx = targetCtx || mainCtx;
       ctx.save();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
@@ -4730,7 +4788,26 @@
       ctx.restore();
     }
 
+    let activePointerId = null; // pointer that owns the current stroke / eraser / lasso gesture
+
     canvas.addEventListener('pointerdown', (e) => {
+      // A second pointer while drawing: ignore it; a second finger turns the gesture into a multi-touch
+      // gesture (two-finger tap = undo), so the half-drawn stroke is discarded instead of zig-zagging.
+      if (isDrawing && activePointerId !== null && e.pointerId !== activePointerId) {
+        if (e.pointerType === 'touch' && currentStroke) {
+          const discarded = currentStroke;
+          appState.strokes = appState.strokes.filter(st => st !== discarded);
+          if (appState.history.length) appState.history.pop();
+          try { canvas.releasePointerCapture(activePointerId); } catch (_) {}
+          clearTimeout(shapeHoldTimer);
+          isDrawing = false;
+          currentStroke = null;
+          activePointerId = null;
+          redrawAllStrokes();
+        }
+        return;
+      }
+
       // 抓手平移模式 (Hand tool、空格长按或鼠标中键)
       if (appState.tool === 'hand' || e.spaceKey || appState.isSpaceDown || e.button === 1) {
         appState.isPanning = true;
@@ -4739,6 +4816,7 @@
         return;
       }
 
+      appState.lastActiveBoard = 'right';
       e.preventDefault();
       closeAllFlyouts();
       const pos = getCanvasCoordinates(e);
@@ -4863,6 +4941,8 @@
         }
         clearSelection();
         isDrawing = true;
+        activePointerId = e.pointerId;
+        try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
         appState.lassoPath = [pos];
         return;
       }
@@ -4878,26 +4958,18 @@
         saveHistory();
         eraseStrokesAt(pos.x, pos.y);
         isDrawing = true;
+        activePointerId = e.pointerId;
+        try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
         return;
       }
 
       saveHistory();
       isDrawing = true;
+      activePointerId = e.pointerId;
+      try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
       isShapeSnapped = false;
       const pressure = (e.pressure !== undefined && e.pressure > 0) ? e.pressure : 0.5;
-      const baseSize = Number(appState.brushSize);
-      let strokeWidth = baseSize;
-      if (appState.tool === 'pencil') strokeWidth = baseSize * 0.75;
-      else if (appState.tool === 'maru') strokeWidth = Math.max(0.8, baseSize * 0.55);
-      else if (appState.tool === 'blue_pencil') strokeWidth = Math.max(1, baseSize * 0.8);
-      else if (appState.tool === 'brush') strokeWidth = baseSize * (0.7 + 0.8 * pressure);
-      else if (appState.tool === 'ballpoint') strokeWidth = baseSize * 0.82;
-      else if (appState.tool === 'crosshatch') strokeWidth = baseSize * 0.9;
-      else if (appState.tool === 'neon') strokeWidth = Math.max(2, baseSize * 1.2);
-      else if (appState.tool === 'dotted') strokeWidth = baseSize;
-      else if (appState.tool === 'highlighter') strokeWidth = baseSize * 3.6;
-      else if (appState.tool === 'spray') strokeWidth = baseSize * 2.2;
-      else strokeWidth = baseSize * (0.5 + 0.8 * Math.pow(pressure, 1.3));
+      const strokeWidth = computeStrokeWidth(appState.tool, pressure);
 
       pos.time = performance.now();
       pos.pressure = pressure;
@@ -4941,12 +5013,8 @@
     });
 
     canvas.addEventListener('pointermove', (e) => {
-      if (appState.isPanning) {
-        appState.panX = e.clientX - appState.panStart.x;
-        appState.panY = e.clientY - appState.panStart.y;
-        applyZoomAndPan();
-        return;
-      }
+      if (appState.isPanning) return; // handled by the window-level listener (works across both boards)
+      if (isDrawing && activePointerId !== null && e.pointerId !== activePointerId) return;
 
       e.preventDefault();
 
@@ -5050,6 +5118,12 @@
 
     // 🌟 全局 Window 层级平移拖拽与拉框多选系统：彻底解决选框覆盖 Canvas 导致鼠标拖不动的 Bug
     window.addEventListener('pointermove', (e) => {
+      if (appState.isPanning) {
+        appState.panX = e.clientX - appState.panStart.x;
+        appState.panY = e.clientY - appState.panStart.y;
+        applyZoomAndPan();
+        return;
+      }
       if (appState.isMarqueeSelecting) {
         e.preventDefault();
         const pos = getCanvasCoordinates(e);
@@ -5088,7 +5162,9 @@
       }
     });
 
-    window.addEventListener('pointerup', () => {
+    const onWindowPointerUp = (e) => {
+      // Ignore other fingers/pens while a stroke is in progress
+      if (isDrawing && activePointerId !== null && e && e.pointerId !== activePointerId) return;
       clearTimeout(shapeHoldTimer);
       if (appState.isPanning) {
         appState.isPanning = false;
@@ -5120,8 +5196,15 @@
       if (appState.isDraggingSelection) {
         appState.isDraggingSelection = false;
         updateSelectionBoxUI();
+        if (typeof scheduleAutosave === 'function') scheduleAutosave();
         return;
       }
+
+      const wasDrawing = isDrawing;
+      if (activePointerId !== null) {
+        try { canvas.releasePointerCapture(activePointerId); } catch (_) {}
+      }
+      activePointerId = null;
 
       if (isDrawing && appState.tool === 'lasso') {
         isDrawing = false;
@@ -5138,7 +5221,10 @@
 
       isDrawing = false;
       currentStroke = null;
-    });
+      if (wasDrawing && typeof scheduleAutosave === 'function') scheduleAutosave();
+    };
+    window.addEventListener('pointerup', onWindowPointerUp);
+    window.addEventListener('pointercancel', onWindowPointerUp);
 
     // 🖼️ 剪贴板图片粘贴与文件插入 (Ctrl+V / Drag & Drop)
     function addImageToCanvas(src, posX, posY) {
@@ -5259,42 +5345,135 @@
       }
     }, { passive: false });
 
-    // 撤销/重做历史
-    function saveHistory() {
-      if (appState.history.length > 25) appState.history.shift();
-      appState.history.push({
-        strokes: JSON.parse(JSON.stringify(appState.strokes)),
-        texts: JSON.parse(JSON.stringify(appState.texts)),
-        images: appState.images.slice()
-      });
-    }
+    // 撤销/重做历史 (History entry format: { strokes, texts, images })
+    const HISTORY_LIMIT = 25;
 
-    const undoBtnElem = document.getElementById('btnUndo') || document.getElementById('btnUndoDrawer');
-    if (undoBtnElem) {
-      undoBtnElem.onclick = () => {
-        if (appState.history && appState.history.length > 0) {
-          const prev = appState.history.pop();
-          appState.strokes = prev.strokes;
-          appState.texts = prev.texts || [];
-          appState.images = prev.images || [];
-          clearSelection();
-          redrawAllStrokes();
-        }
+    // Deep snapshot of one board. Strokes/texts are JSON-cloned; images keep their <img> element
+    // reference but their geometry (x/y/width/height/rotation) is copied so move/resize/rotate is undoable.
+    function snapshotBoard(strokes, texts, images) {
+      return {
+        strokes: JSON.parse(JSON.stringify(strokes || [])),
+        texts: JSON.parse(JSON.stringify(texts || [], (k, v) => (k === '_editing' ? undefined : v))),
+        images: (images || []).map(im => ({ ...im }))
       };
     }
-    const triggerUndo = () => {
-      if (undoBtnElem) undoBtnElem.click();
-      else if (typeof undo === 'function') undo();
-    };
 
-    // 键盘快捷键 (V/P/E/L/T/Ctrl+Z/Delete/Space)
+    function normalizeHistoryEntry(entry) {
+      // Legacy left-board entries were plain stroke arrays
+      if (Array.isArray(entry)) return { strokes: entry, texts: null, images: null };
+      return entry || { strokes: [], texts: [], images: [] };
+    }
+
+    function pushCapped(stack, entry) {
+      stack.push(entry);
+      while (stack.length > HISTORY_LIMIT) stack.shift();
+    }
+
+    function saveHistory() {
+      pushCapped(appState.history, snapshotBoard(appState.strokes, appState.texts, appState.images));
+      appState.redoStack = [];
+      appState.lastActiveBoard = 'right';
+      if (typeof scheduleAutosave === 'function') scheduleAutosave();
+    }
+
+    // Left board (dual mode) always edits appState.pages[0]
+    function saveLeftHistory() {
+      const p = appState.pages[0];
+      if (!p) return;
+      if (!p.strokes) p.strokes = [];
+      if (!p.texts) p.texts = [];
+      if (!p.images) p.images = [];
+      if (!p.history) p.history = [];
+      pushCapped(p.history, snapshotBoard(p.strokes, p.texts, p.images));
+      p.redoStack = [];
+      appState.lastActiveBoard = 'left';
+      if (typeof scheduleAutosave === 'function') scheduleAutosave();
+    }
+
+    function stepLeftBoardHistory(fromKey, toKey) {
+      const p = appState.pages[0];
+      if (!p || !p[fromKey] || p[fromKey].length === 0) return false;
+      if (!p[toKey]) p[toKey] = [];
+      pushCapped(p[toKey], snapshotBoard(p.strokes, p.texts, p.images));
+      const entry = normalizeHistoryEntry(p[fromKey].pop());
+      p.strokes = entry.strokes || [];
+      if (entry.texts) p.texts = entry.texts;
+      if (entry.images) p.images = entry.images;
+      renderReferenceBoard();
+      if (typeof scheduleAutosave === 'function') scheduleAutosave();
+      return true;
+    }
+
+    function stepMainBoardHistory(fromKey, toKey) {
+      if (!appState[fromKey] || appState[fromKey].length === 0) return false;
+      if (!appState[toKey]) appState[toKey] = [];
+      pushCapped(appState[toKey], snapshotBoard(appState.strokes, appState.texts, appState.images));
+      const entry = normalizeHistoryEntry(appState[fromKey].pop());
+      appState.strokes = entry.strokes || [];
+      appState.texts = entry.texts || [];
+      appState.images = entry.images || [];
+      clearSelection();
+      redrawAllStrokes();
+      if (typeof renderLayersUI === 'function') renderLayersUI();
+      if (typeof scheduleAutosave === 'function') scheduleAutosave();
+      return true;
+    }
+
+    function undo() {
+      if (appState.isDualSpread && appState.lastActiveBoard === 'left') {
+        stepLeftBoardHistory('history', 'redoStack');
+      } else {
+        stepMainBoardHistory('history', 'redoStack');
+      }
+    }
+
+    function redo() {
+      if (appState.isDualSpread && appState.lastActiveBoard === 'left') {
+        stepLeftBoardHistory('redoStack', 'history');
+      } else {
+        stepMainBoardHistory('redoStack', 'history');
+      }
+    }
+    window.undo = undo;
+    window.redo = redo;
+
+    const undoBtnElem = document.getElementById('btnUndo') || document.getElementById('btnUndoDrawer');
+    if (undoBtnElem) undoBtnElem.onclick = () => undo();
+    const triggerUndo = () => undo();
+
+    function isEditableTarget(t) {
+      if (!t) return false;
+      const tag = t.tagName;
+      return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || !!t.isContentEditable;
+    }
+
+    // 键盘快捷键 (H/V/P/E/L/T, Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z / Ctrl+Y redo, Delete, Space)
     window.addEventListener('keydown', (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-      const key = e.key.toLowerCase();
-      if ((e.ctrlKey || e.metaKey) && key === 'z') {
+      if (isEditableTarget(e.target)) return;
+      const key = (e.key || '').toLowerCase();
+      const mod = e.ctrlKey || e.metaKey;
+      if (mod && !e.altKey && key === 'z') {
         e.preventDefault();
-        triggerUndo();
-      } else if (key === 'h') {
+        if (e.shiftKey) redo(); else undo();
+        return;
+      }
+      if (mod && !e.altKey && key === 'y') {
+        e.preventDefault();
+        redo();
+        return;
+      }
+      if (key === 'delete' || key === 'backspace') {
+        if ((appState.selectedImages && appState.selectedImages.length > 0) ||
+            (appState.selectedTexts && appState.selectedTexts.length > 0) ||
+            (appState.selectedStrokes && appState.selectedStrokes.length > 0)) {
+          e.preventDefault();
+          deleteSelectedItems();
+        }
+        return;
+      }
+      // Single-key tool shortcuts must never fire with modifiers (Cmd+V paste, Ctrl+P print, ...)
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (key === 'h') {
         appState.tool = 'hand'; updateToolButtonsUI();
       } else if (key === 'v') {
         appState.tool = 'select'; updateToolButtonsUI();
@@ -5306,13 +5485,6 @@
         appState.tool = 'lasso'; updateToolButtonsUI();
       } else if (key === 't') {
         appState.tool = 'text'; updateToolButtonsUI();
-      } else if (key === 'delete' || key === 'backspace') {
-        if ((appState.selectedImages && appState.selectedImages.length > 0) ||
-            (appState.selectedTexts && appState.selectedTexts.length > 0) ||
-            (appState.selectedStrokes && appState.selectedStrokes.length > 0)) {
-          e.preventDefault();
-          deleteSelectedItems();
-        }
       } else if (e.code === 'Space') {
         appState.isSpaceDown = true;
         workbenchWrapper.style.cursor = 'grab';
@@ -6023,7 +6195,11 @@
     const btnAddPage = document.getElementById('btnAddPage');
     const btnDeletePage = document.getElementById('btnDeletePage');
 
-    if (btnPrevPage) btnPrevPage.onclick = () => { if (appState.currentPageIndex > 0) loadPage(appState.currentPageIndex - 1); };
+    // In dual mode the right board stays on index >= 1 (page 1 is always on the left board)
+    if (btnPrevPage) btnPrevPage.onclick = () => {
+      const minIdx = appState.isDualSpread ? 1 : 0;
+      if (appState.currentPageIndex > minIdx) loadPage(appState.currentPageIndex - 1);
+    };
     if (btnNextPage) btnNextPage.onclick = () => { if (appState.currentPageIndex < appState.pages.length - 1) loadPage(appState.currentPageIndex + 1); };
     if (btnAddPage) btnAddPage.onclick = () => addNewPage();
     if (btnDeletePage) btnDeletePage.onclick = () => deleteCurrentPage();
@@ -6135,6 +6311,9 @@
       const isLight = document.body.classList.contains('theme-light');
       if (themeLabel) themeLabel.innerText = isLight ? (dict.theme_light || '白天') : (dict.theme_dark || '夜间');
       if (typeof updateExportModalUI === 'function') updateExportModalUI();
+      // data-i18n above always writes the "dual" text; restore the label for the real current state
+      updateDualToggleUI();
+      updatePageUI();
     }
 
     // 白天 / 夜间模式控制 (Day/Night Theme)
@@ -6309,13 +6488,7 @@
       if (btnCloseMoreTools) btnCloseMoreTools.onclick = () => moreToolsDrawer.classList.add('hidden');
     }
 
-    const btnUndoDrawer = document.getElementById('btnUndoDrawer');
-    if (btnUndoDrawer) {
-      btnUndoDrawer.onclick = () => {
-        const btnUndo = document.getElementById('btnUndo');
-        if (btnUndo) btnUndo.click();
-      };
-    }
+    // btnUndoDrawer is wired once above (undoBtnElem → undo()).
     const btnClearAllDrawer = document.getElementById('btnClearAllDrawer');
     if (btnClearAllDrawer) {
       btnClearAllDrawer.onclick = () => {
