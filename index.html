@@ -6441,7 +6441,10 @@
     function setLanguage(lang) {
       if (!TRANSLATIONS[lang]) lang = 'en';
       appState.lang = lang;
-      localStorage.setItem('user_lang_pref', lang);
+      try { localStorage.setItem('user_lang_pref', lang); } catch (_) {}
+      // Cookie is read by functions/_middleware.ts to pick the language on the next visit
+      document.cookie = `user_lang_pref=${lang}; path=/; max-age=31536000; SameSite=Lax`;
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
       const labels = { zh: '中', en: 'EN', ja: '日', ko: '한', de: 'DE', es: 'ES', fr: 'FR' };
       document.getElementById('currentLangLabel').textContent = labels[lang] || 'EN';
       const dict = TRANSLATIONS[lang];
@@ -7018,8 +7021,19 @@
         }
       });
 
-      const savedLang = localStorage.getItem('user_lang_pref') || 'zh';
-      setLanguage(savedLang);
+      // Language priority: ?lang=xx (if supported) > saved preference > default (zh)
+      let startLang = null;
+      try {
+        const qLang = (new URLSearchParams(window.location.search).get('lang') || '').toLowerCase();
+        if (qLang && TRANSLATIONS[qLang]) startLang = qLang;
+      } catch (_) {}
+      if (!startLang) {
+        try {
+          const savedLang = localStorage.getItem('user_lang_pref');
+          if (savedLang && TRANSLATIONS[savedLang]) startLang = savedLang;
+        } catch (_) {}
+      }
+      setLanguage(startLang || 'zh');
       const savedTheme = localStorage.getItem('eazyopc_theme') || 'dark';
       applyTheme(savedTheme);
       const activeColorDot = document.getElementById('activeColorDot');
