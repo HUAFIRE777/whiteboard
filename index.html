@@ -5334,6 +5334,7 @@
           points: [pos]
         };
         p.strokes.push(currentRefStroke);
+        updateEmptyHint();
         renderReferenceBoard();
       });
 
@@ -6094,6 +6095,7 @@
         points: [pos]
       };
       appState.strokes.push(currentStroke);
+      updateEmptyHint(); // live strokes never pass through redrawAllStrokes, so hide the empty-board hint here
 
       // 绘制起点微圆点
       ctx.save();
