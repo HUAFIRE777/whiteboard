@@ -991,6 +991,59 @@
     .wb-drawer-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
     .wb-drawer-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
 
+    /* Shared modal pattern: header (icon + title + close), body, footer; 150ms entrance */
+    .wb-modal { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(2, 6, 23, 0.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+    .wb-modal.hidden { display: none; }
+    .wb-modal-panel { width: 100%; max-height: 90vh; overflow-y: auto; background: var(--surface-solid); color: var(--text); border: 1px solid var(--hairline); border-radius: var(--r-xl); box-shadow: var(--sh-lg); padding: var(--sp-6); animation: wbModalIn 150ms ease-out; }
+    @keyframes wbModalIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+    @media (prefers-reduced-motion: reduce) { .wb-modal-panel { animation: none; } }
+    .wb-modal-head { display: flex; align-items: flex-start; gap: var(--sp-3); padding-bottom: var(--sp-4); margin-bottom: var(--sp-4); border-bottom: 1px solid var(--hairline); }
+    .wb-modal-ico { width: 36px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: var(--r-md); background: var(--accent-soft); color: var(--accent); }
+    .wb-modal-ico svg { width: 18px; height: 18px; }
+    .wb-modal-title { font-size: 16px; font-weight: 800; color: var(--text-strong); letter-spacing: -0.01em; }
+    .wb-modal-sub { font-size: 12px; line-height: 1.6; color: var(--text-muted); margin-top: 2px; }
+    .wb-modal-close { margin-left: auto; width: 32px; height: 32px; flex-shrink: 0; border-radius: var(--r-sm); color: var(--text-muted); font-size: 14px; display: flex; align-items: center; justify-content: center; }
+    .wb-modal-close:hover { background: var(--surface-2); color: var(--text-strong); }
+    .wb-btn { height: var(--btn-h-md); padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: var(--r-md); font-size: 12px; font-weight: 700; border: 1px solid var(--hairline); color: var(--text); background: var(--surface-2); white-space: nowrap; transition: background-color 120ms ease, border-color 120ms ease; }
+    .wb-btn:hover { border-color: var(--accent); }
+    .wb-btn-primary { background: var(--accent-strong); border-color: var(--accent-strong); color: #ffffff; }
+    .wb-btn-primary:hover { background: var(--accent); }
+    .wb-btn-sm { height: var(--btn-h-sm); padding: 0 10px; font-size: 11px; }
+    .wb-btn-danger:hover { border-color: #ef4444; color: #ef4444; }
+    .wb-badge { white-space: nowrap; flex-shrink: 0; display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 9999px; font-size: 10px; font-weight: 800; letter-spacing: 0.02em; }
+    .wb-badge-free { background: rgba(16, 185, 129, 0.16); color: #34d399; }
+    .wb-badge-pro { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
+    .wb-badge-active { background: var(--accent-soft); color: var(--accent); }
+    .wb-tpl-card { display: flex; flex-direction: column; gap: 8px; text-align: left; padding: 12px; border-radius: var(--r-lg); border: 1px solid var(--hairline); background: var(--surface-2); transition: border-color 120ms ease, transform 120ms ease; min-height: 100%; }
+    .wb-tpl-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .wb-tpl-thumb { height: 84px; border-radius: var(--r-sm); background: #ffffff; border: 1px solid var(--hairline); overflow: hidden; }
+    .wb-tpl-thumb svg { width: 100%; height: 100%; display: block; }
+    .wb-tpl-name { font-size: 13px; font-weight: 800; color: var(--text-strong); }
+    .wb-tpl-desc { font-size: 11px; line-height: 1.55; color: var(--text-muted); flex: 1; }
+    .wb-board-row { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: var(--r-md); border: 1px solid var(--hairline); background: var(--surface-2); }
+    .wb-board-row.is-active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+    .wb-board-name { font-size: 13px; font-weight: 700; color: var(--text-strong); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .wb-board-meta { font-size: 11px; color: var(--text-muted); }
+    .wb-input { height: var(--btn-h-md); padding: 0 10px; border-radius: var(--r-sm); border: 1.5px solid var(--hairline); background: var(--surface-solid); color: var(--text-strong); font-size: 13px; font-weight: 600; width: 100%; }
+    .wb-shortcuts { display: grid; grid-template-columns: 1fr auto; gap: 8px 16px; font-size: 13px; }
+    .wb-shortcuts .k { display: flex; gap: 4px; justify-content: flex-end; }
+    .wb-shortcuts kbd { min-width: 24px; height: 24px; padding: 0 6px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid var(--hairline); border-bottom-width: 2px; background: var(--surface-2); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; font-weight: 700; color: var(--text-strong); }
+    /* Rule 2 — light mode: white panels, #0f172a bold text, black primary buttons, white inputs with dark borders */
+    body.theme-light .wb-modal { background: rgba(15, 23, 42, 0.45); }
+    body.theme-light .wb-modal-panel { background: #ffffff; border-color: #cbd5e1; color: #0f172a; }
+    body.theme-light .wb-modal-panel :is(.wb-modal-title, .wb-tpl-name, .wb-board-name) { color: #0f172a !important; font-weight: 800; }
+    body.theme-light .wb-modal-panel :is(.wb-modal-sub, .wb-tpl-desc, .wb-board-meta, .wb-shortcuts span) { color: #0f172a !important; font-weight: 700; }
+    body.theme-light .wb-modal-panel :is(.wb-tpl-card, .wb-board-row) { background: #f8fafc; border-color: #cbd5e1; }
+    body.theme-light .wb-modal-panel .wb-btn { background: #ffffff; border: 1.5px solid #334155; color: #0f172a; font-weight: 800; }
+    body.theme-light .wb-modal-panel .wb-btn-primary { background: #0f172a; border-color: #0f172a; color: #ffffff; }
+    body.theme-light .wb-modal-panel .wb-btn-primary:hover { background: #334155; }
+    body.theme-light .wb-modal-panel .wb-input { background: #ffffff; border-color: #334155; color: #0f172a; font-weight: 700; }
+    body.theme-light .wb-modal-panel .wb-modal-close { color: #0f172a; }
+    body.theme-light .wb-modal-panel .wb-badge-free { background: #d1fae5; color: #065f46; }
+    body.theme-light .wb-modal-panel .wb-badge-pro { background: #fef3c7; color: #92400e; }
+    body.theme-light .wb-modal-panel .wb-badge-active { background: #e0e7ff; color: #3730a3; }
+    body.theme-light .wb-shortcuts kbd { background: #f8fafc; border-color: #94a3b8; color: #0f172a; }
+
     /* ================= Round 4: shared toast ================= */
     .wb-toast {
       position: fixed; left: 50%; bottom: 24px; z-index: 90; max-width: min(92vw, 520px);
@@ -1323,6 +1376,13 @@
       <button id="btnToolConnector" type="button" class="p-2 rounded-xl text-indigo-600 dark:text-indigo-400 hover:bg-stone-100 dark:hover:bg-slate-800 text-xs transition flex items-center justify-center" data-i18n-title="tip_arrow" title="连接线 / 箭头：从便签或图形拖出即可连接 (A)" aria-label="Connector">
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>
+
+      <!-- 5b. 🧩 模板 (看板 / SWOT / 复盘 / 思维导图 / 流程图 …) -->
+      <button id="btnTemplates" type="button" class="p-2 rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-stone-100 dark:hover:bg-slate-800 text-xs transition flex items-center justify-center" data-i18n-title="tip_templates" title="模板：看板、SWOT、复盘、思维导图、流程图等" aria-label="Templates">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      </button>
+
+      <div class="w-6 h-px bg-stone-200 dark:bg-slate-700 my-0.5"></div>
 
       <!-- 6. 当前绘图笔刷 (快捷键 P) -->
       <button id="btnCurrentBrush" class="tool-btn p-2 rounded-xl text-stone-700 dark:text-slate-300 hover:bg-stone-100 dark:hover:bg-slate-800 text-xs transition flex items-center justify-center tool-btn-active relative" data-tool="pen" data-i18n-title="tip_pen" title="🖋️ 自然笔锋钢笔 (快捷键 P)">
@@ -2568,6 +2628,57 @@
 
   <!-- ================= 8. Creem $4.99 永久使用授权结账弹窗 ================= -->
   <!-- ================= 8. Creem $4.99 永久使用授权结账弹窗 ================= -->
+  <!-- ================= Round 4: 模板库 ================= -->
+  <div id="templatesModal" class="wb-modal hidden" role="dialog" aria-modal="true" aria-labelledby="templatesModalTitle">
+    <div class="wb-modal-panel max-w-3xl">
+      <div class="wb-modal-head">
+        <div class="wb-modal-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+        <div class="min-w-0">
+          <h3 id="templatesModalTitle" class="wb-modal-title" data-i18n="tpl_modal_title">模板</h3>
+          <p class="wb-modal-sub" data-i18n="tpl_modal_sub">插入到当前页面，可撤销。免费版含看板、头脑风暴、周计划，其余模板需 Pro。</p>
+        </div>
+        <button id="btnCloseTemplatesModal" type="button" class="wb-modal-close" aria-label="Close">✕</button>
+      </div>
+      <div id="templatesGrid" class="wb-modal-body grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3"></div>
+    </div>
+  </div>
+
+  <!-- ================= Round 4: 我的白板 (本地多白板管理) ================= -->
+  <div id="boardsModal" class="wb-modal hidden" role="dialog" aria-modal="true" aria-labelledby="boardsModalTitle">
+    <div class="wb-modal-panel max-w-lg">
+      <div class="wb-modal-head">
+        <div class="wb-modal-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+        <div class="min-w-0">
+          <h3 id="boardsModalTitle" class="wb-modal-title" data-i18n="boards_modal_title">我的白板</h3>
+          <p class="wb-modal-sub" data-i18n="boards_modal_sub">所有白板只保存在这台设备的浏览器里。换设备请用「保存作品」。</p>
+        </div>
+        <button id="btnCloseBoardsModal" type="button" class="wb-modal-close" aria-label="Close">✕</button>
+      </div>
+      <div class="wb-modal-body space-y-3">
+        <div class="flex items-center justify-between gap-2">
+          <span id="boardsQuota" class="wb-modal-sub"></span>
+          <button id="btnNewBoard" type="button" class="wb-btn wb-btn-primary"><span aria-hidden="true">＋</span> <span data-i18n="boards_new">新建白板</span></button>
+        </div>
+        <ul id="boardsList" class="space-y-2"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= Round 4: 快捷键 ================= -->
+  <div id="shortcutsModal" class="wb-modal hidden" role="dialog" aria-modal="true" aria-labelledby="shortcutsModalTitle">
+    <div class="wb-modal-panel max-w-md">
+      <div class="wb-modal-head">
+        <div class="wb-modal-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg></div>
+        <div class="min-w-0">
+          <h3 id="shortcutsModalTitle" class="wb-modal-title" data-i18n="shortcuts_title">键盘快捷键</h3>
+          <p class="wb-modal-sub" data-i18n="shortcuts_sub">输入文字时快捷键不会触发</p>
+        </div>
+        <button id="btnCloseShortcutsModal" type="button" class="wb-modal-close" aria-label="Close">✕</button>
+      </div>
+      <div id="shortcutsList" class="wb-modal-body wb-shortcuts"></div>
+    </div>
+  </div>
+
   <div id="proModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
     <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-3xl p-6 shadow-2xl text-white space-y-4">
       <div class="text-center space-y-1.5">
@@ -2584,6 +2695,7 @@
         <div class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> <span data-i18n="pro_perk_3"><strong>Canva / Figma 矢量无损工程 (SVG)</strong>（自由二次编辑）</span></div>
         <div class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> <span data-i18n="pro_perk_4"><strong>高保真 PDF 打印文档</strong>（按选定画幅输出）</span></div>
         <div class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> <span data-i18n="pro_perk_5"><strong>一次付费 · 永久使用</strong>（全部功能统一打包，无后续收费）</span></div>
+        <div class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> <span data-i18n="pro_perk_6"><strong>全部 8 套模板 + 不限数量的「我的白板」</strong>（免费版 3 套模板、最多 3 块白板）</span></div>
       </div>
 
       <div class="space-y-2.5">
@@ -3246,6 +3358,19 @@
     // ================= Round 4 strings (zh + en; other languages fall back to en, then zh) =================
     const R4_I18N = {
       zh: {
+        tpl_modal_title: '模板', tpl_modal_sub: '插入到当前页面，可撤销。免费版含看板、头脑风暴、周计划，其余模板需 Pro。', tpl_free: '免费',
+        toast_tpl_inserted: '已插入模板：{name}（可 Ctrl/Cmd+Z 撤销）',
+        boards_modal_title: '我的白板', boards_modal_sub: '所有白板只保存在这台设备的浏览器里。换设备请用「保存作品」。',
+        boards_new: '新建白板', boards_default_name: '白板 {n}', boards_copy_name: '{name} 副本',
+        boards_quota_free: '{n} / 3 块（免费版上限 3 块，Pro 不限）', boards_quota_pro: '共 {n} 块 · Pro 不限数量',
+        boards_limit_toast: '免费版最多 3 块白板，升级 Pro 可不限数量。',
+        boards_quota_toast: '浏览器存储空间不足，无法切换白板。请先「保存作品」或删除不用的白板。',
+        boards_switched: '已切换到「{name}」', boards_created: '已新建「{name}」',
+        boards_last_toast: '至少保留一块白板。要清空内容请用「清空白板」。',
+        boards_confirm_delete: '确定删除「{name}」吗？删除后无法恢复（除非你保存过作品文件）。',
+        boards_updated: '更新于', boards_current: '当前', boards_open: '打开', boards_rename: '重命名', boards_duplicate: '复制', boards_delete: '删除',
+        boards_other_tab: '你在另一个标签页切换了白板。为避免覆盖内容，本页已暂停自动保存，请刷新页面。',
+        pro_perk_6: '<strong>全部 8 套模板 + 不限数量的「我的白板」</strong>（免费版 3 套模板、最多 3 块白板）',
         site_subtitle: '免登录 · 本地保存的私人白板',
         seo_badge: '免登录 · 隐私 · 本地优先的个人与课堂白板',
         seo_h2: '打开就能画的私人白板：便签、图形与会跟随的连接线',
@@ -3299,6 +3424,19 @@
         toast_autosave_quota: '浏览器存储空间不足，自动保存未包含图片。请用「保存作品」把完整作品（含图片）存到本机。'
       },
       en: {
+        tpl_modal_title: 'Templates', tpl_modal_sub: 'Inserted on the current page and undoable. Kanban, Brainstorm and Weekly plan are free; the others need Pro.', tpl_free: 'Free',
+        toast_tpl_inserted: 'Inserted template: {name} (Ctrl/Cmd+Z to undo)',
+        boards_modal_title: 'My boards', boards_modal_sub: 'All boards are stored only in this browser on this device. Use “Save work” to move one to another device.',
+        boards_new: 'New board', boards_default_name: 'Board {n}', boards_copy_name: '{name} copy',
+        boards_quota_free: '{n} / 3 boards (free limit 3, Pro unlimited)', boards_quota_pro: '{n} boards · unlimited with Pro',
+        boards_limit_toast: 'The free version keeps up to 3 boards. Upgrade to Pro for unlimited boards.',
+        boards_quota_toast: 'Browser storage is full, so the board cannot be switched. “Save work” first or delete boards you no longer need.',
+        boards_switched: 'Switched to “{name}”', boards_created: 'Created “{name}”',
+        boards_last_toast: 'At least one board is kept. Use “Clear board” to empty it.',
+        boards_confirm_delete: 'Delete “{name}”? This cannot be undone (unless you saved a work file).',
+        boards_updated: 'Updated', boards_current: 'Current', boards_open: 'Open', boards_rename: 'Rename', boards_duplicate: 'Duplicate', boards_delete: 'Delete',
+        boards_other_tab: 'You switched boards in another tab. Autosave is paused here so nothing gets overwritten — please reload this page.',
+        pro_perk_6: '<strong>All 8 templates + unlimited “My boards”</strong> (free: 3 templates, up to 3 boards)',
         site_subtitle: 'Private, no-login whiteboard',
         seo_badge: 'No login · Private · Local-first whiteboard for personal use and classrooms',
         seo_h2: 'A private whiteboard that opens instantly: sticky notes, shapes and connectors that follow',
@@ -7419,13 +7557,19 @@ ${pathsSvg}</svg>`;
     function getLinearPath(s) {
       const a = s.points[0], b = s.points[s.points.length - 1];
       if (s.routing !== 'elbow') return [a, b];
-      const side = s._fromSide || (Math.abs(b.x - a.x) >= Math.abs(b.y - a.y) ? 'e' : 'n');
-      if (side === 'e' || side === 'w') {
+      const horizontalFirst = Math.abs(b.x - a.x) >= Math.abs(b.y - a.y);
+      const fromH = s.fromId != null && s._fromSide ? (s._fromSide === 'e' || s._fromSide === 'w') : horizontalFirst;
+      const toH = s.toId != null && s._toSide ? (s._toSide === 'e' || s._toSide === 'w') : fromH;
+      if (fromH && toH) {
         const mx = (a.x + b.x) / 2;
         return [a, { x: mx, y: a.y }, { x: mx, y: b.y }, b];
       }
-      const my = (a.y + b.y) / 2;
-      return [a, { x: a.x, y: my }, { x: b.x, y: my }, b];
+      if (!fromH && !toH) {
+        const my = (a.y + b.y) / 2;
+        return [a, { x: a.x, y: my }, { x: b.x, y: my }, b];
+      }
+      // One horizontal and one vertical side: a single corner
+      return fromH ? [a, { x: b.x, y: a.y }, b] : [a, { x: a.x, y: b.y }, b];
     }
 
     function arrowHeadPoints(tip, from, size) {
@@ -8527,6 +8671,551 @@ ${pathsSvg}</svg>`;
       return row;
     }
 
+    // ================= 🧩 模板 (Templates) — 3 free, the rest Pro =================
+    // Each template is laid out in its own design space (W × H) and scaled to fit the current page on insert.
+    function tplText(zh, en) { return appState.lang === 'zh' ? zh : en; }
+    const TPL_COLORS = { yellow: STICKY_COLORS[0], pink: STICKY_COLORS[1], green: STICKY_COLORS[2], blue: STICKY_COLORS[3] };
+    const TPL_INK = '#334155';
+
+    function tplSticky(x, y, w, h, color, text, key) { return { t: 'sticky', x, y, w, h, color, text, key }; }
+    function tplShape(kind, x, y, w, h, opt = {}, key) { return { t: 'shape', kind, x, y, w, h, opt, key }; }
+    function tplLabel(x, y, text, size = 18, opt = {}) { return { t: 'text', x, y, text, size, bold: opt.bold !== false, color: opt.color || '#0f172a', align: opt.align || 'left' }; }
+    function tplConn(from, to, opt = {}) { return { t: 'conn', from, to, kind: opt.kind || 'arrow', routing: opt.routing || 'straight', fa: opt.fa || 'auto', ta: opt.ta || 'auto' }; }
+    // Centred label inside a box
+    function tplBoxLabel(x, y, w, h, text, size = 18) { return tplLabel(x + w / 2, y + h / 2 + size * 0.55, text, size, { align: "center" }); }
+
+    const TEMPLATES = [
+      { id: 'kanban', free: true, icon: '🗂️', name: ['看板', 'Kanban'], desc: ['待办 / 进行中 / 完成 三列任务板', 'To do / Doing / Done task board'],
+        build() {
+          const W = 1000, H = 620, items = [tplLabel(20, 38, tplText('看板', 'Kanban board'), 26)];
+          const cols = [[tplText('待办', 'To do'), 'yellow'], [tplText('进行中', 'Doing'), 'blue'], [tplText('完成', 'Done'), 'green']];
+          cols.forEach(([title, color], i) => {
+            const x = 20 + i * 330;
+            items.push(tplShape('roundrect', x, 60, 300, 540, { fill: 'translucent', fillColor: '#e2e8f0', color: '#94a3b8', strokeWidth: 2 }));
+            items.push(tplLabel(x + 18, 96, title, 20));
+            const n = i === 0 ? 2 : 1;
+            for (let k = 0; k < n; k++) items.push(tplSticky(x + 20, 120 + k * 150, 260, 130, color, tplText(`任务 ${String.fromCharCode(65 + i * 2 + k)}：写下要做的事`, `Task ${String.fromCharCode(65 + i * 2 + k)}: describe the work`)));
+          });
+          return { W, H, items };
+        } },
+      { id: 'brainstorm', free: true, icon: '💡', name: ['头脑风暴', 'Brainstorm'], desc: ['中心主题 + 6 张发散便签', 'Central topic with 6 idea notes'],
+        build() {
+          const W = 1000, H = 640, items = [];
+          items.push(tplShape('ellipse', 390, 255, 220, 130, { fill: 'solid', fillColor: '#e9d5ff', color: '#8b5cf6', strokeWidth: 3 }, 'c'));
+          items.push(tplBoxLabel(390, 255, 220, 130, tplText('中心主题', 'Main topic'), 22));
+          const colors = ['yellow', 'pink', 'green', 'blue', 'yellow', 'pink'];
+          for (let i = 0; i < 6; i++) {
+            const a = -Math.PI / 2 + i * Math.PI / 3;
+            const cx = 500 + Math.cos(a) * 360, cy = 320 + Math.sin(a) * 235;
+            items.push(tplSticky(cx - 85, cy - 55, 170, 110, colors[i], tplText(`点子 ${i + 1}`, `Idea ${i + 1}`), 'n' + i));
+            items.push(tplConn('c', 'n' + i, { kind: 'line' }));
+          }
+          return { W, H, items };
+        } },
+      { id: 'weekly', free: true, icon: '📅', name: ['周计划', 'Weekly plan'], desc: ['本周目标 + 周一到周日七列', 'Weekly goal and seven day columns'],
+        build() {
+          const W = 1000, H = 620, items = [tplLabel(20, 38, tplText('本周计划', 'Weekly plan'), 26)];
+          items.push(tplSticky(20, 56, 960, 76, 'pink', tplText('本周目标：', 'Goal for this week:')));
+          const days = tplText('周一 周二 周三 周四 周五 周六 周日', 'Mon Tue Wed Thu Fri Sat Sun').split(' ');
+          days.forEach((d, i) => {
+            const x = 20 + i * 138;
+            items.push(tplShape('roundrect', x, 150, 128, 450, { fill: 'translucent', fillColor: i >= 5 ? '#fed7aa' : '#e2e8f0', color: '#94a3b8', strokeWidth: 2 }));
+            items.push(tplLabel(x + 64, 180, d, 18, { align: 'center' }));
+          });
+          items.push(tplSticky(28, 196, 112, 90, 'yellow', tplText('待办…', 'To do…')));
+          return { W, H, items };
+        } },
+      { id: 'swot', free: false, icon: '🧭', name: ['SWOT 分析', 'SWOT'], desc: ['优势 / 劣势 / 机会 / 威胁 四象限', 'Strengths / Weaknesses / Opportunities / Threats'],
+        build() {
+          const W = 1000, H = 640, items = [tplLabel(20, 38, tplText('SWOT 分析', 'SWOT analysis'), 26)];
+          const q = [
+            [tplText('S 优势', 'S · Strengths'), '#bbf7d0', '#10b981', 'green'],
+            [tplText('W 劣势', 'W · Weaknesses'), '#fbcfe8', '#ec4899', 'pink'],
+            [tplText('O 机会', 'O · Opportunities'), '#bae6fd', '#0ea5e9', 'blue'],
+            [tplText('T 威胁', 'T · Threats'), '#fed7aa', '#f97316', 'yellow']
+          ];
+          q.forEach(([title, fill, stroke, color], i) => {
+            const x = 20 + (i % 2) * 490, y = 60 + Math.floor(i / 2) * 290;
+            items.push(tplShape('rect', x, y, 470, 270, { fill: 'translucent', fillColor: fill, color: stroke, strokeWidth: 2 }));
+            items.push(tplLabel(x + 18, y + 36, title, 22, { color: TPL_INK }));
+            items.push(tplSticky(x + 20, y + 60, 200, 110, color, tplText('写下一条…', 'Add a point…')));
+          });
+          return { W, H, items };
+        } },
+      { id: 'retro', free: false, icon: '🔁', name: ['复盘', 'Retro'], desc: ['开始做 / 停止做 / 继续做', 'Start / Stop / Continue'],
+        build() {
+          const W = 1000, H = 620, items = [tplLabel(20, 38, tplText('复盘', 'Retrospective'), 26)];
+          const cols = [[tplText('开始做 Start', 'Start'), 'green', '#10b981'], [tplText('停止做 Stop', 'Stop'), 'pink', '#ec4899'], [tplText('继续做 Continue', 'Continue'), 'blue', '#0ea5e9']];
+          cols.forEach(([title, color, stroke], i) => {
+            const x = 20 + i * 330;
+            items.push(tplShape('roundrect', x, 60, 300, 540, { fill: 'none', color: stroke, strokeWidth: 2 }));
+            items.push(tplLabel(x + 18, 96, title, 20, { color: TPL_INK }));
+            items.push(tplSticky(x + 20, 120, 260, 120, color, tplText('写下一条…', 'Add a note…')));
+            items.push(tplSticky(x + 20, 260, 260, 120, color, ''));
+          });
+          return { W, H, items };
+        } },
+      { id: 'mindmap', free: false, icon: '🧠', name: ['思维导图起步', 'Mind map starter'], desc: ['中心主题 + 4 个分支 + 子节点', 'Central idea, 4 branches and sub-ideas'],
+        build() {
+          const W = 1000, H = 700, items = [];
+          items.push(tplShape('roundrect', 400, 310, 200, 80, { fill: 'solid', fillColor: '#c7d2fe', color: '#4f46e5', strokeWidth: 3 }, 'c'));
+          items.push(tplBoxLabel(400, 310, 200, 80, tplText('中心主题', 'Central idea'), 22));
+          const br = [[140, 160, 'yellow'], [660, 160, 'blue'], [140, 460, 'green'], [660, 460, 'pink']];
+          br.forEach(([x, y, color], i) => {
+            items.push(tplShape('ellipse', x, y, 200, 80, { fill: 'translucent', fillColor: TPL_COLORS[color].bg, color: TPL_COLORS[color].border === '#fde047' ? '#ca8a04' : TPL_COLORS[color].border, strokeWidth: 2 }, 'b' + i));
+            items.push(tplBoxLabel(x, y, 200, 80, tplText(`分支 ${i + 1}`, `Branch ${i + 1}`), 18));
+            items.push(tplConn('c', 'b' + i, { kind: 'line' }));
+            const cy = i < 2 ? 20 : 590;
+            for (let k = 0; k < 2; k++) {
+              items.push(tplSticky(x - 20 + k * 130, cy, 110, 80, color, tplText('子想法', 'Sub-idea'), `s${i}${k}`));
+              items.push(tplConn('b' + i, `s${i}${k}`, { kind: 'line' }));
+            }
+          });
+          return { W, H, items };
+        } },
+      { id: 'journey', free: false, icon: '🧍', name: ['用户旅程', 'User journey'], desc: ['5 个阶段 × 行为 / 想法 / 痛点 / 机会', '5 stages × actions / thoughts / pains / ideas'],
+        build() {
+          const W = 1000, H = 640, items = [tplLabel(20, 38, tplText('用户旅程地图', 'User journey map'), 26)];
+          const stages = tplText('认知 考虑 购买 使用 推荐', 'Aware Consider Buy Use Advocate').split(' ');
+          const rows = [tplText('行为', 'Actions'), tplText('想法', 'Thoughts'), tplText('痛点', 'Pain points'), tplText('机会', 'Opportunities')];
+          stages.forEach((st, i) => {
+            const x = 160 + i * 168;
+            items.push(tplShape('roundrect', x, 60, 160, 50, { fill: 'solid', fillColor: '#c7d2fe', color: '#6366f1', strokeWidth: 2 }, 'st' + i));
+            items.push(tplBoxLabel(x, 60, 160, 50, st, 17));
+            if (i > 0) items.push(tplConn('st' + (i - 1), 'st' + i, { fa: 'e', ta: 'w' }));
+          });
+          rows.forEach((r, j) => {
+            const y = 126 + j * 124;
+            items.push(tplLabel(20, y + 62, r, 17, { color: TPL_INK }));
+            stages.forEach((_, i) => {
+              const x = 160 + i * 168;
+              if (j === 0) items.push(tplSticky(x, y, 160, 112, 'yellow', ''));
+              else items.push(tplShape('rect', x, y, 160, 112, { fill: 'translucent', fillColor: j === 2 ? '#fbcfe8' : (j === 3 ? '#bbf7d0' : '#e2e8f0'), color: '#cbd5e1', strokeWidth: 1 }));
+            });
+          });
+          return { W, H, items };
+        } },
+      { id: 'flowchart', free: false, icon: '🔀', name: ['流程图起步', 'Flowchart starter'], desc: ['开始 → 步骤 → 判断 → 分支 → 结束', 'Start → step → decision → branches → end'],
+        build() {
+          const W = 1000, H = 700, items = [];
+          const box = (kind, key, x, y, w, h, text, fill, stroke) => {
+            items.push(tplShape(kind, x, y, w, h, { fill: 'solid', fillColor: fill, color: stroke, strokeWidth: 2 }, key));
+            items.push(tplBoxLabel(x, y, w, h, text, 18));
+          };
+          box('ellipse', 'start', 400, 10, 200, 70, tplText('开始', 'Start'), '#bbf7d0', '#10b981');
+          box('rect', 'p1', 400, 130, 200, 80, tplText('步骤 1', 'Step 1'), '#ffffff', '#334155');
+          box('diamond', 'd', 390, 260, 220, 130, tplText('条件？', 'Condition?'), '#fef08a', '#ca8a04');
+          box('rect', 'p2', 400, 450, 200, 80, tplText('步骤 2', 'Step 2'), '#ffffff', '#334155');
+          box('rect', 'alt', 720, 285, 200, 80, tplText('处理其他情况', 'Handle the other case'), '#ffffff', '#334155');
+          box('ellipse', 'end', 400, 590, 200, 70, tplText('结束', 'End'), '#fbcfe8', '#ec4899');
+          items.push(tplConn('start', 'p1', { fa: 's', ta: 'n' }));
+          items.push(tplConn('p1', 'd', { fa: 's', ta: 'n' }));
+          items.push(tplConn('d', 'p2', { fa: 's', ta: 'n' }));
+          items.push(tplConn('d', 'alt', { fa: 'e', ta: 'w' }));
+          items.push(tplConn('p2', 'end', { fa: 's', ta: 'n' }));
+          items.push(tplConn('alt', 'end', { fa: 's', ta: 'e', routing: 'elbow' }));
+          items.push(tplLabel(512, 420, tplText('是', 'Yes'), 16, { color: '#047857' }));
+          items.push(tplLabel(640, 314, tplText('否', 'No'), 16, { color: '#b91c1c' }));
+          return { W, H, items };
+        } }
+    ];
+
+    // Small SVG preview built from the same template data
+    function templateThumbSVG(tpl) {
+      const { W, H, items } = tpl.build();
+      const centers = {};
+      let body = '';
+      for (const it of items) {
+        if (it.t === 'sticky') {
+          const c = TPL_COLORS[it.color] || TPL_COLORS.yellow;
+          body += `<rect x="${it.x}" y="${it.y}" width="${it.w}" height="${it.h}" rx="10" fill="${c.bg}" stroke="${c.border}" stroke-width="3"/>`;
+        } else if (it.t === 'shape') {
+          const o = it.opt || {};
+          const fill = o.fill === 'none' ? 'none' : (o.fillColor || '#e2e8f0');
+          const op = o.fill === 'translucent' ? ' fill-opacity="0.45"' : '';
+          const st = `stroke="${o.color || '#334155'}" stroke-width="${Math.max(3, (o.strokeWidth || 2) * 2)}" fill="${fill}"${op}`;
+          if (it.kind === 'ellipse') body += `<ellipse cx="${it.x + it.w / 2}" cy="${it.y + it.h / 2}" rx="${it.w / 2}" ry="${it.h / 2}" ${st}/>`;
+          else if (it.kind === 'diamond') body += `<path d="M${it.x + it.w / 2} ${it.y} L${it.x + it.w} ${it.y + it.h / 2} L${it.x + it.w / 2} ${it.y + it.h} L${it.x} ${it.y + it.h / 2}Z" ${st}/>`;
+          else body += `<rect x="${it.x}" y="${it.y}" width="${it.w}" height="${it.h}" rx="${it.kind === 'roundrect' ? 16 : 0}" ${st}/>`;
+        } else if (it.t === 'text') {
+          const w = Math.min(300, String(it.text).length * it.size * 0.55);
+          const x = it.align === 'center' ? it.x - w / 2 : it.x;
+          body += `<rect x="${x}" y="${it.y - it.size * 0.7}" width="${w}" height="${it.size * 0.5}" rx="3" fill="#94a3b8" opacity="0.7"/>`;
+        }
+        if (it.key) centers[it.key] = { x: it.x + it.w / 2, y: it.y + it.h / 2 };
+      }
+      for (const it of items) {
+        if (it.t !== 'conn' || !centers[it.from] || !centers[it.to]) continue;
+        const a = centers[it.from], b = centers[it.to];
+        body += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#64748b" stroke-width="4" opacity="0.6"/>`;
+      }
+      return `<svg viewBox="-20 -20 ${W + 40} ${H + 40}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
+    }
+
+    function insertTemplate(id) {
+      const tpl = TEMPLATES.find(t => t.id === id);
+      if (!tpl) return false;
+      if (!tpl.free && !appState.isPro) {
+        document.getElementById('proModal').classList.remove('hidden');
+        return false;
+      }
+      if (activeStickyEditor) activeStickyEditor.commit();
+      const { W, H, items } = tpl.build();
+      const k = Math.min(1.3, (cssWidth - 40) / W, (cssHeight - 40) / H);
+      const ox = (cssWidth - W * k) / 2, oy = (cssHeight - H * k) / 2;
+      const X = (v) => ox + v * k, Y = (v) => oy + v * k;
+      saveHistory();
+      const keyIds = {};
+      const added = { strokes: [], images: [], texts: [] };
+      for (const it of items) {
+        if (it.t === 'sticky') {
+          const c = TPL_COLORS[it.color] || TPL_COLORS.yellow;
+          const st = makeStickyItem({ x: X(it.x), y: Y(it.y), width: it.w * k, height: it.h * k, bg: c.bg, border: c.border, text: it.text || '', fontSize: Math.max(10, Math.round(15 * Math.min(1.2, k))) });
+          appState.images.push(st); added.images.push(st);
+          if (it.key) keyIds[it.key] = st.id;
+        } else if (it.t === 'shape') {
+          const o = it.opt || {};
+          const sh = makeShapeStroke(it.kind, { x: X(it.x), y: Y(it.y) }, { x: X(it.x + it.w), y: Y(it.y + it.h) },
+            { fill: o.fill || 'none', fillColor: o.fillColor || '#e2e8f0', color: o.color || '#334155', strokeWidth: o.strokeWidth || 2 });
+          appState.strokes.push(sh); added.strokes.push(sh);
+          if (it.key) keyIds[it.key] = sh.id;
+        } else if (it.t === 'text') {
+          const size = Math.max(10, Math.round(it.size * Math.min(1.2, Math.max(k, 0.55))));
+          const t = { id: Date.now() + Math.random(), text: it.text, x: X(it.x), y: Y(it.y), size, color: it.color || '#0f172a', bold: !!it.bold, rotation: 0 };
+          if (it.align === 'center') t.x -= getTextBounds(t).width / 2;
+          appState.texts.push(t); added.texts.push(t);
+        }
+      }
+      for (const it of items) {
+        if (it.t !== 'conn' || keyIds[it.from] == null || keyIds[it.to] == null) continue;
+        const c = makeShapeStroke(it.kind, { x: 0, y: 0 }, { x: 1, y: 1 }, { color: '#64748b', strokeWidth: 2, routing: it.routing });
+        c.fromId = keyIds[it.from]; c.toId = keyIds[it.to]; c.fromAnchor = it.fa; c.toAnchor = it.ta;
+        appState.strokes.push(c); added.strokes.push(c);
+      }
+      appState.tool = 'select';
+      updateToolButtonsUI();
+      appState.selectedStrokes = added.strokes;
+      appState.selectedImages = added.images;
+      appState.selectedTexts = added.texts;
+      redrawAllStrokes();
+      updateSelectionBoxUI();
+      renderLayersUI();
+      scheduleAutosave();
+      if (typeof updateEmptyHint === 'function') updateEmptyHint();
+      showToast(i18nText('toast_tpl_inserted', '已插入模板：{name}（可 Ctrl/Cmd+Z 撤销）', { name: tplText(tpl.name[0], tpl.name[1]) }));
+      return true;
+    }
+
+    const templatesModal = document.getElementById('templatesModal');
+    function renderTemplatesGrid() {
+      const grid = document.getElementById('templatesGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      for (const tpl of TEMPLATES) {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'wb-tpl-card';
+        card.dataset.template = tpl.id;
+        const locked = !tpl.free && !appState.isPro;
+        card.innerHTML = `<div class="wb-tpl-thumb">${templateThumbSVG(tpl)}</div>
+          <div class="flex items-center justify-between gap-2"><span class="wb-tpl-name">${escapeXml(tpl.icon + ' ' + tplText(tpl.name[0], tpl.name[1]))}</span>
+          <span class="wb-badge ${tpl.free ? 'wb-badge-free' : 'wb-badge-pro'}">${tpl.free ? escapeXml(i18nText('tpl_free', '免费')) : (locked ? '🔒 Pro' : 'Pro')}</span></div>
+          <span class="wb-tpl-desc">${escapeXml(tplText(tpl.desc[0], tpl.desc[1]))}</span>`;
+        card.onclick = () => {
+          if (insertTemplate(tpl.id) && templatesModal) templatesModal.classList.add('hidden');
+        };
+        grid.appendChild(card);
+      }
+    }
+    function openTemplatesModal() {
+      if (!templatesModal) return;
+      closeAllFlyouts();
+      renderTemplatesGrid();
+      templatesModal.classList.remove('hidden');
+    }
+    // Refresh the Pro-dependent Round 4 panels when the licence changes (separate from the core eazypro:change handler)
+    window.addEventListener('eazypro:change', () => {
+      try {
+        if (templatesModal && !templatesModal.classList.contains('hidden')) renderTemplatesGrid();
+        if (typeof renderBoardsList === 'function') renderBoardsList();
+      } catch (_) {}
+    });
+    ['btnTemplates', 'btnTemplatesDrawer'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) b.onclick = (e) => { e.stopPropagation(); openTemplatesModal(); };
+    });
+    if (templatesModal) {
+      const c = document.getElementById('btnCloseTemplatesModal');
+      if (c) c.onclick = () => templatesModal.classList.add('hidden');
+      templatesModal.addEventListener('click', (e) => { if (e.target === templatesModal) templatesModal.classList.add('hidden'); });
+    }
+
+    // ================= 🗂️ 我的白板 (multiple local boards) — free up to 3, Pro unlimited =================
+    // Index: eazyopc_whiteboard_boards_v1 = { activeId, boards: [{ id, name, createdAt, updatedAt }] }.
+    // The ACTIVE board's document always lives in the autosave key (eazyopc_whiteboard_doc_v1); every other board is
+    // stored once under eazyopc_whiteboard_board_<id>. Switching swaps them, so autosave and 保存作品 keep working as before.
+    const BOARDS_INDEX_KEY = 'eazyopc_whiteboard_boards_v1';
+    const BOARD_KEY_PREFIX = 'eazyopc_whiteboard_board_';
+    const FREE_BOARD_LIMIT = 3;
+    let boardsIndex = null;
+
+    function newBoardId() {
+      return 'b' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+
+    function defaultBoardName(n) {
+      return i18nText('boards_default_name', '白板 {n}', { n });
+    }
+
+    function loadBoardsIndex() {
+      let idx = null;
+      try { idx = JSON.parse(localStorage.getItem(BOARDS_INDEX_KEY) || 'null'); } catch (_) { idx = null; }
+      if (!idx || !Array.isArray(idx.boards) || !idx.boards.length || !idx.boards.some(b => b && b.id === idx.activeId)) {
+        const now = Date.now();
+        const firstId = newBoardId();
+        idx = { activeId: firstId, boards: [{ id: firstId, name: defaultBoardName(1), createdAt: now, updatedAt: now }] };
+        try { localStorage.setItem(BOARDS_INDEX_KEY, JSON.stringify(idx)); } catch (_) {}
+      }
+      boardsIndex = idx;
+      return idx;
+    }
+
+    function saveBoardsIndex() {
+      try { localStorage.setItem(BOARDS_INDEX_KEY, JSON.stringify(boardsIndex)); return true; } catch (_) { return false; }
+    }
+
+    function getActiveBoardMeta() {
+      const idx = boardsIndex || loadBoardsIndex();
+      return idx.boards.find(b => b.id === idx.activeId) || idx.boards[0];
+    }
+    function getActiveBoardName() { const m = getActiveBoardMeta(); return m ? m.name : ''; }
+
+    let boardMetaTouchTimer = null;
+    function touchActiveBoardMeta() {
+      if (!boardsIndex) return;
+      clearTimeout(boardMetaTouchTimer);
+      boardMetaTouchTimer = setTimeout(() => {
+        const m = getActiveBoardMeta();
+        if (m) { m.updatedAt = Date.now(); saveBoardsIndex(); }
+      }, 400);
+    }
+
+    function canAddBoard() {
+      const idx = boardsIndex || loadBoardsIndex();
+      if (appState.isPro || idx.boards.length < FREE_BOARD_LIMIT) return true;
+      showToast(i18nText('boards_limit_toast', '免费版最多 3 块白板，升级 Pro 可不限数量。'), 4500);
+      document.getElementById('proModal').classList.remove('hidden');
+      return false;
+    }
+
+    function emptyBoardDocument() {
+      return { app: 'eazyopc', site: 'whiteboard', v: 1, savedAt: Date.now(), currentPageIndex: 0, paper: appState.paper, ratio: appState.ratio,
+        pages: [{ id: Date.now(), strokes: [], texts: [], images: [] }] };
+    }
+
+    // Stores the live document under the active board's own key and returns its raw JSON (null on quota failure)
+    function stashActiveBoard() {
+      if (activeStickyEditor) activeStickyEditor.commit();
+      flushAutosave();
+      let raw = null;
+      try { raw = localStorage.getItem(AUTOSAVE_KEY); } catch (_) { raw = null; }
+      if (!raw) raw = JSON.stringify(buildDocumentObject(true));
+      try { localStorage.setItem(BOARD_KEY_PREFIX + boardsIndex.activeId, raw); } catch (_) {
+        showToast(i18nText('boards_quota_toast', '浏览器存储空间不足，无法切换白板。请先「保存作品」或删除不用的白板。'), 6000);
+        return null;
+      }
+      return raw;
+    }
+
+    // Loads `doc` as the active board without letting the load itself rewrite storage
+    function activateBoardDocument(id, doc) {
+      const wasReady = autosaveReady;
+      autosaveReady = false;
+      try { loadDocumentIntoApp(doc); } finally { autosaveReady = wasReady; }
+      boardsIndex.activeId = id;
+      saveBoardsIndex();
+      updateBoardsButtonLabel();
+    }
+
+    function switchBoard(id) {
+      if (!boardsIndex || id === boardsIndex.activeId) return;
+      let targetRaw = null, targetDoc = null;
+      try { targetRaw = localStorage.getItem(BOARD_KEY_PREFIX + id); } catch (_) { targetRaw = null; }
+      try { targetDoc = targetRaw ? validateWorkDocument(JSON.parse(targetRaw)) : null; } catch (_) { targetDoc = null; }
+      if (!targetDoc) { targetDoc = emptyBoardDocument(); targetRaw = JSON.stringify(targetDoc); }
+      if (stashActiveBoard() === null) return;
+      // Move the target into the autosave slot (free its own key first so the quota has room)
+      try { localStorage.removeItem(BOARD_KEY_PREFIX + id); } catch (_) {}
+      try { localStorage.setItem(AUTOSAVE_KEY, targetRaw); } catch (_) {
+        try { localStorage.setItem(BOARD_KEY_PREFIX + id, targetRaw); } catch (__) {}
+        showToast(i18nText('boards_quota_toast', '浏览器存储空间不足，无法切换白板。请先「保存作品」或删除不用的白板。'), 6000);
+        return;
+      }
+      activateBoardDocument(id, targetDoc);
+      const m = getActiveBoardMeta();
+      showToast(i18nText('boards_switched', '已切换到「{name}」', { name: m ? m.name : '' }));
+    }
+
+    function createBoard() {
+      if (!canAddBoard()) return;
+      if (stashActiveBoard() === null) return;
+      const now = Date.now();
+      const id = newBoardId();
+      boardsIndex.boards.push({ id, name: defaultBoardName(boardsIndex.boards.length + 1), createdAt: now, updatedAt: now });
+      const doc = emptyBoardDocument();
+      try { localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(doc)); } catch (_) {}
+      activateBoardDocument(id, doc);
+      showToast(i18nText('boards_created', '已新建「{name}」', { name: getActiveBoardName() }));
+    }
+
+    function duplicateBoard(id) {
+      if (!canAddBoard()) return;
+      let raw = null;
+      if (id === boardsIndex.activeId) {
+        flushAutosave();
+        try { raw = localStorage.getItem(AUTOSAVE_KEY); } catch (_) {}
+        if (!raw) raw = JSON.stringify(buildDocumentObject(true));
+      } else {
+        try { raw = localStorage.getItem(BOARD_KEY_PREFIX + id); } catch (_) {}
+      }
+      if (!raw) raw = JSON.stringify(emptyBoardDocument());
+      const src = boardsIndex.boards.find(b => b.id === id);
+      const now = Date.now();
+      const newId = newBoardId();
+      try { localStorage.setItem(BOARD_KEY_PREFIX + newId, raw); } catch (_) {
+        showToast(i18nText('boards_quota_toast', '浏览器存储空间不足，无法切换白板。请先「保存作品」或删除不用的白板。'), 6000);
+        return;
+      }
+      boardsIndex.boards.push({ id: newId, name: i18nText('boards_copy_name', '{name} 副本', { name: src ? src.name : '' }), createdAt: now, updatedAt: now });
+      saveBoardsIndex();
+      renderBoardsList();
+    }
+
+    function renameBoard(id, name) {
+      const b = boardsIndex.boards.find(x => x.id === id);
+      const clean = String(name || '').trim().slice(0, 60);
+      if (!b || !clean) return;
+      b.name = clean;
+      saveBoardsIndex();
+      updateBoardsButtonLabel();
+    }
+
+    function deleteBoard(id) {
+      if (!boardsIndex || boardsIndex.boards.length <= 1) {
+        showToast(i18nText('boards_last_toast', '至少保留一块白板。要清空内容请用「清空白板」。'));
+        return;
+      }
+      const b = boardsIndex.boards.find(x => x.id === id);
+      if (!b || !confirm(i18nText('boards_confirm_delete', '确定删除「{name}」吗？删除后无法恢复（除非你保存过作品文件）。', { name: b.name }))) return;
+      if (id === boardsIndex.activeId) {
+        const other = boardsIndex.boards.find(x => x.id !== id);
+        switchBoard(other.id);
+        if (boardsIndex.activeId === id) return; // switch failed
+      }
+      try { localStorage.removeItem(BOARD_KEY_PREFIX + id); } catch (_) {}
+      boardsIndex.boards = boardsIndex.boards.filter(x => x.id !== id);
+      saveBoardsIndex();
+      renderBoardsList();
+    }
+
+    function updateBoardsButtonLabel() {
+      const btn = document.getElementById('btnBoardsManager');
+      if (btn) btn.title = `${i18nText('btn_my_boards', '我的白板')}: ${getActiveBoardName()}`;
+    }
+
+    function formatBoardTime(ts) {
+      try { return new Date(ts).toLocaleString(appState.lang === 'zh' ? 'zh-CN' : undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (_) { return ''; }
+    }
+
+    const boardsModal = document.getElementById('boardsModal');
+    function renderBoardsList() {
+      const list = document.getElementById('boardsList');
+      const quota = document.getElementById('boardsQuota');
+      if (!list || !boardsIndex) return;
+      if (quota) {
+        quota.textContent = appState.isPro
+          ? i18nText('boards_quota_pro', '共 {n} 块 · Pro 不限数量', { n: boardsIndex.boards.length })
+          : i18nText('boards_quota_free', '{n} / 3 块（免费版上限 3 块，Pro 不限）', { n: boardsIndex.boards.length });
+      }
+      list.innerHTML = '';
+      const sorted = boardsIndex.boards.slice().sort((a, b) => (b.id === boardsIndex.activeId) - (a.id === boardsIndex.activeId) || (b.updatedAt || 0) - (a.updatedAt || 0));
+      for (const b of sorted) {
+        const active = b.id === boardsIndex.activeId;
+        const li = document.createElement('li');
+        li.className = 'wb-board-row' + (active ? ' is-active' : '');
+        const info = document.createElement('div');
+        info.className = 'min-w-0 flex-1';
+        const name = document.createElement('div');
+        name.className = 'wb-board-name';
+        name.textContent = b.name;
+        const meta = document.createElement('div');
+        meta.className = 'wb-board-meta';
+        meta.textContent = `${i18nText('boards_updated', '更新于')} ${formatBoardTime(b.updatedAt || b.createdAt)}`;
+        info.appendChild(name); info.appendChild(meta);
+        li.appendChild(info);
+        if (active) {
+          const badge = document.createElement('span');
+          badge.className = 'wb-badge wb-badge-active';
+          badge.textContent = i18nText('boards_current', '当前');
+          li.appendChild(badge);
+        } else {
+          const open = document.createElement('button');
+          open.type = 'button'; open.className = 'wb-btn wb-btn-sm wb-btn-primary';
+          open.textContent = i18nText('boards_open', '打开');
+          open.onclick = () => { switchBoard(b.id); renderBoardsList(); if (boardsIndex.activeId === b.id && boardsModal) boardsModal.classList.add('hidden'); };
+          li.appendChild(open);
+        }
+        const mk = (label, title, fn, extra = '') => {
+          const x = document.createElement('button');
+          x.type = 'button'; x.className = 'wb-btn wb-btn-sm ' + extra; x.textContent = label; x.title = title; x.setAttribute('aria-label', title);
+          x.onclick = fn; li.appendChild(x);
+        };
+        mk('✏️', i18nText('boards_rename', '重命名'), () => {
+          const input = document.createElement('input');
+          input.className = 'wb-input'; input.value = b.name; input.maxLength = 60;
+          info.replaceChildren(input);
+          input.focus(); input.select();
+          let done = false;
+          const finish = (save) => { if (done) return; done = true; if (save) renameBoard(b.id, input.value); renderBoardsList(); };
+          input.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') finish(true); else if (e.key === 'Escape') finish(false); });
+          input.addEventListener('blur', () => finish(true));
+        });
+        mk('⧉', i18nText('boards_duplicate', '复制'), () => duplicateBoard(b.id));
+        mk('🗑', i18nText('boards_delete', '删除'), () => deleteBoard(b.id), 'wb-btn-danger');
+        list.appendChild(li);
+      }
+    }
+    function openBoardsModal() {
+      if (!boardsModal) return;
+      closeAllFlyouts();
+      touchActiveBoardMeta();
+      renderBoardsList();
+      boardsModal.classList.remove('hidden');
+    }
+    ['btnBoardsManager', 'btnBoardsDrawer'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) b.onclick = (e) => { e.stopPropagation(); openBoardsModal(); };
+    });
+    if (boardsModal) {
+      const c = document.getElementById('btnCloseBoardsModal');
+      if (c) c.onclick = () => boardsModal.classList.add('hidden');
+      boardsModal.addEventListener('click', (e) => { if (e.target === boardsModal) boardsModal.classList.add('hidden'); });
+      const nb = document.getElementById('btnNewBoard');
+      if (nb) nb.onclick = () => { createBoard(); renderBoardsList(); };
+    }
+    // Other tabs may change the index (e.g. create a board): keep ours in sync
+    window.addEventListener('storage', (e) => {
+      if (e.key !== BOARDS_INDEX_KEY || !boardsIndex) return;
+      const mine = boardsIndex.activeId;
+      loadBoardsIndex();
+      if (boardsIndex.activeId !== mine) {
+        // Another tab switched boards: stop autosaving here so this tab never overwrites the other board
+        autosaveReady = false;
+        showToast(i18nText('boards_other_tab', '你在另一个标签页切换了白板。为避免覆盖内容，本页已暂停自动保存，请刷新页面。'), 12000);
+      }
+      renderBoardsList();
+    });
+
     function initAppOnLoad() {
       if ('serviceWorker' in navigator) {
         const registerSW = () => navigator.serviceWorker.register('/sw.js').catch(() => {});
@@ -8625,6 +9314,7 @@ ${pathsSvg}</svg>`;
       // Restore the autosaved document before the first render. If restoring throws, keep autosave
       // disabled for this session so the saved data is never overwritten by an empty board.
       let restoreFailed = false;
+      try { loadBoardsIndex(); updateBoardsButtonLabel(); } catch (_) {}
       try { restoreAutosave(); } catch (err) { restoreFailed = true; console.warn('Autosave restore failed', err); }
       autosaveReady = !restoreFailed;
       resizeCanvas();
