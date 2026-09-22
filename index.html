@@ -808,6 +808,106 @@
       font-weight: 700 !important;
     }
     
+
+    /* ================= ☀️ Rule 2: light-mode modals — black text on white, no grey-on-grey ================= */
+    body.theme-light #proModal > div.bg-slate-900,
+    body.theme-light #exportModal > div.bg-slate-900,
+    body.theme-light #restoreModal > div.bg-slate-900,
+    body.theme-light #feedbackModal > div.bg-slate-900 {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    body.theme-light :is(#proModal, #exportModal, #restoreModal, #feedbackModal) :is(.bg-slate-950, .bg-slate-900, .bg-slate-900\/90, .bg-slate-800, .bg-slate-800\/80, .bg-slate-800\/90, .bg-indigo-500\/10, .bg-amber-500\/10, .bg-amber-500\/15) {
+      background: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    body.theme-light :is(#proModal, #exportModal, #restoreModal, #feedbackModal) :is(h1, h2, h3, h4, h5, p, span, strong, label, div, li, a) {
+      color: #0f172a !important;
+    }
+    body.theme-light :is(#proModal, #exportModal, #restoreModal, #feedbackModal) :is(p, span, div, li, a, label) {
+      font-weight: 700 !important;
+    }
+    body.theme-light :is(#proModal, #exportModal, #restoreModal, #feedbackModal) :is(h1, h2, h3, h4, h5, strong, .font-bold, .font-black, .font-extrabold) {
+      font-weight: 800 !important;
+    }
+    body.theme-light :is(#proModal, #exportModal, #restoreModal, #feedbackModal) :is(.border-slate-700, .border-slate-800, .border-slate-800\/80, .border-t) {
+      border-color: #cbd5e1 !important;
+    }
+    body.theme-light :is(#proModal, #exportModal, #restoreModal, #feedbackModal) :is(input[type="text"], input[type="email"], input:not([type]), textarea) {
+      background: #ffffff !important;
+      border: 1.5px solid #334155 !important;
+      color: #0f172a !important;
+      font-weight: 700 !important;
+    }
+    body.theme-light :is(#proModal, #exportModal, #restoreModal, #feedbackModal) :is(input, textarea)::placeholder {
+      color: #475569 !important;
+      font-weight: 600 !important;
+    }
+    /* Buttons: black background, white text */
+    body.theme-light :is(#proModal, #exportModal, #restoreModal, #feedbackModal) :is(button, a#creemCheckoutBtn, a#btnOpenCanva, a#btnOpenFigma) {
+      background: #0f172a !important;
+      border-color: #0f172a !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+    }
+    body.theme-light :is(#proModal, #exportModal, #restoreModal, #feedbackModal) :is(button, a#creemCheckoutBtn, a#btnOpenCanva, a#btnOpenFigma) :is(span, strong, div) {
+      color: #ffffff !important;
+    }
+    body.theme-light :is(#proModal, #exportModal, #restoreModal, #feedbackModal) :is(button, a#creemCheckoutBtn):hover {
+      background: #334155 !important;
+    }
+    /* Text-style controls (close ✕, "continue free", restore link) stay text: dark on white */
+    body.theme-light :is(#proModal, #exportModal, #restoreModal, #feedbackModal) button:is(#btnCloseExportModal, #btnCloseRestoreModal, #btnCloseFeedbackModal, #btnCloseProModal, #btnOpenRestoreModal),
+    body.theme-light :is(#proModal, #exportModal, #restoreModal, #feedbackModal) button:is(#btnCloseExportModal, #btnCloseRestoreModal, #btnCloseFeedbackModal, #btnCloseProModal, #btnOpenRestoreModal):hover {
+      background: transparent !important;
+      border-color: transparent !important;
+      color: #0f172a !important;
+      font-weight: 800 !important;
+    }
+    body.theme-light #exportModal button#btnOpenRestoreModal span { color: #0f172a !important; text-decoration: underline; }
+    /* Pro format chips: unselected = outlined, selected (amber class) = black */
+    body.theme-light #exportModal #proFormatSubOptions button.btn-pro-fmt {
+      background: #ffffff !important;
+      border: 1.5px solid #334155 !important;
+      color: #0f172a !important;
+    }
+    body.theme-light #exportModal #proFormatSubOptions button.btn-pro-fmt.bg-amber-500 {
+      background: #0f172a !important;
+      border-color: #0f172a !important;
+      color: #ffffff !important;
+    }
+    /* Export tier cards keep a visible selected state */
+    body.theme-light #exportModal .export-tier-card {
+      border: 2px solid #cbd5e1 !important;
+    }
+    body.theme-light #exportModal .export-tier-card.border-emerald-500 {
+      border-color: #047857 !important;
+      box-shadow: 0 0 0 1px #047857 inset !important;
+    }
+    body.theme-light #exportModal .export-tier-card.border-amber-500 {
+      border-color: #b45309 !important;
+      box-shadow: 0 0 0 1px #b45309 inset !important;
+    }
+    /* Page dock dual toggle: legible in light mode */
+    body.theme-light #pageManagerDock button#btnToggleDualView {
+      background: #f1f5f9 !important;
+      border: 1px solid #cbd5e1 !important;
+      color: #0f172a !important;
+      font-weight: 700 !important;
+    }
+    body.theme-light #pageManagerDock button#btnToggleDualView * {
+      color: #0f172a !important;
+    }
+    body.theme-light #pageManagerDock button#btnToggleDualView.dual-active {
+      background: #4f46e5 !important;
+      border-color: #4f46e5 !important;
+      color: #ffffff !important;
+    }
+    body.theme-light #pageManagerDock button#btnToggleDualView.dual-active * {
+      color: #ffffff !important;
+    }
 </style>
   <!-- Open-Source Typography (Google Fonts) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
