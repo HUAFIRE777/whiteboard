@@ -4876,6 +4876,28 @@
       });
 
       selectionOverlay.appendChild(box);
+
+      // The board clips everything outside it: keep the action pill inside the board even when the
+      // selection touches the bottom edge or is wider/taller than the board (it used to vanish there)
+      const pill = box.querySelector('.selection-action-pill');
+      if (pill) {
+        const pw = pill.offsetWidth || 0, ph = pill.offsetHeight || 26;
+        // The floating page dock covers the bottom of the board: treat its top edge as the usable bottom
+        let limitY = cssHeight;
+        const pdock = document.getElementById('pageManagerDock');
+        if (pdock) {
+          const dr = pdock.getBoundingClientRect(), cr = canvasCard.getBoundingClientRect();
+          if (dr.height && cr.height && dr.top < cr.bottom) limitY = Math.max(ph + 8, Math.min(cssHeight, (dr.top - cr.top) * cssHeight / cr.height));
+        }
+        const visBottom = Math.min(boxH, limitY - minY); // box-local y of the usable bottom
+        let top = (minY + boxH + 10 + ph <= limitY - 4) ? boxH + 10 : Math.max(-minY + 4, visBottom - ph - 8);
+        let absLeft = minX + boxW / 2 - pw / 2;
+        absLeft = Math.max(4, Math.min(cssWidth - pw - 4, absLeft));
+        pill.style.top = `${top}px`;
+        pill.style.bottom = 'auto';
+        pill.style.left = `${absLeft - minX}px`;
+        pill.style.transform = 'none';
+      }
     }
 
     function rotateSelectedItems(angleDelta) {
