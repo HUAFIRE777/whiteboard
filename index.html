@@ -7070,7 +7070,11 @@
     }
 
     function initAppOnLoad() {
-      if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); }); }
+      if ('serviceWorker' in navigator) {
+        const registerSW = () => navigator.serviceWorker.register('/sw.js').catch(() => {});
+        if (document.readyState === 'complete') registerSW();
+        else window.addEventListener('load', registerSW, { once: true });
+      }
       
       // 🌟 12 大大师级笔刷工坊事件绑定
       const btnMoreBrushes = document.getElementById('btnMoreBrushes');
