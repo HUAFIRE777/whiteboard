@@ -916,6 +916,17 @@
     body.theme-light #pageManagerDock button#btnToggleDualView.dual-active * {
       color: #ffffff !important;
     }
+    /* ================= Round 4: shared toast ================= */
+    .wb-toast {
+      position: fixed; left: 50%; bottom: 24px; z-index: 90; max-width: min(92vw, 520px);
+      transform: translate(-50%, 12px); opacity: 0; pointer-events: none;
+      padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 600; line-height: 1.5;
+      background: rgba(15, 23, 42, 0.96); color: #f8fafc; border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35); transition: opacity 150ms ease, transform 150ms ease;
+    }
+    .wb-toast.wb-toast-show { opacity: 1; transform: translate(-50%, 0); }
+    body.theme-light .wb-toast { background: #ffffff !important; color: #0f172a !important; border-color: #cbd5e1 !important; font-weight: 700; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14) !important; }
+    @media (prefers-reduced-motion: reduce) { .wb-toast { transition: none; } }
 </style>
   <!-- Open-Source Typography (Google Fonts) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2404,7 +2415,7 @@
     </div>
   </div>
   <!-- 🍞 独立开发者反馈与交互吐司提示 -->
-  <div id="creatorToast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-2xl bg-slate-900/95 text-white text-xs border border-slate-700 shadow-2xl flex items-center gap-2 transition-all duration-300 pointer-events-none opacity-0 translate-y-4"></div>
+  <div id="creatorToast" class="wb-toast" role="status" aria-live="polite"></div>
 
 
   <!-- ================= 7. 手机端原生存图模态弹窗 ================= -->
@@ -3159,6 +3170,27 @@
       return str;
     }
 
+    // Shared tiny non-blocking toast (plain text only — never HTML)
+    let toastTimer = null;
+    function showToast(message, duration = 3200) {
+      let toast = document.getElementById('creatorToast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'creatorToast';
+        document.body.appendChild(toast);
+      }
+      toast.className = 'wb-toast';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      toast.textContent = String(message == null ? '' : message);
+      // force reflow so the entrance transition runs again for back-to-back toasts
+      void toast.offsetWidth;
+      toast.classList.add('wb-toast-show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('wb-toast-show'), duration);
+    }
+    window.showToast = showToast;
+
     // Tools that never create strokes (everything else is a drawing tool)
     const NON_STROKE_TOOLS = new Set(['hand', 'select', 'lasso', 'text', 'laser', 'eraser']);
     function isStrokeTool(tool) {
@@ -3179,6 +3211,10 @@
     }
 
     function serializeImageForSave(im) {
+      if (isStickyItem(im)) {
+        return { id: im.id, kind: 'sticky', x: im.x, y: im.y, width: im.width, height: im.height, rotation: im.rotation || 0,
+          bg: im.bg, border: im.border, text: im.text || '', fontSize: im.fontSize || STICKY_FONT_SIZE };
+      }
       const src = im && im.img ? (im.img.currentSrc || im.img.src) : (im && im.src);
       if (!src) return null;
       return { id: im.id, src, x: im.x, y: im.y, width: im.width, height: im.height, rotation: im.rotation || 0 };
@@ -3189,50 +3225,47 @@
         id: p.id,
         strokes: p.strokes || [],
         texts: (p.texts || []).map(t => { const c = { ...t }; delete c._editing; return c; }),
-        images: withImages ? (p.images || []).map(serializeImageForSave).filter(Boolean) : []
+        // Sticky notes are tiny and always kept; bitmap images are dropped first when the quota is hit
+        images: (p.images || []).filter(im => withImages || isStickyItem(im)).map(serializeImageForSave).filter(Boolean)
       };
     }
 
-    function collectStickyNotesForSave() {
-      const layer = document.getElementById('stickyLayer');
-      if (!layer) return [];
-      return Array.from(layer.querySelectorAll('.wb-sticky')).map(n => {
-        const ta = n.querySelector('textarea');
-        return {
-          left: parseFloat(n.style.left) || 0,
-          top: parseFloat(n.style.top) || 0,
-          bg: n.dataset.bg || '#fef08a',
-          border: n.dataset.border || '#fde047',
-          text: ta ? ta.value : ''
-        };
-      });
+    // Whole document (all pages) as a plain object. Shared by autosave, 「保存作品」 (.eazyopc) and the boards manager.
+    function buildDocumentObject(withImages) {
+      const cur = appState.currentPageIndex;
+      // Read the live page from appState without mutating appState.pages
+      const pages = appState.pages.map((p, idx) => (idx === cur
+        ? { id: p.id, strokes: appState.strokes, texts: appState.texts, images: appState.images }
+        : p));
+      return {
+        app: 'eazyopc',
+        site: 'whiteboard',
+        v: 1,
+        savedAt: Date.now(),
+        currentPageIndex: appState.isDualSpread ? 0 : cur, // 双板状态下刷新回到第 1 页
+        paper: appState.paper,
+        ratio: appState.ratio,
+        pages: pages.map(pg => serializePageForSave(pg, withImages))
+      };
     }
 
+    let autosaveQuotaWarned = false;
     function flushAutosave() {
       clearTimeout(autosaveTimer);
       autosaveTimer = null;
       if (!autosaveReady) return;
       try {
-        // Read the live page from appState without mutating appState.pages
-        const cur = appState.currentPageIndex;
-        const pages = appState.pages.map((p, idx) => (idx === cur
-          ? { id: p.id, strokes: appState.strokes, texts: appState.texts, images: appState.images }
-          : p));
-        const build = (withImages) => JSON.stringify({
-          v: 1,
-          savedAt: Date.now(),
-          currentPageIndex: appState.isDualSpread ? 0 : cur, // 双板状态下刷新回到第 1 页
-          paper: appState.paper,
-          ratio: appState.ratio,
-          pages: pages.map(pg => serializePageForSave(pg, withImages)),
-          stickies: collectStickyNotesForSave()
-        });
         try {
-          localStorage.setItem(AUTOSAVE_KEY, build(true));
+          localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(buildDocumentObject(true)));
         } catch (quotaErr) {
-          // Most likely the quota: keep strokes/texts, drop embedded images
-          try { localStorage.setItem(AUTOSAVE_KEY, build(false)); } catch (_) {}
+          // Most likely the quota: keep strokes/texts/stickies, drop embedded images
+          try { localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(buildDocumentObject(false))); } catch (_) {}
+          if (!autosaveQuotaWarned) {
+            autosaveQuotaWarned = true;
+            showToast(i18nText('toast_autosave_quota', '浏览器存储空间不足，自动保存未包含图片。请用「保存作品」把完整作品（含图片）存到本机。'), 7000);
+          }
         }
+        if (typeof touchActiveBoardMeta === 'function') touchActiveBoardMeta();
       } catch (_) { /* never let autosave break drawing */ }
     }
 
@@ -3242,6 +3275,11 @@
         const raw = localStorage.getItem(AUTOSAVE_KEY);
         if (raw) doc = JSON.parse(raw);
       } catch (_) { doc = null; }
+      return applyDocumentObject(doc);
+    }
+
+    // Replaces appState.pages / paper / ratio with a parsed document. Returns false if the document is unusable.
+    function applyDocumentObject(doc) {
       if (!doc || !Array.isArray(doc.pages) || doc.pages.length === 0) return false;
 
       const onImgLoad = () => {
@@ -3249,8 +3287,9 @@
         if (appState.isDualSpread) renderReferenceBoard();
       };
       const rebuildImages = (list) => (Array.isArray(list) ? list : [])
-        .filter(im => im && typeof im.src === 'string' && im.src)
+        .filter(im => im && (im.kind === 'sticky' || (typeof im.src === 'string' && im.src)))
         .map(im => {
+          if (im.kind === 'sticky') return makeStickyItem(im);
           const img = new Image();
           img.crossOrigin = 'anonymous';
           img.onload = onImgLoad;
@@ -3295,9 +3334,14 @@
         ratioSel.value = doc.ratio;
       }
 
-      if (Array.isArray(doc.stickies) && typeof addPastelStickyNote === 'function') {
+      // Legacy autosave (before Round 4): sticky notes were global DOM nodes → move them onto the saved page
+      if (Array.isArray(doc.stickies)) {
         for (const n of doc.stickies) {
-          if (n) addPastelStickyNote(n.bg || '#fef08a', n.border || '#fde047', n);
+          if (!n) continue;
+          const st = makeStickyItem({ x: n.left, y: n.top, width: 160, height: 120, bg: n.bg, border: n.border, text: n.text });
+          fitStickyHeight(st);
+          live.images.push(st);
+          appState.images.push(st);
         }
       }
       return true;
@@ -3693,6 +3737,10 @@
 
       // 1. 渲染插入/粘贴的图片 (支持 360° 旋转)
       for (const im of (board.images || [])) {
+        if (im.kind === 'sticky') {
+          if (!im._editing) drawStickyNote(targetCtx, im, targetCtx === mainCtx);
+          continue;
+        }
         if (im.img && im.img.complete) {
           targetCtx.save();
           const cx = im.x + im.width / 2;
@@ -4035,6 +4083,12 @@
 
         <!-- 现代浮动操作胶囊栏 -->
         <div class="selection-action-pill">
+          ${(getSingleSelectedSticky()) ? `
+            <button class="btn-pill-edit-sticky font-bold" title="${escapeXml(i18nText('pill_edit_sticky_tip', '编辑便签文字（双击便签也可以）'))}">✏️ ${escapeXml(i18nText('pill_edit_sticky', '编辑'))}</button>
+            <span style="color:#64748b; font-size:10px;">|</span>
+            ${STICKY_COLORS.map(c => `<button class="btn-pill-sticky-color" data-bg="${c.bg}" data-border="${c.border}" title="${escapeXml(i18nText(c.key, c.zh))}" style="width:16px;height:16px;padding:0;border-radius:9999px;background:${c.bg};border:1.5px solid ${c.border};"></button>`).join('')}
+            <span style="color:#64748b; font-size:10px;">|</span>
+          ` : ''}
           ${(appState.selectedTexts && appState.selectedTexts.length === 1 && (!appState.selectedStrokes || appState.selectedStrokes.length === 0)) ? `
             <button class="btn-pill-edit-text font-bold text-indigo-400 dark:text-indigo-300" title="编辑文字内容、更换字体与字号">✏️ 编辑文字</button>
             <span style="color:#64748b; font-size:10px;">|</span>
@@ -4058,6 +4112,29 @@
           }
         };
       }
+      const btnEditSticky = box.querySelector('.btn-pill-edit-sticky');
+      if (btnEditSticky) {
+        btnEditSticky.onclick = (e) => { e.stopPropagation(); const st = getSingleSelectedSticky(); if (st) openStickyEditor(st); };
+      }
+      box.querySelectorAll('.btn-pill-sticky-color').forEach(b => {
+        b.onclick = (e) => {
+          e.stopPropagation();
+          const st = getSingleSelectedSticky();
+          if (!st) return;
+          saveHistory();
+          st.bg = b.dataset.bg; st.border = b.dataset.border;
+          redrawAllStrokes();
+          scheduleAutosave();
+        };
+      });
+      box.ondblclick = (e) => {
+        e.stopPropagation();
+        const st = getSingleSelectedSticky();
+        if (st) { openStickyEditor(st); return; }
+        if (appState.selectedTexts && appState.selectedTexts.length === 1 && !(appState.selectedStrokes || []).length && !(appState.selectedImages || []).length) {
+          openRichTextEditor(appState.selectedTexts[0]);
+        }
+      };
       box.querySelector('.btn-pill-rot-l').onclick = (e) => { e.stopPropagation(); rotateSelectedItems(-Math.PI / 2); };
       box.querySelector('.btn-pill-rot-r').onclick = (e) => { e.stopPropagation(); rotateSelectedItems(Math.PI / 2); };
       box.querySelector('.btn-pill-copy').onclick = (e) => { e.stopPropagation(); duplicateSelectedItems(); };
@@ -4354,10 +4431,8 @@
         const clonedStrokes = [];
         for (const s of appState.selectedStrokes) {
           const clone = {
+            ...JSON.parse(JSON.stringify(s)),
             id: Date.now() + Math.random(),
-            tool: s.tool,
-            color: s.color,
-            size: s.size,
             points: s.points.map(pt => ({
               x: pt.x + 24,
               y: pt.y + 24,
@@ -4375,14 +4450,13 @@
         const clonedList = [];
         for (const im of appState.selectedImages) {
           const clone = {
+            ...im,
             id: Date.now() + Math.random(),
-            img: im.img,
             x: im.x + 24,
             y: im.y + 24,
-            width: im.width,
-            height: im.height,
             rotation: im.rotation || 0
           };
+          delete clone._editing;
           appState.images.push(clone);
           clonedList.push(clone);
         }
@@ -5228,6 +5302,14 @@
       const pos = getCanvasCoordinates(e);
 
       if (appState.tool === 'text') {
+        // Clicking a sticky note with the text tool edits the note
+        for (let i = appState.images.length - 1; i >= 0; i--) {
+          const im = appState.images[i];
+          if (isStickyItem(im) && pos.x >= im.x && pos.x <= im.x + im.width && pos.y >= im.y && pos.y <= im.y + im.height) {
+            openStickyEditor(im);
+            return;
+          }
+        }
         let hitText = null;
         for (let i = appState.texts.length - 1; i >= 0; i--) {
           const t = appState.texts[i];
@@ -5267,6 +5349,16 @@
           }
         }
         if (hitImg) {
+          if (isStickyItem(hitImg)) {
+            const now = performance.now();
+            if (appState._lastClickedSticky === hitImg && (now - (appState._lastStickyClickTime || 0)) < 380) {
+              appState._lastClickedSticky = null;
+              openStickyEditor(hitImg);
+              return;
+            }
+            appState._lastClickedSticky = hitImg;
+            appState._lastStickyClickTime = now;
+          }
           saveHistory();
           appState.selectedImages = [hitImg];
           appState.selectedTexts = [];
@@ -5878,6 +5970,11 @@
         }
         return;
       }
+      if (key === 'enter' && !mod && getSingleSelectedSticky()) {
+        e.preventDefault();
+        openStickyEditor(getSingleSelectedSticky());
+        return;
+      }
       // Single-key tool shortcuts must never fire with modifiers (Cmd+V paste, Ctrl+P print, ...)
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (key === 'h') {
@@ -6105,64 +6202,139 @@
         .replace(/'/g, '&apos;');
     }
 
-    function generateVectorSVGString() {
-      let pathsSvg = '';
+    function buildSvgShape() { return ''; } // replaced by the shapes module
 
-      // 1. 导出插入的图片 (支持 360° 旋转)
-      for (const im of appState.images) {
+    function svgNum(n) {
+      return Math.round((Number(n) || 0) * 100) / 100;
+    }
+
+    // Paper background / grid as vector elements (mirrors renderBackgroundOnContext, minus the random chalk grain)
+    function buildSvgBackground(w, h) {
+      const bgFill = {
+        dot: '#ffffff', square: '#f8fafc', green_chalk: '#0c241b', black_chalk: '#171717', ivory: '#fffdf2', ruled: '#fffdf5', plain: '#ffffff'
+      }[appState.paper] || '#ffffff';
+      let out = `<rect x="0" y="0" width="${w}" height="${h}" fill="${bgFill}" />\n`;
+      if (appState.paper === 'dot') {
+        out += '<g fill="rgba(148,163,184,0.45)">';
+        for (let x = 28; x < w; x += 28) for (let y = 28; y < h; y += 28) out += `<circle cx="${x}" cy="${y}" r="1.25"/>`;
+        out += '</g>\n';
+      } else if (appState.paper === 'square') {
+        out += '<g>';
+        for (let x = 0; x < w; x += 24) {
+          const major = x % 120 === 0;
+          out += `<line x1="${x + 0.5}" y1="0" x2="${x + 0.5}" y2="${h}" stroke="${major ? 'rgba(148,163,184,0.55)' : 'rgba(226,232,240,0.7)'}" stroke-width="${major ? 1 : 0.6}"/>`;
+        }
+        for (let y = 0; y < h; y += 24) {
+          const major = y % 120 === 0;
+          out += `<line x1="0" y1="${y + 0.5}" x2="${w}" y2="${y + 0.5}" stroke="${major ? 'rgba(148,163,184,0.55)' : 'rgba(226,232,240,0.7)'}" stroke-width="${major ? 1 : 0.6}"/>`;
+        }
+        out += '</g>\n';
+      } else if (appState.paper === 'ruled') {
+        out += '<g stroke-width="1">';
+        for (let y = 60; y < h; y += 84) {
+          out += `<line x1="0" y1="${y}" x2="${w}" y2="${y}" stroke="#fda4af"/>`;
+          out += `<line x1="0" y1="${y + 24}" x2="${w}" y2="${y + 24}" stroke="#93c5fd" stroke-dasharray="4 4"/>`;
+          out += `<line x1="0" y1="${y + 48}" x2="${w}" y2="${y + 48}" stroke="#93c5fd"/>`;
+          out += `<line x1="0" y1="${y + 72}" x2="${w}" y2="${y + 72}" stroke="#fda4af"/>`;
+        }
+        out += '</g>\n';
+      }
+      return out;
+    }
+
+    function buildSvgSticky(st) {
+      const cx = st.x + st.width / 2, cy = st.y + st.height / 2;
+      const rot = st.rotation ? ` transform="rotate(${svgNum(st.rotation * 180 / Math.PI)} ${svgNum(cx)} ${svgNum(cy)})"` : '';
+      const { lines, fontSize, lineH } = getStickyLines(st);
+      const maxLines = Math.max(1, Math.floor((st.height - STICKY_PAD * 2) / lineH) + 1);
+      let out = `<g${rot}><rect x="${svgNum(st.x)}" y="${svgNum(st.y)}" width="${svgNum(st.width)}" height="${svgNum(st.height)}" rx="10" ry="10" fill="${escapeXml(st.bg || '#fef08a')}" stroke="${escapeXml(st.border || '#fde047')}" stroke-width="1.2" />`;
+      if (st.text) {
+        out += `<text font-family="${escapeXml(STICKY_FONT)}" font-size="${fontSize}" font-weight="500" fill="${STICKY_TEXT_COLOR}">`;
+        lines.slice(0, maxLines).forEach((ln, i) => {
+          // canvas draws with textBaseline=top; SVG uses the alphabetic baseline (~0.8em below the top)
+          out += `<tspan x="${svgNum(st.x + STICKY_PAD)}" y="${svgNum(st.y + STICKY_PAD + i * lineH + fontSize * 0.8)}" xml:space="preserve">${escapeXml(ln)}</tspan>`;
+        });
+        out += '</text>';
+      }
+      return out + '</g>\n';
+    }
+
+    function buildSvgText(t) {
+      const fontSize = Number(t.size) || 24;
+      const family = t.fontFamily || "'Noto Sans SC', sans-serif";
+      const tb = getTextBounds(t);
+      const lines = String(t.text || '').split('\n');
+      const lineH = fontSize * 1.25;
+      const totalH = Math.max(lineH, lines.length * lineH);
+      const cx = t.x + tb.width / 2;
+      const cy = t.y - lineH + totalH / 2;
+      const rot = t.rotation ? ` transform="rotate(${svgNum(t.rotation * 180 / Math.PI)} ${svgNum(cx)} ${svgNum(cy)})"` : '';
+      let out = `<text font-size="${fontSize}" fill="${escapeXml(t.color || '#18181b')}" font-weight="${t.bold ? 'bold' : 'normal'}" font-family="${escapeXml(family)}"${rot}>`;
+      lines.forEach((ln, li) => {
+        out += `<tspan x="${svgNum(t.x)}" y="${svgNum(cy - totalH / 2 + (li + 0.82) * lineH)}" xml:space="preserve">${escapeXml(ln)}</tspan>`;
+      });
+      return out + '</text>\n';
+    }
+
+    // src (optional): { strokes, texts, images } of another page. Defaults to the live board.
+    function generateVectorSVGString(src = null) {
+      const board = src || appState;
+      let pathsSvg = buildSvgBackground(cssWidth, cssHeight);
+
+      // 1. 图片与便签 (支持 360° 旋转)
+      for (const im of (board.images || [])) {
+        if (isStickyItem(im)) { pathsSvg += buildSvgSticky(im); continue; }
         if (im.img && im.img.src) {
           const cx = im.x + im.width / 2;
           const cy = im.y + im.height / 2;
           const rotDeg = ((im.rotation || 0) * 180 / Math.PI).toFixed(2);
           const transform = im.rotation ? ` transform="rotate(${rotDeg} ${cx} ${cy})"` : '';
-          pathsSvg += `<image href="${escapeXml(im.img.src)}" x="${im.x}" y="${im.y}" width="${im.width}" height="${im.height}"${transform} />\n`;
+          pathsSvg += `<image href="${escapeXml(im.img.src)}" x="${im.x}" y="${im.y}" width="${im.width}" height="${im.height}" preserveAspectRatio="none"${transform} />\n`;
         }
       }
 
-      // 2. 导出 7 大笔刷手绘线条
-      for (const s of appState.strokes) {
+      // 2. 手绘线条与图形
+      for (const s of (board.strokes || [])) {
         if (!s.points || s.points.length === 0) continue;
+        if (s.tool === 'shape') { pathsSvg += buildSvgShape(s, board); continue; }
         if (s.tool === 'spray') {
           for (const pt of s.points) {
             if (pt.sprayDots) {
               for (const dot of pt.sprayDots) {
-                pathsSvg += `<rect x="${pt.x + dot.dx}" y="${pt.y + dot.dy}" width="${dot.r}" height="${dot.r}" fill="${escapeXml(s.color)}" opacity="0.45" />\n`;
+                pathsSvg += `<rect x="${svgNum(pt.x + dot.dx)}" y="${svgNum(pt.y + dot.dy)}" width="${dot.r}" height="${dot.r}" fill="${escapeXml(s.color)}" opacity="0.45" />\n`;
               }
             }
           }
           continue;
         }
         if (s.points.length === 1) {
-          pathsSvg += `<circle cx="${s.points[0].x}" cy="${s.points[0].y}" r="${s.size / 2}" fill="${escapeXml(s.color)}" />\n`;
+          pathsSvg += `<circle cx="${svgNum(s.points[0].x)}" cy="${svgNum(s.points[0].y)}" r="${svgNum(s.size / 2)}" fill="${escapeXml(s.color)}" />\n`;
           continue;
         }
-        let d = `M ${s.points[0].x} ${s.points[0].y}`;
-        for (let i = 1; i < s.points.length; i++) {
-          const p1 = s.points[i - 1];
-          const p2 = s.points[i];
-          const midX = (p1.x + p2.x) / 2;
-          const midY = (p1.y + p2.y) / 2;
-          d += ` Q ${p1.x} ${p1.y} ${midX} ${midY}`;
+        let d = `M ${svgNum(s.points[0].x)} ${svgNum(s.points[0].y)}`;
+        for (let i = 1; i < s.points.length - 1; i++) {
+          const p1 = s.points[i];
+          const p2 = s.points[i + 1];
+          d += ` Q ${svgNum(p1.x)} ${svgNum(p1.y)} ${svgNum((p1.x + p2.x) / 2)} ${svgNum((p1.y + p2.y) / 2)}`;
         }
+        const last = s.points[s.points.length - 1];
+        d += ` L ${svgNum(last.x)} ${svgNum(last.y)}`;
+        const color = s.tool === 'blue_pencil' ? '#38bdf8' : s.color;
         const opacity = s.tool === 'highlighter' ? '0.35' : (s.tool === 'pencil' ? '0.78' : '1');
-        pathsSvg += `<path d="${d}" fill="none" stroke="${escapeXml(s.color)}" stroke-width="${s.size}" stroke-linecap="round" stroke-linejoin="round" opacity="${opacity}" />\n`;
+        const width = s.tool === 'highlighter' ? s.size * 3.6 : s.size;
+        const dash = s.tool === 'dotted' ? ` stroke-dasharray="${svgNum(Math.max(4, s.size * 1.8))} ${svgNum(Math.max(4, s.size * 1.8))}"` : '';
+        pathsSvg += `<path d="${d}" fill="none" stroke="${escapeXml(color)}" stroke-width="${svgNum(width)}" stroke-linecap="round" stroke-linejoin="round" opacity="${opacity}"${dash} />\n`;
       }
 
-      // 3. 导出自由打字文字 (支持 360° 旋转)
-      for (const t of appState.texts) {
-        const estW = Math.max(30, (t.text ? t.text.length : 4) * t.size * 0.7);
-        const cx = t.x + estW / 2;
-        const cy = t.y - t.size / 2;
-        const rotDeg = ((t.rotation || 0) * 180 / Math.PI).toFixed(2);
-        const transform = t.rotation ? ` transform="rotate(${rotDeg} ${cx} ${cy})"` : '';
-        pathsSvg += `<text x="${t.x}" y="${t.y}" font-size="${t.size}" fill="${escapeXml(t.color)}" font-weight="600" font-family="sans-serif"${transform}>${escapeXml(t.text)}</text>\n`;
+      // 3. 自由打字文字 (多行 + 360° 旋转)
+      for (const t of (board.texts || [])) {
+        if (!t || !t.text) continue;
+        pathsSvg += buildSvgText(t);
       }
 
       return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${cssWidth} ${cssHeight}" width="${cssWidth}" height="${cssHeight}">
-  <rect width="100%" height="100%" fill="${appState.paper.includes('chalk') ? '#0c241b' : '#ffffff'}" />
-  ${pathsSvg}
-</svg>`;
+${pathsSvg}</svg>`;
     }
 
     function exportVectorSVG() {
@@ -6833,72 +7005,223 @@
       };
     });
 
-    // restoreData (optional): { left, top, text } when re-creating a note from autosave
-    function addPastelStickyNote(bgColor, borderColor, restoreData = null) {
-      if (!restoreData) saveHistory();
-      const cx = restoreData ? (Number(restoreData.left) || 0) : (cssWidth - 160) / 2 + (Math.random() - 0.5) * 60;
-      const cy = restoreData ? (Number(restoreData.top) || 0) : (cssHeight - 140) / 2 + (Math.random() - 0.5) * 60;
+    // ================= 📝 Sticky notes (canvas-rendered, stored per page in board.images with kind:'sticky') =================
+    // Stickies live in the same array as images so selection / move / resize / rotate / undo / dual board / autosave /
+    // save-file / every export (PNG, PDF, SVG) handle them with the image code paths.
+    const STICKY_PAD = 12;
+    const STICKY_FONT_SIZE = 15;
+    const STICKY_FONT = "'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif";
+    const STICKY_TEXT_COLOR = '#292524';
 
-      const note = document.createElement('div');
-      note.className = 'wb-sticky absolute p-3 rounded-xl shadow-lg cursor-move border select-none group pointer-events-auto transition-transform';
-      note.dataset.bg = bgColor;
-      note.dataset.border = borderColor;
-      note.style.left = `${cx}px`;
-      note.style.top = `${cy}px`;
-      note.style.width = '160px';
-      note.style.minHeight = '120px';
-      note.style.backgroundColor = bgColor;
-      note.style.borderColor = borderColor;
+    function isStickyItem(im) {
+      return !!im && im.kind === 'sticky';
+    }
 
-      const textarea = document.createElement('textarea');
-      textarea.className = 'w-full h-20 bg-transparent border-none outline-none resize-none text-xs font-sans text-stone-800 leading-relaxed';
-      textarea.placeholder = '点击输入灵感便签...';
-      if (restoreData && typeof restoreData.text === 'string') textarea.value = restoreData.text;
-      textarea.addEventListener('input', () => scheduleAutosave());
-      note.appendChild(textarea);
+    const STICKY_COLORS = [
+      { bg: '#fef08a', border: '#fde047', key: 'sticky_yellow', zh: '黄色' },
+      { bg: '#fbcfe8', border: '#f472b6', key: 'sticky_pink', zh: '粉色' },
+      { bg: '#bbf7d0', border: '#86efac', key: 'sticky_green', zh: '绿色' },
+      { bg: '#bae6fd', border: '#7dd3fc', key: 'sticky_blue', zh: '蓝色' }
+    ];
 
-      const delBtn = document.createElement('button');
-      delBtn.innerText = '✕';
-      delBtn.className = 'absolute top-1 right-1 text-[10px] text-stone-400 hover:text-stone-700 opacity-0 group-hover:opacity-100 transition';
-      delBtn.onclick = (e) => {
-        e.stopPropagation();
-        note.remove();
-        renderLayersUI();
+    function getSingleSelectedSticky() {
+      const imgs = appState.selectedImages || [];
+      if (imgs.length !== 1 || !isStickyItem(imgs[0])) return null;
+      if ((appState.selectedStrokes || []).length || (appState.selectedTexts || []).length) return null;
+      return imgs[0];
+    }
+
+    function makeStickyItem(opts = {}) {
+      return {
+        id: opts.id || (Date.now() + Math.random()),
+        kind: 'sticky',
+        x: Number(opts.x) || 0,
+        y: Number(opts.y) || 0,
+        width: Math.max(40, Number(opts.width) || 180),
+        height: Math.max(40, Number(opts.height) || 140),
+        rotation: Number(opts.rotation) || 0,
+        bg: typeof opts.bg === 'string' ? opts.bg : '#fef08a',
+        border: typeof opts.border === 'string' ? opts.border : '#fde047',
+        text: typeof opts.text === 'string' ? opts.text : '',
+        fontSize: Math.max(8, Math.min(72, Number(opts.fontSize) || STICKY_FONT_SIZE))
+      };
+    }
+
+    // Greedy line wrapping that breaks between words (Latin) or between characters (CJK / very long words)
+    function wrapTextToWidth(measureCtx, text, maxW) {
+      const out = [];
+      const tokenRe = /[⺀-鿿가-힯぀-ヿ＀-￯]|[^\s⺀-鿿가-힯぀-ヿ＀-￯]+|[^\S\n]+/g;
+      for (const para of String(text || '').split('\n')) {
+        let line = '';
+        const tokens = para.match(tokenRe) || [];
+        for (const tok of tokens) {
+          const candidate = line + tok;
+          if (!line || measureCtx.measureText(candidate).width <= maxW) {
+            if (!line && measureCtx.measureText(tok).width > maxW) {
+              // Token longer than a whole line: split it by characters
+              for (const ch of Array.from(tok)) {
+                if (line && measureCtx.measureText(line + ch).width > maxW) { out.push(line); line = ch; }
+                else line += ch;
+              }
+            } else {
+              line = candidate;
+            }
+          } else {
+            out.push(line.replace(/\s+$/, ''));
+            line = /^\s+$/.test(tok) ? '' : tok;
+            if (line && measureCtx.measureText(line).width > maxW) {
+              const chars = Array.from(line); line = '';
+              for (const ch of chars) {
+                if (line && measureCtx.measureText(line + ch).width > maxW) { out.push(line); line = ch; }
+                else line += ch;
+              }
+            }
+          }
+        }
+        out.push(line.replace(/\s+$/, ''));
+      }
+      return out;
+    }
+
+    function getStickyLines(st, measureCtx) {
+      const mc = measureCtx || mainCtx;
+      const fs = Number(st.fontSize) || STICKY_FONT_SIZE;
+      mc.save();
+      mc.font = `500 ${fs}px ${STICKY_FONT}`;
+      const lines = wrapTextToWidth(mc, st.text || '', Math.max(10, st.width - STICKY_PAD * 2));
+      mc.restore();
+      return { lines, fontSize: fs, lineH: Math.round(fs * 1.4) };
+    }
+
+    function traceRoundRect(c, x, y, w, h, r) {
+      const rr = Math.max(0, Math.min(r, w / 2, h / 2));
+      c.moveTo(x + rr, y);
+      c.lineTo(x + w - rr, y);
+      c.arcTo(x + w, y, x + w, y + rr, rr);
+      c.lineTo(x + w, y + h - rr);
+      c.arcTo(x + w, y + h, x + w - rr, y + h, rr);
+      c.lineTo(x + rr, y + h);
+      c.arcTo(x, y + h, x, y + h - rr, rr);
+      c.lineTo(x, y + rr);
+      c.arcTo(x, y, x + rr, y, rr);
+      c.closePath();
+    }
+
+    // Shadow-less rounded rectangle + wrapped text (identical on screen and in PNG / PDF exports)
+    function drawStickyNote(c, st, isLiveScreen) {
+      c.save();
+      const cx = st.x + st.width / 2;
+      const cy = st.y + st.height / 2;
+      c.translate(cx, cy);
+      if (st.rotation) c.rotate(st.rotation);
+      const x0 = -st.width / 2, y0 = -st.height / 2;
+      c.beginPath();
+      traceRoundRect(c, x0, y0, st.width, st.height, 10);
+      c.fillStyle = st.bg || '#fef08a';
+      c.fill();
+      c.lineWidth = 1.2;
+      c.strokeStyle = st.border || '#fde047';
+      c.stroke();
+      const { lines, fontSize, lineH } = getStickyLines(st, c);
+      c.font = `500 ${fontSize}px ${STICKY_FONT}`;
+      c.textBaseline = 'top';
+      c.fillStyle = STICKY_TEXT_COLOR;
+      c.beginPath();
+      c.rect(x0 + 2, y0 + 2, st.width - 4, st.height - 4);
+      c.clip();
+      if (!st.text && isLiveScreen) {
+        c.globalAlpha = 0.45;
+        c.fillText(i18nText('sticky_placeholder', '双击输入便签内容…'), x0 + STICKY_PAD, y0 + STICKY_PAD);
+      } else {
+        lines.forEach((ln, i) => c.fillText(ln, x0 + STICKY_PAD, y0 + STICKY_PAD + i * lineH));
+      }
+      c.restore();
+    }
+
+    // Grow the note so all wrapped lines fit (never shrinks below the user's size)
+    function fitStickyHeight(st) {
+      const { lines, lineH } = getStickyLines(st);
+      const need = Math.ceil(lines.length * lineH + STICKY_PAD * 2);
+      if (need > st.height) st.height = need;
+    }
+
+    let activeStickyEditor = null;
+
+    function openStickyEditor(st) {
+      if (!st || !isStickyItem(st)) return;
+      if (activeStickyEditor) activeStickyEditor.commit();
+      clearSelection();
+      const ta = document.createElement('textarea');
+      ta.className = 'wb-sticky-editor';
+      ta.value = st.text || '';
+      ta.placeholder = i18nText('sticky_placeholder', '双击输入便签内容…');
+      Object.assign(ta.style, {
+        position: 'absolute', left: `${st.x}px`, top: `${st.y}px`, width: `${st.width}px`, height: `${st.height}px`,
+        background: st.bg || '#fef08a', border: `1.2px solid ${st.border || '#fde047'}`, borderRadius: '10px',
+        padding: `${STICKY_PAD}px`, boxSizing: 'border-box', resize: 'none', outline: '2px solid #6366f1', outlineOffset: '2px',
+        font: `500 ${Number(st.fontSize) || STICKY_FONT_SIZE}px ${STICKY_FONT}`, lineHeight: `${Math.round((Number(st.fontSize) || STICKY_FONT_SIZE) * 1.4)}px`,
+        color: STICKY_TEXT_COLOR, pointerEvents: 'auto', zIndex: '20', overflow: 'hidden', margin: '0',
+        transform: st.rotation ? `rotate(${st.rotation}rad)` : 'none', transformOrigin: 'center center'
+      });
+      st._editing = true;
+      redrawAllStrokes();
+      const original = st.text || '';
+      let done = false;
+      const grow = () => {
+        ta.style.height = 'auto';
+        const h = Math.max(st.height, ta.scrollHeight);
+        ta.style.height = `${h}px`;
+      };
+      const commit = () => {
+        if (done) return;
+        done = true;
+        activeStickyEditor = null;
+        const next = ta.value;
+        ta.remove();
+        delete st._editing;
+        if (next !== original) {
+          // Undo restores the text from before this edit
+          const idx = appState.images.indexOf(st);
+          if (idx >= 0) {
+            const before = { ...st, text: original };
+            pushCapped(appState.history, snapshotBoard(appState.strokes, appState.texts, appState.images.map(im => (im === st ? before : im))));
+            appState.redoStack = [];
+          }
+          st.text = next;
+          fitStickyHeight(st);
+        }
+        redrawAllStrokes();
         scheduleAutosave();
       };
-      note.appendChild(delBtn);
-
-      // Dragging logic
-      let isDragging = false;
-      let startX = 0, startY = 0;
-      let origLeft = 0, origTop = 0;
-
-      note.addEventListener('pointerdown', (e) => {
-        if (e.target === textarea || e.target === delBtn) return;
-        isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        origLeft = parseFloat(note.style.left);
-        origTop = parseFloat(note.style.top);
-        note.setPointerCapture(e.pointerId);
+      ta.addEventListener('input', grow);
+      ta.addEventListener('blur', commit);
+      ta.addEventListener('keydown', (e) => {
+        e.stopPropagation();
+        if (e.key === 'Escape' || (e.key === 'Enter' && (e.metaKey || e.ctrlKey))) { e.preventDefault(); ta.blur(); }
       });
+      ta.addEventListener('pointerdown', (e) => e.stopPropagation());
+      stickyLayer.appendChild(ta);
+      activeStickyEditor = { commit, st };
+      setTimeout(() => { try { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); grow(); } catch (_) {} }, 30);
+    }
 
-      note.addEventListener('pointermove', (e) => {
-        if (!isDragging) return;
-        note.style.left = `${origLeft + (e.clientX - startX)}px`;
-        note.style.top = `${origTop + (e.clientY - startY)}px`;
-      });
-
-      note.addEventListener('pointerup', (e) => {
-        isDragging = false;
-        try { note.releasePointerCapture(e.pointerId); } catch(err) {}
-      });
-
-      stickyLayer.appendChild(note);
-      if (restoreData) return;
-      setTimeout(() => textarea.focus(), 100);
+    // Adds a sticky note to the current (right / single) board, selects it and opens the text editor
+    function addPastelStickyNote(bgColor, borderColor, opts = null) {
+      saveHistory();
+      const w = 180, h = 140;
+      const st = makeStickyItem(Object.assign({
+        x: Math.round((cssWidth - w) / 2 + (Math.random() - 0.5) * 60),
+        y: Math.round((cssHeight - h) / 2 + (Math.random() - 0.5) * 60),
+        width: w, height: h, bg: bgColor || '#fef08a', border: borderColor || '#fde047'
+      }, opts || {}));
+      appState.images.push(st);
+      appState.tool = 'select';
+      updateToolButtonsUI();
+      redrawAllStrokes();
       renderLayersUI();
       scheduleAutosave();
+      if (!opts || !opts.noEdit) openStickyEditor(st);
+      return st;
     }
 
     // ==========================================
@@ -7145,7 +7468,9 @@
 
       if (appState.images) {
         appState.images.forEach((im, idx) => {
-          const item = createLayerDOMItem('🖼️', `架构图片 #${idx + 1}`, true, false, 1, {
+          const item = createLayerDOMItem(isStickyItem(im) ? '📝' : '🖼️', isStickyItem(im)
+            ? `${i18nText('layer_sticky', '便签')} · ${escapeXml(String(im.text || '').slice(0, 10))}`
+            : `${i18nText('layer_image', '图片')} #${idx + 1}`, true, false, 1, {
             onDelete: () => {
               appState.images = appState.images.filter(x => x.id !== im.id);
               redrawAllStrokes();
@@ -7326,21 +7651,7 @@
     };
 
     function showCreatorToast(message, duration = 4000) {
-      let toast = document.getElementById('creatorToast');
-      if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'creatorToast';
-        toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-2xl bg-slate-900/95 text-white text-xs border border-slate-700 shadow-2xl flex items-center gap-2 transition-all duration-300 pointer-events-none opacity-0 translate-y-4';
-        document.body.appendChild(toast);
-      }
-      toast.innerHTML = message;
-      toast.classList.remove('opacity-0', 'translate-y-4');
-      toast.classList.add('opacity-100', 'translate-y-0');
-      clearTimeout(window.__creatorToastTimer);
-      window.__creatorToastTimer = setTimeout(() => {
-        toast.classList.remove('opacity-100', 'translate-y-0');
-        toast.classList.add('opacity-0', 'translate-y-4');
-      }, duration);
+      showToast(message, duration);
     }
 
     const btnOpenFeedbackModal = document.getElementById('btnOpenFeedbackModal');
