@@ -6621,6 +6621,14 @@
       } else if (key === 'v') {
         appState.tool = 'select'; updateToolButtonsUI();
       } else if (key === 'p') {
+        // P always returns to the natural pen, so the dock brush button must show (and highlight) the pen again
+        const cb = document.getElementById('btnCurrentBrush');
+        if (cb && cb.dataset.tool !== 'pen') {
+          cb.dataset.tool = 'pen';
+          const ic = document.getElementById('curBrushIcon');
+          if (ic) ic.innerText = '🖋️';
+          document.querySelectorAll('#brushStudioFlyout .brush-card').forEach(c => c.classList.remove('active'));
+        }
         appState.tool = 'pen'; updateToolButtonsUI();
       } else if (key === 'e') {
         appState.tool = 'eraser'; updateToolButtonsUI();
