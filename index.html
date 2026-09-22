@@ -1294,7 +1294,7 @@
           <span class="text-[9px] text-slate-400">拖拽圆环与方块拾色</span>
         </div>
         <div class="relative w-[180px] h-[180px] flex items-center justify-center select-none touch-none">
-          <canvas id="hsvWheelCanvas" width="180" height="180" class="cursor-crosshair rounded-full shadow-lg block"></canvas>
+          <canvas id="hsvWheelCanvas" width="180" height="180" class="cursor-crosshair rounded-full shadow-lg block touch-none"></canvas>
         </div>
       </div>
 
@@ -5690,12 +5690,7 @@
     let isDraggingHue = false;
     let isDraggingSV = false;
 
-    function hexToRgb(hex) {
-      hex = hex.replace('#', '');
-      if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
-      const num = parseInt(hex, 16);
-      return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
-    }
+    // hexToRgb() is defined once near the top of this script (with null guard).
 
     function rgbToHex(r, g, b) {
       return '#' + [r, g, b].map(x => {
@@ -6044,29 +6039,7 @@
       renderReferenceBoard();
     };
 
-    // 箭头、流程框与便签
-    const btnToolArrow = document.getElementById('btnToolArrow');
-    if (btnToolArrow) {
-      btnToolArrow.onclick = () => {
-        saveHistory();
-        const cx = cssWidth / 2, cy = cssHeight / 2;
-        const pts = [];
-        for (let x = cx - 60; x <= cx + 60; x += 10) pts.push({ x, y: cy });
-        pts.push({ x: cx + 45, y: cy - 10 });
-        pts.push({ x: cx + 60, y: cy });
-        pts.push({ x: cx + 45, y: cy + 10 });
-
-        appState.strokes.push({
-          id: Date.now() + Math.random(),
-          tool: 'pen',
-          color: appState.currentColor,
-          size: Number(appState.brushSize) + 1,
-          points: pts
-        });
-        redrawAllStrokes();
-      };
-    }
-
+    // 流程框
     const btnToolBox = document.getElementById('btnToolBox');
     if (btnToolBox) {
       btnToolBox.onclick = () => {
@@ -6087,47 +6060,6 @@
           points: pts
         });
         redrawAllStrokes();
-      };
-    }
-
-    const btnToolSticky = document.getElementById('btnToolSticky');
-    if (btnToolSticky) {
-      btnToolSticky.onclick = () => {
-        const note = document.createElement('div');
-        const colors = ['bg-amber-100 border-amber-300 text-amber-950', 'bg-blue-100 border-blue-300 text-blue-950', 'bg-emerald-100 border-emerald-300 text-emerald-950', 'bg-rose-100 border-rose-300 text-rose-950'];
-        const chosen = colors[Math.floor(Math.random() * colors.length)];
-
-        note.className = `sticky-note absolute p-3 ${chosen} rounded-2xl shadow-xl w-48 h-40 border flex flex-col pointer-events-auto`;
-        note.style.left = `${Math.max(20, cssWidth / 2 - 90 + (Math.random() * 40 - 20))}px`;
-        note.style.top = `${Math.max(20, cssHeight / 2 - 70 + (Math.random() * 40 - 20))}px`;
-        
-        note.innerHTML = `
-          <div class="note-handle flex justify-between items-center mb-1 text-[11px] font-bold opacity-75 cursor-move">
-            <span>📝 灵感便签</span>
-            <button onclick="this.closest('.sticky-note').remove()" class="text-rose-600 hover:text-rose-800 text-base leading-none">×</button>
-          </div>
-          <textarea placeholder="输入讨论要点或行动项..." class="w-full flex-1 bg-transparent text-xs outline-none resize-none leading-relaxed"></textarea>
-        `;
-
-        let isDragging = false, startX, startY, origX, origY;
-        const handle = note.querySelector('.note-handle');
-        handle.onpointerdown = (e) => {
-          isDragging = true;
-          startX = e.clientX; startY = e.clientY;
-          origX = note.offsetLeft; origY = note.offsetTop;
-          handle.setPointerCapture(e.pointerId);
-        };
-        handle.onpointermove = (e) => {
-          if (!isDragging) return;
-          note.style.left = `${origX + (e.clientX - startX)}px`;
-          note.style.top = `${origY + (e.clientY - startY)}px`;
-        };
-        handle.onpointerup = (e) => {
-          isDragging = false;
-          try { handle.releasePointerCapture(e.pointerId); } catch {}
-        };
-
-        if (stickyLayer) stickyLayer.appendChild(note);
       };
     }
 
