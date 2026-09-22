@@ -4711,6 +4711,17 @@
           openStickyEditor(tapSticky);
           return;
         }
+        // Same for a single selected text (the box is rebuilt on pointerup, so the browser's dblclick never reaches it)
+        const selT = appState.selectedTexts || [];
+        const tapText = (!tapSticky && selT.length === 1 && !(appState.selectedStrokes || []).length && !(appState.selectedImages || []).length) ? selT[0] : null;
+        if (tapText && ((appState._lastBoxTapText === tapText && nowTap - (appState._lastBoxTapTime || 0) < 380) ||
+            (appState._lastClickedText === tapText && nowTap - (appState._lastTextClickTime || 0) < 380))) {
+          appState._lastBoxTapText = null;
+          appState._lastClickedText = null;
+          openRichTextEditor(tapText);
+          return;
+        }
+        appState._lastBoxTapText = tapText;
         appState._lastBoxTapSticky = tapSticky;
         appState._lastBoxTapTime = nowTap;
         saveHistory();
