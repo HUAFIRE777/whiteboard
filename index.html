@@ -1222,14 +1222,14 @@
         <span class="text-sm">📝</span>
       </button>
 
-      <!-- 4. ➔ 智能连接箭头 (Smart Connectors & Arrows) -->
-      <button class="tool-btn p-2 rounded-xl text-indigo-600 dark:text-indigo-400 hover:bg-stone-100 dark:hover:bg-slate-800 text-xs transition flex items-center justify-center" data-tool="arrow" data-i18n-title="tip_arrow" title="➔ 智能连接线与流程箭头 (思维导图与架构图)">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <!-- 4. 🔷 形状 (矩形 / 圆角矩形 / 椭圆 / 菱形 / 三角形) -->
+      <button id="btnToolBox" type="button" class="p-2 rounded-xl text-stone-700 dark:text-slate-300 hover:bg-stone-100 dark:hover:bg-slate-800 text-xs transition flex items-center justify-center" data-i18n-title="tip_box" title="形状：矩形 / 椭圆 / 菱形 / 三角形 (R / O)" aria-label="Shapes">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="10" height="10" rx="1.5"/><circle cx="16" cy="16" r="5"/></svg>
       </button>
 
-      <!-- 5. 🔲 流程矩形框 (Box) -->
-      <button id="btnToolBox" class="p-2 rounded-xl text-stone-700 dark:text-slate-300 hover:bg-stone-100 dark:hover:bg-slate-800 text-xs transition flex items-center justify-center" data-i18n-title="tip_box" title="🔲 插入标准流程矩形框">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="5" rx="3"/></svg>
+      <!-- 5. ➔ 连接线与箭头 (两端可吸附到便签 / 图形，移动时自动跟随) -->
+      <button id="btnToolConnector" type="button" class="p-2 rounded-xl text-indigo-600 dark:text-indigo-400 hover:bg-stone-100 dark:hover:bg-slate-800 text-xs transition flex items-center justify-center" data-i18n-title="tip_arrow" title="连接线 / 箭头：从便签或图形拖出即可连接 (A)" aria-label="Connector">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>
 
       <!-- 6. 当前绘图笔刷 (快捷键 P) -->
@@ -1291,6 +1291,53 @@
           <span class="text-[10px] text-sky-700">系统架构 · 业务逻辑</span>
         </button>
       </div>
+    </div>
+
+    <!-- 🔷 形状与连接线面板 -->
+    <div id="shapePanel" class="wb-flyout hidden absolute left-14 sm:left-18 top-24 z-40 rounded-2xl p-3 shadow-2xl space-y-2.5 w-72 transition-all" role="dialog" aria-labelledby="shapePanelTitle">
+      <div class="flex items-center justify-between pb-1.5 border-b wb-hairline text-xs font-bold">
+        <span id="shapePanelTitle" class="flex items-center gap-1.5"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="10" height="10" rx="1.5"/><circle cx="16" cy="16" r="5"/></svg> <span data-i18n="shape_panel_title">形状与连接线</span></span>
+        <button id="btnCloseShapePanel" type="button" class="wb-icon-btn" aria-label="Close">✕</button>
+      </div>
+      <div class="grid grid-cols-4 gap-1.5" id="shapeKindGrid">
+        <button type="button" class="shape-kind-btn" data-shape="rect" data-i18n-title="shape_rect" title="矩形 (R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="6" width="17" height="12"/></svg></button>
+        <button type="button" class="shape-kind-btn" data-shape="roundrect" data-i18n-title="shape_roundrect" title="圆角矩形"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="6" width="17" height="12" rx="4"/></svg></button>
+        <button type="button" class="shape-kind-btn" data-shape="ellipse" data-i18n-title="shape_ellipse" title="椭圆 (O)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="12" rx="9" ry="6.5"/></svg></button>
+        <button type="button" class="shape-kind-btn" data-shape="diamond" data-i18n-title="shape_diamond" title="菱形 (D)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3 21 12 12 21 3 12Z"/></svg></button>
+        <button type="button" class="shape-kind-btn" data-shape="triangle" data-i18n-title="shape_triangle" title="三角形"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 4 21 20H3Z"/></svg></button>
+        <button type="button" class="shape-kind-btn" data-shape="line" data-i18n-title="shape_line" title="直线"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="19" x2="20" y2="5"/></svg></button>
+        <button type="button" class="shape-kind-btn" data-shape="arrow" data-i18n-title="shape_arrow" title="单向箭头 (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="19" x2="19" y2="5"/><path d="M11 5h8v8" /></svg></button>
+        <button type="button" class="shape-kind-btn" data-shape="arrow2" data-i18n-title="shape_arrow2" title="双向箭头"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="19" x2="19" y2="5"/><path d="M11 5h8v8M13 19H5v-8"/></svg></button>
+      </div>
+      <div class="space-y-1.5">
+        <div class="wb-label" data-i18n="shape_stroke_color">描边颜色</div>
+        <div id="shapeStrokeColors" class="flex flex-wrap gap-1.5"></div>
+      </div>
+      <div class="space-y-1.5">
+        <div class="wb-label" data-i18n="shape_fill">填充</div>
+        <div class="wb-segmented" id="shapeFillSeg">
+          <button type="button" data-fill="none" data-i18n="shape_fill_none">无</button>
+          <button type="button" data-fill="translucent" data-i18n="shape_fill_translucent">半透明</button>
+          <button type="button" data-fill="solid" data-i18n="shape_fill_solid">实色</button>
+        </div>
+        <div id="shapeFillColors" class="flex flex-wrap gap-1.5"></div>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="space-y-1.5">
+          <div class="wb-label" data-i18n="shape_width">线宽</div>
+          <div class="wb-segmented" id="shapeWidthSeg">
+            <button type="button" data-w="1">1</button><button type="button" data-w="2">2</button><button type="button" data-w="4">4</button><button type="button" data-w="6">6</button>
+          </div>
+        </div>
+        <div class="space-y-1.5">
+          <div class="wb-label" data-i18n="shape_routing">连接线路径</div>
+          <div class="wb-segmented" id="shapeRoutingSeg">
+            <button type="button" data-routing="straight" data-i18n="shape_routing_straight">直线</button>
+            <button type="button" data-routing="elbow" data-i18n="shape_routing_elbow">折线</button>
+          </div>
+        </div>
+      </div>
+      <p class="wb-hint" data-i18n="shape_hint">拖动绘制，按住 Shift 画正方形/正圆或 45° 线。从便签、图片或图形上拖出箭头即可连接，移动它们时箭头自动跟随。选中图形后修改这里的样式会直接应用。</p>
     </div>
 
     <!-- 🗄️ PS 式「更多工具」二级收拢抽屉 -->
@@ -3383,6 +3430,9 @@
       } else if (appState.tool === 'laser') {
         canvas.style.cursor = 'pointer';
         canvas.classList.remove('cursor-pen-nib');
+      } else if (appState.tool === 'shape') {
+        canvas.style.cursor = 'crosshair';
+        canvas.classList.remove('cursor-pen-nib');
       } else {
         // 🖋️ 真实握笔手感：启用倾斜 45° 拟真笔尖光标
         canvas.classList.add('cursor-pen-nib');
@@ -3711,6 +3761,7 @@
     // src (optional): { strokes, texts, images } of another board (e.g. dual-mode left page). Defaults to appState.
     function redrawAllStrokes(targetCtx = ctx, scale = dpr, transparent = false, src = null) {
       const board = src || appState;
+      rerouteConnectors(board);
       renderBackgroundOnContext(targetCtx, cssWidth, cssHeight, scale, transparent);
 
       targetCtx.save();
@@ -3755,6 +3806,7 @@
             // 2. 渲染 12 大商业级手绘笔画 (G-Pen, 丸笔, 铅笔, 蓝笔, 毛笔, 喷枪, 荧光, 排线, 霓虹, 虚线, 激光, 圆珠笔)
       for (const s of (board.strokes || [])) {
         if (!s.points || s.points.length === 0) continue;
+        if (s.tool === 'shape') { drawShape(targetCtx, s); continue; }
         targetCtx.save();
 
         if (s.tool === 'highlighter') {
@@ -3926,11 +3978,12 @@
     function isStrokeNearPoint(stroke, px, py, radius) {
       if (!stroke.points || stroke.points.length === 0) return false;
       const r2 = radius * radius;
-      for (let i = 0; i < stroke.points.length; i++) {
-        const p1 = stroke.points[i];
+      const pts = stroke.tool === 'shape' ? getShapeOutline(stroke) : stroke.points;
+      for (let i = 0; i < pts.length; i++) {
+        const p1 = pts[i];
         if ((p1.x - px) ** 2 + (p1.y - py) ** 2 <= r2) return true;
         if (i > 0) {
-          const p0 = stroke.points[i - 1];
+          const p0 = pts[i - 1];
           if (distToSegmentSquared({ x: px, y: py }, p0, p1) <= r2) return true;
         }
       }
@@ -4146,6 +4199,7 @@
         e.stopPropagation();
         e.preventDefault();
         saveHistory();
+        detachConnectorsForSelectionTransform();
 
         const centerX = minX + boxW / 2;
         const centerY = minY + boxH / 2;
@@ -4239,6 +4293,7 @@
           e.stopPropagation();
           e.preventDefault();
           saveHistory();
+          detachConnectorsForSelectionTransform();
           const handleType = handle.dataset.handle;
           const startPointer = getCanvasCoordinates(e);
 
@@ -4330,7 +4385,7 @@
 
             // 1. 缩放手绘线条笔画
             for (const item of snapStrokes) {
-              item.stroke.size = Math.max(1, item.origSize * avgScale);
+              if (item.stroke.tool !== 'shape') item.stroke.size = Math.max(1, item.origSize * avgScale);
               for (let i = 0; i < item.origPoints.length; i++) {
                 const origPt = item.origPoints[i];
                 const targetPt = item.stroke.points[i];
@@ -4384,6 +4439,7 @@
     function rotateSelectedItems(angleDelta) {
       if (!appState.selectionBounds) return;
       saveHistory();
+      detachConnectorsForSelectionTransform();
       const centerX = appState.selectionBounds.x + appState.selectionBounds.width / 2;
       const centerY = appState.selectionBounds.y + appState.selectionBounds.height / 2;
       const cosA = Math.cos(angleDelta);
@@ -4427,6 +4483,8 @@
 
     function duplicateSelectedItems() {
       saveHistory();
+      const dupIdMap = new Map();
+      const dupStrokes = [];
       if (appState.selectedStrokes && appState.selectedStrokes.length > 0) {
         const clonedStrokes = [];
         for (const s of appState.selectedStrokes) {
@@ -4443,6 +4501,8 @@
           };
           appState.strokes.push(clone);
           clonedStrokes.push(clone);
+          dupIdMap.set(s.id, clone.id);
+          dupStrokes.push(clone);
         }
         appState.selectedStrokes = clonedStrokes;
       }
@@ -4459,6 +4519,7 @@
           delete clone._editing;
           appState.images.push(clone);
           clonedList.push(clone);
+          dupIdMap.set(im.id, clone.id);
         }
         appState.selectedImages = clonedList;
       }
@@ -4477,6 +4538,12 @@
           clonedList.push(clone);
         }
         appState.selectedTexts = clonedList;
+      }
+      // Duplicated connectors bind to the duplicated elements, or become free lines
+      for (const c of dupStrokes) {
+        if (!isLinearShape(c)) continue;
+        if (c.fromId != null) { if (dupIdMap.has(c.fromId)) c.fromId = dupIdMap.get(c.fromId); else { delete c.fromId; delete c.fromAnchor; } }
+        if (c.toId != null) { if (dupIdMap.has(c.toId)) c.toId = dupIdMap.get(c.toId); else { delete c.toId; delete c.toAnchor; } }
       }
       redrawAllStrokes();
       updateSelectionBoxUI();
@@ -4712,6 +4779,7 @@
         if (e && refActivePointerId !== null && e.pointerId !== refActivePointerId) return;
         isRefDrawing = false;
         currentRefStroke = null;
+        if (shapeDraft && shapeDraft.isLeft) finishShapeDraft();
         if (e && refActivePointerId !== null) {
           try { refCanvas.releasePointerCapture(refActivePointerId); } catch (_) {}
         }
@@ -4764,6 +4832,14 @@
           return;
         }
 
+        if (tool === 'shape') {
+          isRefDrawing = true;
+          if (!p.strokes) p.strokes = [];
+          beginShapeDraft(p, pos, true);
+          renderReferenceBoard();
+          return;
+        }
+
         const pressure = (e.pressure !== undefined && e.pressure > 0) ? e.pressure : 0.5;
         const strokeWidth = computeStrokeWidth(tool, pressure);
         pos.time = performance.now();
@@ -4787,6 +4863,12 @@
         if (refActivePointerId !== null && e.pointerId !== refActivePointerId) return;
         e.preventDefault();
 
+        if (shapeDraft && shapeDraft.isLeft) {
+          updateShapeDraft(getRefCanvasCoordinates(e), e.shiftKey);
+          renderReferenceBoard();
+          drawAttachHighlight(refCanvas.getContext('2d'));
+          return;
+        }
         if (appState.tool === 'eraser' || !currentRefStroke) {
           const pos = getRefCanvasCoordinates(e);
           const p = appState.pages[0];
@@ -4877,7 +4959,7 @@
     }
 
     function closeAllFlyouts(exceptId = null) {
-      const flyoutIds = ['paletteFlyout', 'brushStudioFlyout', 'langMenu', 'moreToolsDrawer'];
+      const flyoutIds = ['paletteFlyout', 'brushStudioFlyout', 'langMenu', 'moreToolsDrawer', 'shapePanel', 'stickyColorMenu', 'mediaMenu', 'layersPanel'];
       for (const id of flyoutIds) {
         if (id !== exceptId) {
           const el = document.getElementById(id);
@@ -5403,7 +5485,7 @@
         let hitStroke = null;
         for (let i = appState.strokes.length - 1; i >= 0; i--) {
           const s = appState.strokes[i];
-          if (isStrokeNearPoint(s, pos.x, pos.y, Math.max(24, (s.size || 3) * 3))) {
+          if (isStrokeNearPoint(s, pos.x, pos.y, Math.max(24, (s.size || 3) * 3)) || shapeContainsPoint(s, pos.x, pos.y)) {
             hitStroke = s;
             break;
           }
@@ -5458,6 +5540,16 @@
         isDrawing = true;
         activePointerId = e.pointerId;
         try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+        return;
+      }
+
+      if (appState.tool === 'shape') {
+        saveHistory();
+        isDrawing = true;
+        activePointerId = e.pointerId;
+        try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+        beginShapeDraft(appState, pos, false);
+        redrawAllStrokes();
         return;
       }
 
@@ -5517,6 +5609,7 @@
       e.preventDefault();
 
       if (appState.isDraggingSelection) {
+        if (!appState._connDetached) { detachConnectorsForSelectionTransform(); appState._connDetached = true; }
         const pos = getCanvasCoordinates(e);
         const dx = pos.x - appState.dragStartPos.x;
         const dy = pos.y - appState.dragStartPos.y;
@@ -5547,6 +5640,13 @@
       if (!isDrawing) return;
 
       const pos = getCanvasCoordinates(e);
+
+      if (shapeDraft && !shapeDraft.isLeft) {
+        updateShapeDraft(pos, e.shiftKey);
+        redrawAllStrokes();
+        drawAttachHighlight(ctx);
+        return;
+      }
 
       if (appState.tool === 'lasso') {
         appState.lassoPath.push(pos);
@@ -5633,6 +5733,7 @@
 
       if (appState.isDraggingSelection) {
         e.preventDefault();
+        if (!appState._connDetached) { detachConnectorsForSelectionTransform(); appState._connDetached = true; }
         const pos = getCanvasCoordinates(e);
         const dx = pos.x - appState.dragStartPos.x;
         const dy = pos.y - appState.dragStartPos.y;
@@ -5694,6 +5795,7 @@
       }
       if (appState.isDraggingSelection) {
         appState.isDraggingSelection = false;
+        appState._connDetached = false;
         updateSelectionBoxUI();
         if (typeof scheduleAutosave === 'function') scheduleAutosave();
         return;
@@ -5715,6 +5817,15 @@
           updateSelectionBoxUI();
         }
         appState.lassoPath = [];
+        return;
+      }
+
+      if (shapeDraft && !shapeDraft.isLeft) {
+        finishShapeDraft();
+        isDrawing = false;
+        currentStroke = null;
+        redrawAllStrokes();
+        if (typeof scheduleAutosave === 'function') scheduleAutosave();
         return;
       }
 
@@ -5989,6 +6100,16 @@
         appState.tool = 'lasso'; updateToolButtonsUI();
       } else if (key === 't') {
         appState.tool = 'text'; updateToolButtonsUI();
+      } else if (key === 'r') {
+        setShapeKind('rect');
+      } else if (key === 'o') {
+        setShapeKind('ellipse');
+      } else if (key === 'd') {
+        setShapeKind('diamond');
+      } else if (key === 'a') {
+        setShapeKind('arrow');
+      } else if (key === 'n') {
+        addPastelStickyNote('#fef08a', '#fde047');
       } else if (e.code === 'Space') {
         appState.isSpaceDown = true;
         workbenchWrapper.style.cursor = 'grab';
@@ -6201,8 +6322,6 @@
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&apos;');
     }
-
-    function buildSvgShape() { return ''; } // replaced by the shapes module
 
     function svgNum(n) {
       return Math.round((Number(n) || 0) * 100) / 100;
@@ -6761,6 +6880,12 @@ ${pathsSvg}</svg>`;
       document.querySelectorAll('.tool-btn').forEach(btn => {
         btn.classList.toggle('tool-btn-active', btn.dataset.tool === appState.tool);
       });
+      const isShape = appState.tool === 'shape';
+      const boxBtn = document.getElementById('btnToolBox');
+      const connBtn = document.getElementById('btnToolConnector');
+      if (boxBtn) boxBtn.classList.toggle('tool-btn-active', isShape && CLOSED_SHAPES.has(appState.shapeKind));
+      if (connBtn) connBtn.classList.toggle('tool-btn-active', isShape && LINEAR_SHAPES.has(appState.shapeKind));
+      if (typeof updateShapePanelUI === 'function' && document.getElementById('shapePanel')) updateShapePanelUI();
       if (appState.tool !== 'lasso' && appState.tool !== 'select') clearSelection();
       updateCanvasCursor();
     }
@@ -6798,27 +6923,562 @@ ${pathsSvg}</svg>`;
       renderReferenceBoard();
     };
 
-    // 流程框
-    const btnToolBox = document.getElementById('btnToolBox');
-    if (btnToolBox) {
-      btnToolBox.onclick = () => {
-        saveHistory();
-        const cx = cssWidth / 2, cy = cssHeight / 2;
-        const w = 140, h = 80;
-        const pts = [];
-        for (let x = cx - w/2; x <= cx + w/2; x += 10) pts.push({ x, y: cy - h/2 });
-        for (let y = cy - h/2; y <= cy + h/2; y += 10) pts.push({ x: cx + w/2, y });
-        for (let x = cx + w/2; x >= cx - w/2; x -= 10) pts.push({ x, y: cy + h/2 });
-        for (let y = cy + h/2; y >= cy - h/2; y -= 10) pts.push({ x: cx - w/2, y });
+    // ================= 🔷 Shapes & connectors =================
+    // A shape is a stroke with tool:'shape' so selection / move / resize / rotate / undo / autosave / save-file / dual board
+    // and the eraser work unchanged. Closed shapes store 4 frame corners [tl, tr, br, bl] (rotation / skew survive transforms);
+    // lines & arrows store [start, end] plus optional fromId/toId + fromAnchor/toAnchor ('n'|'e'|'s'|'w'|'auto') and
+    // routing ('straight'|'elbow'). Attached ends are re-routed on every render, so connectors follow moved elements.
+    const CLOSED_SHAPES = new Set(['rect', 'roundrect', 'ellipse', 'diamond', 'triangle']);
+    const LINEAR_SHAPES = new Set(['line', 'arrow', 'arrow2']);
+    const SHAPE_FILL_COLORS = ['#ffffff', '#fef08a', '#fbcfe8', '#bbf7d0', '#bae6fd', '#e9d5ff', '#fed7aa', '#e2e8f0'];
+    appState.shapeKind = 'rect';
+    appState.shapeStyle = { fill: 'none', fillColor: '#bae6fd', strokeWidth: 2, routing: 'straight' };
 
-        appState.strokes.push({
-          id: Date.now() + Math.random(),
-          tool: 'pen',
-          color: appState.currentColor,
-          size: Number(appState.brushSize),
-          points: pts
+    function isShapeStroke(s) { return !!s && s.tool === 'shape'; }
+    function isClosedShape(s) { return isShapeStroke(s) && CLOSED_SHAPES.has(s.shape); }
+    function isLinearShape(s) { return isShapeStroke(s) && LINEAR_SHAPES.has(s.shape); }
+
+    function makeShapeStroke(kind, a, b, style = {}) {
+      const st = Object.assign({}, appState.shapeStyle, style);
+      const s = {
+        id: style.id || (Date.now() + Math.random()),
+        tool: 'shape',
+        shape: kind,
+        color: style.color || appState.currentColor,
+        size: Math.max(1, Number(st.strokeWidth) || 2),
+        fill: CLOSED_SHAPES.has(kind) ? (st.fill || 'none') : 'none',
+        fillColor: st.fillColor || '#bae6fd',
+        points: []
+      };
+      if (LINEAR_SHAPES.has(kind)) {
+        s.routing = st.routing === 'elbow' ? 'elbow' : 'straight';
+        s.points = [{ x: a.x, y: a.y }, { x: b.x, y: b.y }];
+      } else {
+        setShapeFrameFromCorners(s, a, b);
+      }
+      return s;
+    }
+
+    function setShapeFrameFromCorners(s, a, b) {
+      const x0 = Math.min(a.x, b.x), y0 = Math.min(a.y, b.y), x1 = Math.max(a.x, b.x), y1 = Math.max(a.y, b.y);
+      s.points = [{ x: x0, y: y0 }, { x: x1, y: y0 }, { x: x1, y: y1 }, { x: x0, y: y1 }];
+    }
+
+    // Frame of a closed shape: origin p0, axis u (p0→p1) and v (p0→p3)
+    function getShapeFrame(s) {
+      const [p0, p1, , p3] = s.points;
+      const ux = p1.x - p0.x, uy = p1.y - p0.y, vx = p3.x - p0.x, vy = p3.y - p0.y;
+      return { p0, ux, uy, vx, vy, w: Math.max(0.5, Math.hypot(ux, uy)), h: Math.max(0.5, Math.hypot(vx, vy)) };
+    }
+    function frameMap(f, lx, ly) {
+      return { x: f.p0.x + (lx / f.w) * f.ux + (ly / f.h) * f.vx, y: f.p0.y + (lx / f.w) * f.uy + (ly / f.h) * f.vy };
+    }
+
+    // Path commands in local (w × h) space; beziers survive the affine frame mapping exactly
+    function shapeLocalCommands(kind, w, h) {
+      const K = 0.5522847;
+      if (kind === 'ellipse') {
+        const rx = w / 2, ry = h / 2, cx = rx, cy = ry;
+        return [['M', cx + rx, cy],
+          ['C', cx + rx, cy + K * ry, cx + K * rx, cy + ry, cx, cy + ry],
+          ['C', cx - K * rx, cy + ry, cx - rx, cy + K * ry, cx - rx, cy],
+          ['C', cx - rx, cy - K * ry, cx - K * rx, cy - ry, cx, cy - ry],
+          ['C', cx + K * rx, cy - ry, cx + rx, cy - K * ry, cx + rx, cy], ['Z']];
+      }
+      if (kind === 'diamond') return [['M', w / 2, 0], ['L', w, h / 2], ['L', w / 2, h], ['L', 0, h / 2], ['Z']];
+      if (kind === 'triangle') return [['M', w / 2, 0], ['L', w, h], ['L', 0, h], ['Z']];
+      if (kind === 'roundrect') {
+        const r = Math.max(0, Math.min(18, w * 0.25, h * 0.25)), k = r * (1 - K);
+        return [['M', r, 0], ['L', w - r, 0], ['C', w - k, 0, w, k, w, r], ['L', w, h - r], ['C', w, h - k, w - k, h, w - r, h],
+          ['L', r, h], ['C', k, h, 0, h - k, 0, h - r], ['L', 0, r], ['C', 0, k, k, 0, r, 0], ['Z']];
+      }
+      return [['M', 0, 0], ['L', w, 0], ['L', w, h], ['L', 0, h], ['Z']];
+    }
+
+    function getClosedShapeCommands(s) {
+      const f = getShapeFrame(s);
+      return shapeLocalCommands(s.shape, f.w, f.h).map(cmd => {
+        if (cmd[0] === 'Z') return cmd;
+        const out = [cmd[0]];
+        for (let i = 1; i < cmd.length; i += 2) { const p = frameMap(f, cmd[i], cmd[i + 1]); out.push(p.x, p.y); }
+        return out;
+      });
+    }
+
+    function flattenCommands(cmds) {
+      const pts = [];
+      let cur = null;
+      for (const c of cmds) {
+        if (c[0] === 'M' || c[0] === 'L') { cur = { x: c[1], y: c[2] }; pts.push(cur); }
+        else if (c[0] === 'C' && cur) {
+          for (let t = 1; t <= 8; t++) {
+            const u = t / 8, mt = 1 - u;
+            pts.push({
+              x: mt * mt * mt * cur.x + 3 * mt * mt * u * c[1] + 3 * mt * u * u * c[3] + u * u * u * c[5],
+              y: mt * mt * mt * cur.y + 3 * mt * mt * u * c[2] + 3 * mt * u * u * c[4] + u * u * u * c[6]
+            });
+          }
+          cur = { x: c[5], y: c[6] };
+        }
+      }
+      return pts;
+    }
+
+    // Anchor points (side midpoints) of any attachable element: closed shape, sticky note or image
+    function getElementAnchorsById(board, id) {
+      if (id == null) return null;
+      for (const im of (board.images || [])) {
+        if (im.id !== id) continue;
+        const cx = im.x + im.width / 2, cy = im.y + im.height / 2, r = im.rotation || 0;
+        const rot = (dx, dy) => ({ x: cx + dx * Math.cos(r) - dy * Math.sin(r), y: cy + dx * Math.sin(r) + dy * Math.cos(r) });
+        return { c: { x: cx, y: cy }, n: rot(0, -im.height / 2), e: rot(im.width / 2, 0), s: rot(0, im.height / 2), w: rot(-im.width / 2, 0) };
+      }
+      for (const s of (board.strokes || [])) {
+        if (s.id !== id || !isClosedShape(s) || !s.points || s.points.length < 4) continue;
+        const f = getShapeFrame(s);
+        const tri = s.shape === 'triangle';
+        return {
+          c: frameMap(f, f.w / 2, f.h / 2), n: frameMap(f, f.w / 2, 0), s: frameMap(f, f.w / 2, f.h),
+          e: frameMap(f, tri ? f.w * 0.75 : f.w, f.h / 2), w: frameMap(f, tri ? f.w * 0.25 : 0, f.h / 2)
+        };
+      }
+      return null;
+    }
+
+    function pickAutoSide(anchors, toward) {
+      const dx = toward.x - anchors.c.x, dy = toward.y - anchors.c.y;
+      let best = 'e', bestD = Infinity;
+      for (const k of ['n', 'e', 's', 'w']) {
+        const d = Math.hypot(anchors[k].x - (anchors.c.x + dx * 4), anchors[k].y - (anchors.c.y + dy * 4));
+        if (d < bestD) { bestD = d; best = k; }
+      }
+      return best;
+    }
+
+    // Re-attach connector ends to the current position of their elements (called on every render)
+    function rerouteConnectors(board) {
+      const strokes = board && board.strokes;
+      if (!strokes || !strokes.length) return;
+      for (const s of strokes) {
+        if (!isLinearShape(s) || (s.fromId == null && s.toId == null) || !s.points || s.points.length < 2) continue;
+        const A = s.fromId != null ? getElementAnchorsById(board, s.fromId) : null;
+        const B = s.toId != null ? getElementAnchorsById(board, s.toId) : null;
+        if (s.fromId != null && !A) { delete s.fromId; delete s.fromAnchor; }
+        if (s.toId != null && !B) { delete s.toId; delete s.toAnchor; }
+        const last = s.points.length - 1;
+        const refA = A ? A.c : s.points[0];
+        const refB = B ? B.c : s.points[last];
+        if (A) {
+          const side = (s.fromAnchor && s.fromAnchor !== 'auto') ? s.fromAnchor : pickAutoSide(A, refB);
+          s._fromSide = side;
+          s.points[0] = { x: A[side].x, y: A[side].y };
+        }
+        if (B) {
+          const side = (s.toAnchor && s.toAnchor !== 'auto') ? s.toAnchor : pickAutoSide(B, refA);
+          s._toSide = side;
+          s.points[last] = { x: B[side].x, y: B[side].y };
+        }
+      }
+    }
+
+    // Poly-line actually drawn for a line/arrow (straight or 3-segment orthogonal elbow)
+    function getLinearPath(s) {
+      const a = s.points[0], b = s.points[s.points.length - 1];
+      if (s.routing !== 'elbow') return [a, b];
+      const side = s._fromSide || (Math.abs(b.x - a.x) >= Math.abs(b.y - a.y) ? 'e' : 'n');
+      if (side === 'e' || side === 'w') {
+        const mx = (a.x + b.x) / 2;
+        return [a, { x: mx, y: a.y }, { x: mx, y: b.y }, b];
+      }
+      const my = (a.y + b.y) / 2;
+      return [a, { x: a.x, y: my }, { x: b.x, y: my }, b];
+    }
+
+    function arrowHeadPoints(tip, from, size) {
+      const ang = Math.atan2(tip.y - from.y, tip.x - from.x);
+      const len = Math.max(10, size * 4), spread = Math.PI / 7;
+      return [
+        tip,
+        { x: tip.x - len * Math.cos(ang - spread), y: tip.y - len * Math.sin(ang - spread) },
+        { x: tip.x - len * Math.cos(ang + spread), y: tip.y - len * Math.sin(ang + spread) }
+      ];
+    }
+
+    // Line body shortened under the arrow heads so the tip stays sharp
+    function getLinearDrawData(s) {
+      const path = getLinearPath(s).map(p => ({ x: p.x, y: p.y }));
+      const heads = [];
+      const headLen = Math.max(10, s.size * 4) * 0.8;
+      const trim = (tipIdx, prevIdx) => {
+        const tip = path[tipIdx], prev = path[prevIdx];
+        const d = Math.hypot(tip.x - prev.x, tip.y - prev.y);
+        heads.push(arrowHeadPoints({ x: tip.x, y: tip.y }, prev, s.size));
+        if (d > 0.01) {
+          const k = Math.min(headLen, d) / d;
+          tip.x -= (tip.x - prev.x) * k; tip.y -= (tip.y - prev.y) * k;
+        }
+      };
+      if ((s.shape === 'arrow' || s.shape === 'arrow2') && path.length >= 2) trim(path.length - 1, path.length - 2);
+      if (s.shape === 'arrow2' && path.length >= 2) trim(0, 1);
+      return { path, heads };
+    }
+
+    function hexWithAlpha(hex, alpha) {
+      const rgb = hexToRgb(hex);
+      return rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})` : hex;
+    }
+
+    function drawShape(c, s) {
+      if (!s.points || s.points.length < 2) return;
+      c.save();
+      c.lineJoin = 'round';
+      c.lineCap = 'round';
+      c.strokeStyle = s.color || '#18181b';
+      c.lineWidth = Math.max(1, Number(s.size) || 2);
+      if (isClosedShape(s) && s.points.length >= 4) {
+        c.beginPath();
+        for (const cmd of getClosedShapeCommands(s)) {
+          if (cmd[0] === 'M') c.moveTo(cmd[1], cmd[2]);
+          else if (cmd[0] === 'L') c.lineTo(cmd[1], cmd[2]);
+          else if (cmd[0] === 'C') c.bezierCurveTo(cmd[1], cmd[2], cmd[3], cmd[4], cmd[5], cmd[6]);
+          else c.closePath();
+        }
+        if (s.fill === 'solid' || s.fill === 'translucent') {
+          c.fillStyle = s.fill === 'solid' ? (s.fillColor || '#bae6fd') : hexWithAlpha(s.fillColor || '#bae6fd', 0.3);
+          c.fill();
+        }
+        c.stroke();
+      } else if (isLinearShape(s)) {
+        const { path, heads } = getLinearDrawData(s);
+        c.beginPath();
+        path.forEach((p, i) => (i ? c.lineTo(p.x, p.y) : c.moveTo(p.x, p.y)));
+        c.stroke();
+        c.fillStyle = s.color || '#18181b';
+        for (const hd of heads) {
+          c.beginPath();
+          c.moveTo(hd[0].x, hd[0].y); c.lineTo(hd[1].x, hd[1].y); c.lineTo(hd[2].x, hd[2].y); c.closePath();
+          c.fill();
+          c.lineWidth = Math.max(1, s.size * 0.6);
+          c.stroke();
+        }
+      }
+      c.restore();
+    }
+
+    // Outline as a closed/open poly-line (hit testing, eraser)
+    function getShapeOutline(s) {
+      if (isClosedShape(s) && s.points.length >= 4) {
+        const pts = flattenCommands(getClosedShapeCommands(s));
+        if (pts.length) pts.push(pts[0]);
+        return pts;
+      }
+      return getLinearPath(s);
+    }
+
+    function shapeContainsPoint(s, x, y) {
+      if (!isClosedShape(s) || s.points.length < 4) return false;
+      return pointInPolygon({ x, y }, flattenCommands(getClosedShapeCommands(s)));
+    }
+
+    function buildSvgShape(s) {
+      if (!s.points || s.points.length < 2) return '';
+      const stroke = escapeXml(s.color || '#18181b');
+      const sw = svgNum(Math.max(1, Number(s.size) || 2));
+      if (isClosedShape(s) && s.points.length >= 4) {
+        const d = getClosedShapeCommands(s).map(cmd => cmd[0] === 'Z' ? 'Z' : cmd[0] + ' ' + cmd.slice(1).map(svgNum).join(' ')).join(' ');
+        let fill = 'none', fillOpacity = '';
+        if (s.fill === 'solid' || s.fill === 'translucent') {
+          fill = escapeXml(s.fillColor || '#bae6fd');
+          if (s.fill === 'translucent') fillOpacity = ' fill-opacity="0.3"';
+        }
+        return `<path d="${d}" fill="${fill}"${fillOpacity} stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round" />\n`;
+      }
+      const { path, heads } = getLinearDrawData(s);
+      let out = `<polyline points="${path.map(p => `${svgNum(p.x)},${svgNum(p.y)}`).join(' ')}" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" />\n`;
+      for (const hd of heads) {
+        out += `<polygon points="${hd.map(p => `${svgNum(p.x)},${svgNum(p.y)}`).join(' ')}" fill="${stroke}" stroke="${stroke}" stroke-width="${svgNum(Math.max(1, s.size * 0.6))}" stroke-linejoin="round" />\n`;
+      }
+      return out;
+    }
+
+    // Topmost element a connector end can attach to (sticky, image or closed shape) — excludes `exclude`
+    function findAttachTarget(board, pos, exclude) {
+      const pad = 8;
+      const imgs = board.images || [];
+      for (let i = imgs.length - 1; i >= 0; i--) {
+        const im = imgs[i];
+        if (pos.x >= im.x - pad && pos.x <= im.x + im.width + pad && pos.y >= im.y - pad && pos.y <= im.y + im.height + pad) return im;
+      }
+      const strokes = board.strokes || [];
+      for (let i = strokes.length - 1; i >= 0; i--) {
+        const s = strokes[i];
+        if (s === exclude || !isClosedShape(s)) continue;
+        if (shapeContainsPoint(s, pos.x, pos.y) || isStrokeNearPoint(s, pos.x, pos.y, pad)) return s;
+      }
+      return null;
+    }
+
+    // Fixed side when released close to a side midpoint, otherwise 'auto' (side facing the other end)
+    function pickAnchorForDrop(board, target, pos) {
+      const anchors = getElementAnchorsById(board, target.id);
+      if (!anchors) return 'auto';
+      let best = 'auto', bestD = 16;
+      for (const k of ['n', 'e', 's', 'w']) {
+        const d = Math.hypot(anchors[k].x - pos.x, anchors[k].y - pos.y);
+        if (d < bestD) { bestD = d; best = k; }
+      }
+      return best;
+    }
+
+    function ensureElementId(el) {
+      if (el && el.id == null) el.id = Date.now() + Math.random();
+      return el ? el.id : null;
+    }
+
+    // In-progress shape gesture (main board or left dual board)
+    let shapeDraft = null; // { board, stroke, start, isLeft }
+
+    function beginShapeDraft(board, pos, isLeft) {
+      const kind = appState.shapeKind || 'rect';
+      const stroke = makeShapeStroke(kind, pos, pos);
+      if (LINEAR_SHAPES.has(kind)) {
+        const target = findAttachTarget(board, pos, null);
+        if (target) {
+          stroke.fromId = ensureElementId(target);
+          stroke.fromAnchor = pickAnchorForDrop(board, target, pos);
+        }
+      }
+      board.strokes.push(stroke);
+      shapeDraft = { board, stroke, start: { x: pos.x, y: pos.y }, isLeft: !!isLeft, hover: null };
+      return stroke;
+    }
+
+    function updateShapeDraft(pos, shiftKey) {
+      if (!shapeDraft) return;
+      const { stroke, start, board } = shapeDraft;
+      let p = { x: pos.x, y: pos.y };
+      if (isLinearShape(stroke)) {
+        if (shiftKey) {
+          const ang = Math.round(Math.atan2(p.y - start.y, p.x - start.x) / (Math.PI / 4)) * (Math.PI / 4);
+          const len = Math.hypot(p.x - start.x, p.y - start.y);
+          p = { x: start.x + Math.cos(ang) * len, y: start.y + Math.sin(ang) * len };
+        }
+        stroke.points[stroke.points.length - 1] = p;
+        const target = findAttachTarget(board, p, stroke);
+        shapeDraft.hover = (target && target.id !== stroke.fromId) ? target : null;
+      } else {
+        if (shiftKey) {
+          const d = Math.max(Math.abs(p.x - start.x), Math.abs(p.y - start.y));
+          p = { x: start.x + Math.sign(p.x - start.x || 1) * d, y: start.y + Math.sign(p.y - start.y || 1) * d };
+        }
+        setShapeFrameFromCorners(stroke, start, p);
+      }
+    }
+
+    // Dashed outline around the element the connector would attach to
+    function drawAttachHighlight(c) {
+      if (!shapeDraft || !shapeDraft.hover) return;
+      const t = shapeDraft.hover;
+      let pts;
+      if (t.kind === 'sticky' || t.img) {
+        const a = getElementAnchorsById(shapeDraft.board, t.id);
+        if (!a) return;
+        pts = null;
+        c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.scale(dpr, dpr);
+        c.translate(a.c.x, a.c.y); if (t.rotation) c.rotate(t.rotation);
+        c.strokeStyle = '#6366f1'; c.lineWidth = 2; c.setLineDash([6, 4]);
+        c.strokeRect(-t.width / 2 - 4, -t.height / 2 - 4, t.width + 8, t.height + 8);
+        c.restore();
+        return;
+      }
+      pts = getShapeOutline(t);
+      c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.scale(dpr, dpr);
+      c.strokeStyle = '#6366f1'; c.lineWidth = 3; c.setLineDash([6, 4]); c.globalAlpha = 0.8;
+      c.beginPath(); pts.forEach((p, i) => (i ? c.lineTo(p.x, p.y) : c.moveTo(p.x, p.y))); c.stroke();
+      c.restore();
+    }
+
+    function finishShapeDraft(pos) {
+      if (!shapeDraft) return null;
+      const { stroke, start, board } = shapeDraft;
+      if (isLinearShape(stroke)) {
+        const end = stroke.points[stroke.points.length - 1];
+        if (Math.hypot(end.x - start.x, end.y - start.y) < 6) {
+          // A click creates a default-length connector
+          stroke.points[stroke.points.length - 1] = { x: start.x + 140, y: start.y };
+        } else {
+          const target = findAttachTarget(board, end, stroke);
+          if (target && target.id !== stroke.fromId) {
+            stroke.toId = ensureElementId(target);
+            stroke.toAnchor = pickAnchorForDrop(board, target, end);
+          }
+        }
+      } else {
+        const f = getShapeFrame(stroke);
+        if (f.w < 6 && f.h < 6) {
+          setShapeFrameFromCorners(stroke, { x: start.x - 70, y: start.y - 45 }, { x: start.x + 70, y: start.y + 45 });
+        }
+      }
+      shapeDraft = null;
+      return stroke;
+    }
+
+    // Before moving/scaling a selection: detach connector ends whose element is not moving with it
+    function detachConnectorsForSelectionTransform() {
+      const selStrokes = appState.selectedStrokes || [];
+      if (!selStrokes.some(isLinearShape)) return;
+      const moving = new Set();
+      selStrokes.forEach(s => moving.add(s.id));
+      (appState.selectedImages || []).forEach(im => moving.add(im.id));
+      for (const s of selStrokes) {
+        if (!isLinearShape(s)) continue;
+        // Moving a connector on its own unbinds it; moving it together with one of its elements keeps both bindings
+        if ((s.fromId == null || !moving.has(s.fromId)) && (s.toId == null || !moving.has(s.toId))) {
+          delete s.fromId; delete s.fromAnchor; delete s.toId; delete s.toAnchor;
+        }
+      }
+    }
+
+    function getSelectedShapes() {
+      return (appState.selectedStrokes || []).filter(isShapeStroke);
+    }
+
+    let shapeRestyleSession = false;
+    function restyleSelectedShapes(mutator) {
+      const shapes = getSelectedShapes();
+      if (!shapes.length) return false;
+      if (!shapeRestyleSession) { saveHistory(); shapeRestyleSession = true; setTimeout(() => { shapeRestyleSession = false; }, 1200); }
+      shapes.forEach(mutator);
+      redrawAllStrokes();
+      scheduleAutosave();
+      return true;
+    }
+
+    // 🔷 形状 / 连接线工具与样式面板
+    const btnToolBox = document.getElementById('btnToolBox');
+    const btnToolConnector = document.getElementById('btnToolConnector');
+    const shapePanel = document.getElementById('shapePanel');
+    let lastClosedShapeKind = 'rect';
+    let lastLinearShapeKind = 'arrow';
+
+    function positionFlyoutNear(flyout, btn) {
+      if (!flyout || !btn || !workbenchWrapper) return;
+      const br = btn.getBoundingClientRect();
+      const wr = workbenchWrapper.getBoundingClientRect();
+      const fh = flyout.offsetHeight || 380;
+      flyout.style.top = `${Math.max(8, Math.min(wr.height - fh - 8, br.top - wr.top - 8))}px`;
+    }
+
+    function updateShapePanelUI() {
+      const shapePanel = document.getElementById('shapePanel');
+      if (!shapePanel) return;
+      const st = appState.shapeStyle;
+      shapePanel.querySelectorAll('.shape-kind-btn').forEach(b => b.classList.toggle('is-active', appState.tool === 'shape' && b.dataset.shape === appState.shapeKind));
+      shapePanel.querySelectorAll('#shapeFillSeg button').forEach(b => b.classList.toggle('is-active', b.dataset.fill === st.fill));
+      shapePanel.querySelectorAll('#shapeWidthSeg button').forEach(b => b.classList.toggle('is-active', Number(b.dataset.w) === Number(st.strokeWidth)));
+      shapePanel.querySelectorAll('#shapeRoutingSeg button').forEach(b => b.classList.toggle('is-active', b.dataset.routing === st.routing));
+      shapePanel.querySelectorAll('#shapeFillColors button').forEach(b => b.classList.toggle('is-active', b.dataset.color === st.fillColor));
+      shapePanel.querySelectorAll('#shapeStrokeColors button').forEach(b => b.classList.toggle('is-active', b.dataset.color.toLowerCase() === String(appState.currentColor).toLowerCase()));
+    }
+
+    function setShapeKind(kind) {
+      appState.shapeKind = kind;
+      if (CLOSED_SHAPES.has(kind)) lastClosedShapeKind = kind; else lastLinearShapeKind = kind;
+      appState.tool = 'shape';
+      updateToolButtonsUI();
+      updateShapePanelUI();
+    }
+
+    function openShapePanel(anchorBtn) {
+      if (!shapePanel) return;
+      closeAllFlyouts('shapePanel');
+      [typeof stickyColorMenu !== 'undefined' ? stickyColorMenu : null, document.getElementById('moreToolsDrawer'), document.getElementById('mediaMenu'), document.getElementById('layersPanel')]
+        .forEach(el => el && el.classList.add('hidden'));
+      shapePanel.classList.remove('hidden');
+      positionFlyoutNear(shapePanel, anchorBtn);
+      updateShapePanelUI();
+    }
+
+    if (shapePanel) {
+      const strokeWrap = document.getElementById('shapeStrokeColors');
+      if (strokeWrap) {
+        WHITEBOARD_PALETTE.forEach(c => {
+          const b = document.createElement('button');
+          b.type = 'button'; b.className = 'wb-swatch'; b.dataset.color = c; b.style.background = c; b.title = c;
+          b.onclick = (e) => {
+            e.stopPropagation();
+            syncColorUI(c);
+            restyleSelectedShapes(sh => { sh.color = c; });
+            updateShapePanelUI();
+          };
+          strokeWrap.appendChild(b);
         });
-        redrawAllStrokes();
+      }
+      const fillWrap = document.getElementById('shapeFillColors');
+      if (fillWrap) {
+        SHAPE_FILL_COLORS.forEach(c => {
+          const b = document.createElement('button');
+          b.type = 'button'; b.className = 'wb-swatch'; b.dataset.color = c; b.style.background = c; b.title = c;
+          b.onclick = (e) => {
+            e.stopPropagation();
+            appState.shapeStyle.fillColor = c;
+            if (appState.shapeStyle.fill === 'none') appState.shapeStyle.fill = 'translucent';
+            restyleSelectedShapes(sh => { if (isClosedShape(sh)) { sh.fillColor = c; if (sh.fill === 'none') sh.fill = appState.shapeStyle.fill; } });
+            updateShapePanelUI();
+          };
+          fillWrap.appendChild(b);
+        });
+      }
+      shapePanel.querySelectorAll('.shape-kind-btn').forEach(b => {
+        b.onclick = (e) => { e.stopPropagation(); setShapeKind(b.dataset.shape); };
+      });
+      shapePanel.querySelectorAll('#shapeFillSeg button').forEach(b => {
+        b.onclick = (e) => {
+          e.stopPropagation();
+          appState.shapeStyle.fill = b.dataset.fill;
+          restyleSelectedShapes(sh => { if (isClosedShape(sh)) { sh.fill = b.dataset.fill; sh.fillColor = sh.fillColor || appState.shapeStyle.fillColor; } });
+          updateShapePanelUI();
+        };
+      });
+      shapePanel.querySelectorAll('#shapeWidthSeg button').forEach(b => {
+        b.onclick = (e) => {
+          e.stopPropagation();
+          appState.shapeStyle.strokeWidth = Number(b.dataset.w);
+          restyleSelectedShapes(sh => { sh.size = Number(b.dataset.w); });
+          updateShapePanelUI();
+        };
+      });
+      shapePanel.querySelectorAll('#shapeRoutingSeg button').forEach(b => {
+        b.onclick = (e) => {
+          e.stopPropagation();
+          appState.shapeStyle.routing = b.dataset.routing;
+          restyleSelectedShapes(sh => { if (isLinearShape(sh)) sh.routing = b.dataset.routing; });
+          updateShapePanelUI();
+        };
+      });
+      const btnCloseShapePanel = document.getElementById('btnCloseShapePanel');
+      if (btnCloseShapePanel) btnCloseShapePanel.onclick = (e) => { e.stopPropagation(); shapePanel.classList.add('hidden'); };
+      shapePanel.addEventListener('click', (e) => e.stopPropagation());
+      document.addEventListener('click', (e) => {
+        if (shapePanel.classList.contains('hidden')) return;
+        if (shapePanel.contains(e.target) || (btnToolBox && btnToolBox.contains(e.target)) || (btnToolConnector && btnToolConnector.contains(e.target))) return;
+        shapePanel.classList.add('hidden');
+      });
+    }
+    if (btnToolBox) {
+      btnToolBox.onclick = (e) => {
+        e.stopPropagation();
+        const wasOpen = shapePanel && !shapePanel.classList.contains('hidden') && appState.tool === 'shape' && CLOSED_SHAPES.has(appState.shapeKind);
+        setShapeKind(lastClosedShapeKind);
+        if (wasOpen) shapePanel.classList.add('hidden'); else openShapePanel(btnToolBox);
+      };
+    }
+    if (btnToolConnector) {
+      btnToolConnector.onclick = (e) => {
+        e.stopPropagation();
+        const wasOpen = shapePanel && !shapePanel.classList.contains('hidden') && appState.tool === 'shape' && LINEAR_SHAPES.has(appState.shapeKind);
+        setShapeKind(lastLinearShapeKind);
+        if (wasOpen) shapePanel.classList.add('hidden'); else openShapePanel(btnToolConnector);
       };
     }
 
@@ -7223,6 +7883,7 @@ ${pathsSvg}</svg>`;
       if (!opts || !opts.noEdit) openStickyEditor(st);
       return st;
     }
+
 
     // ==========================================
     // 🗄️ PS 式「更多工具」抽屉
