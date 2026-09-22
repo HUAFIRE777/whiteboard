@@ -5847,6 +5847,15 @@
       }, 'image/png');
     }
 
+    function escapeXml(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+    }
+
     function generateVectorSVGString() {
       let pathsSvg = '';
 
@@ -5857,7 +5866,7 @@
           const cy = im.y + im.height / 2;
           const rotDeg = ((im.rotation || 0) * 180 / Math.PI).toFixed(2);
           const transform = im.rotation ? ` transform="rotate(${rotDeg} ${cx} ${cy})"` : '';
-          pathsSvg += `<image href="${im.img.src}" x="${im.x}" y="${im.y}" width="${im.width}" height="${im.height}"${transform} />\n`;
+          pathsSvg += `<image href="${escapeXml(im.img.src)}" x="${im.x}" y="${im.y}" width="${im.width}" height="${im.height}"${transform} />\n`;
         }
       }
 
@@ -5868,14 +5877,14 @@
           for (const pt of s.points) {
             if (pt.sprayDots) {
               for (const dot of pt.sprayDots) {
-                pathsSvg += `<rect x="${pt.x + dot.dx}" y="${pt.y + dot.dy}" width="${dot.r}" height="${dot.r}" fill="${s.color}" opacity="0.45" />\n`;
+                pathsSvg += `<rect x="${pt.x + dot.dx}" y="${pt.y + dot.dy}" width="${dot.r}" height="${dot.r}" fill="${escapeXml(s.color)}" opacity="0.45" />\n`;
               }
             }
           }
           continue;
         }
         if (s.points.length === 1) {
-          pathsSvg += `<circle cx="${s.points[0].x}" cy="${s.points[0].y}" r="${s.size / 2}" fill="${s.color}" />\n`;
+          pathsSvg += `<circle cx="${s.points[0].x}" cy="${s.points[0].y}" r="${s.size / 2}" fill="${escapeXml(s.color)}" />\n`;
           continue;
         }
         let d = `M ${s.points[0].x} ${s.points[0].y}`;
@@ -5887,7 +5896,7 @@
           d += ` Q ${p1.x} ${p1.y} ${midX} ${midY}`;
         }
         const opacity = s.tool === 'highlighter' ? '0.35' : (s.tool === 'pencil' ? '0.78' : '1');
-        pathsSvg += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.size}" stroke-linecap="round" stroke-linejoin="round" opacity="${opacity}" />\n`;
+        pathsSvg += `<path d="${d}" fill="none" stroke="${escapeXml(s.color)}" stroke-width="${s.size}" stroke-linecap="round" stroke-linejoin="round" opacity="${opacity}" />\n`;
       }
 
       // 3. 导出自由打字文字 (支持 360° 旋转)
@@ -5897,7 +5906,7 @@
         const cy = t.y - t.size / 2;
         const rotDeg = ((t.rotation || 0) * 180 / Math.PI).toFixed(2);
         const transform = t.rotation ? ` transform="rotate(${rotDeg} ${cx} ${cy})"` : '';
-        pathsSvg += `<text x="${t.x}" y="${t.y}" font-size="${t.size}" fill="${t.color}" font-weight="600" font-family="sans-serif"${transform}>${t.text}</text>\n`;
+        pathsSvg += `<text x="${t.x}" y="${t.y}" font-size="${t.size}" fill="${escapeXml(t.color)}" font-weight="600" font-family="sans-serif"${transform}>${escapeXml(t.text)}</text>\n`;
       }
 
       return `<?xml version="1.0" encoding="UTF-8"?>
@@ -5938,7 +5947,7 @@
         alert('PDF 渲染组件加载中，请稍后再试');
         return;
       }
-      syncCurrentPageToState();
+      // The current page is rendered straight from the live state (src = null below)
       const { jsPDF } = window.jspdf;
       const isLandscape = cssWidth >= cssHeight;
       const pdf = new jsPDF({ orientation: isLandscape ? 'l' : 'p', unit: 'pt', format: 'a4' });
@@ -5951,20 +5960,16 @@
       offCanvas.height = Math.round(cssHeight * 2);
       const offCtx = offCanvas.getContext('2d');
 
-      // 逐页绘制并打包多页 PDF（漫画分镜本）
+      // 逐页绘制并打包多页 PDF — render each page from its own data; never touch appState/pages
       appState.pages.forEach((p, idx) => {
         if (idx > 0) pdf.addPage();
-        appState.strokes = p.strokes || [];
-        appState.texts = p.texts || [];
-        appState.images = p.images || [];
         offCtx.clearRect(0, 0, offCanvas.width, offCanvas.height);
-        redrawAllStrokes(offCtx, 2, false);
+        const src = idx === origIndex ? null : { strokes: p.strokes || [], texts: p.texts || [], images: p.images || [] };
+        redrawAllStrokes(offCtx, 2, false, src);
         const imgData = offCanvas.toDataURL('image/jpeg', 0.95);
         pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
       });
 
-      // 恢复原激活页
-      loadPage(origIndex);
       pdf.save(`Whiteboard-Story-${Date.now()}.pdf`);
     }
 
